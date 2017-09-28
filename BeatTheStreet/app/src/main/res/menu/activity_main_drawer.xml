@@ -4,9 +4,13 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_something"
+            android:id="@+id/nav_get_routes"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="Get Routes For Stop" />
+        <item
+            android:id="@+id/nav_get_times_stop"
             android:icon="@drawable/ic_menu_manage"
-            android:title="To be replaced: ./res/menu/" />
+            android:title="Get Times For Stop" />
         <item
             android:id="@+id/nav_get_routes_1929"
             android:icon="@android:drawable/btn_star_big_on"

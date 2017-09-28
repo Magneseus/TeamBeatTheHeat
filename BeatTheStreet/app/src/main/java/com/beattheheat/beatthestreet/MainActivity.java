@@ -94,14 +94,28 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        // Get Stop number
+        TextView stopNum = (TextView) findViewById(R.id.text_stopNo);
+
         // Text View Stuff
         final TextView tv = (TextView) findViewById(R.id.textView3);
 
-        if (id == R.id.nav_something) {
-            tv.setText("test");
-        } else if (id == R.id.nav_get_routes_1929) {
-            Log.d("test", "test2");
+        if (id == R.id.nav_get_routes_1929) {
             octAPI.GetRouteSummaryForStop("1929", new SCallable<String>() {
+                @Override
+                public void call(String arg) {
+                    tv.setText(arg);
+                }
+            });
+        } else if (id == R.id.nav_get_routes) {
+            octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<String>() {
+                @Override
+                public void call(String arg) {
+                    tv.setText(arg);
+                }
+            });
+        } else if (id == R.id.nav_get_times_stop) {
+            octAPI.GetNextTripsForStopAllRoutes(stopNum.getText().toString(), new SCallable<String>() {
                 @Override
                 public void call(String arg) {
                     tv.setText(arg);

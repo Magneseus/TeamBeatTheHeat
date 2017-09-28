@@ -25,37 +25,47 @@ import java.util.Map;
 public class OCTranspo {
     private RequestQueue req;
 
-    private static String routesAtStopURL = "https://api.octranspo1.com/v1.2/GetRouteSummaryForStop";
-    private static String tripsAtStopURL = "https://api.octranspo1.com/v1.2/GetNextTripsForStopAllRoutes";
-    private static String gtfsURL = "https://api.octranspo1.com/v1.2/Gtfs";
+    public enum OC_TYPE {
+        ROUTES_FOR_STOP,
+        TIMES_FOR_STOP_ROUTE,
+        TIMES_FOR_STOP,
+        GTFS,
+        SIZE
+    }
 
-    private static String appID =  "628f2e92";
-    private static String apiKey = "88f44bc3e17f5880763b436cff9a779d";
+    private String[] apiURLs;
+
+    private static final String appID =  "628f2e92";
+    private static final String apiKey = "88f44bc3e17f5880763b436cff9a779d";
 
     public OCTranspo(Context ctx) {
         req = VolleyRequest.getInstance(ctx.getApplicationContext()).getRequestQueue();
+
+        apiURLs = new String[OC_TYPE.SIZE.ordinal()];
+        apiURLs[OC_TYPE.ROUTES_FOR_STOP.ordinal()] = "https://api.octranspo1.com/v1.2/GetRouteSummaryForStop";
+        apiURLs[OC_TYPE.TIMES_FOR_STOP_ROUTE.ordinal()] = "https://api.octranspo1.com/v1.2/GetNextTripsForStop";
+        apiURLs[OC_TYPE.TIMES_FOR_STOP.ordinal()] = "https://api.octranspo1.com/v1.2/GetNextTripsForStopAllRoutes";
+        apiURLs[OC_TYPE.GTFS.ordinal()] = "https://api.octranspo1.com/v1.2/Gtfs";
     }
 
-    public void GetRouteSummaryForStop(final String stopNo, final SCallable<String> func) { //: Retrieves the routes for a given stop number.
+    private void MakeVolleyPOST(OC_TYPE requestType, final HashMap<String, String> requestParams, final SCallable<String> callback) {
         StringRequest jReq = new StringRequest(
                 Request.Method.POST,
-                routesAtStopURL,
+                apiURLs[requestType.ordinal()],
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
-
-                            JSONObject json = new JSONObject(response);
-                            func.call(json.toString(4));
+                            callback.call(response);
                         } catch (Exception e) {
-                            Log.d("error", e.toString());
+                            Log.e("OC_ERR", "Error with callback response: " + e.toString());
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("error", error.toString());
+                        Log.e("OC_ERR", "Error with OC_API POST request: " + error.toString());
                     }
                 }
         ) {
@@ -64,27 +74,49 @@ public class OCTranspo {
              */
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> params = new HashMap<String, String>();
-                params.put("appID", appID);
-                params.put("apiKey", apiKey);
-                params.put("stopNo", stopNo);
-                params.put("format", "json");
-                return params;
+                return requestParams;
             }
         };
 
         req.add(jReq);
     }
 
-    public void GetNextTripsForStop() { //: Retrieves next three trips on the route for a given stop number.
+    // Retrieves the routes for a given stop number.
+    public void GetRouteSummaryForStop(final String stopNo, final SCallable<String> callback) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("appID", appID);
+        params.put("apiKey", apiKey);
+        params.put("stopNo", stopNo);
+        params.put("format", "json");
 
+        MakeVolleyPOST(OC_TYPE.ROUTES_FOR_STOP, params, callback);
     }
 
-    public void GetNextTripsForStopAllRoutes() { //: Retrieves next three trips for all routes for a given stop number.
+    // Retrieves next three trips on the route for a given stop number.
+    public void GetNextTripsForStop(final String stopNo, final String routeNo, final SCallable<String> callback) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("appID", appID);
+        params.put("apiKey", apiKey);
+        params.put("stopNo", stopNo);
+        params.put("routeNo", routeNo);
+        params.put("format", "json");
 
+        MakeVolleyPOST(OC_TYPE.TIMES_FOR_STOP_ROUTE, params, callback);
     }
 
-    public void GTFS() { //: Retrieves specific records from all sections the of GTFS file.
+    // Retrieves next three trips for all routes for a given stop number.
+    public void GetNextTripsForStopAllRoutes(final String stopNo, final SCallable<String> callback) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("appID", appID);
+        params.put("apiKey", apiKey);
+        params.put("stopNo", stopNo);
+        params.put("format", "json");
 
+        MakeVolleyPOST(OC_TYPE.TIMES_FOR_STOP, params, callback);
+    }
+
+    // Retrieves specific records from all sections the of GTFS file.
+    public void GTFS() {
+        //TODO: Specify how we're going to request this, also look into download managers for large filesize
     }
 }
