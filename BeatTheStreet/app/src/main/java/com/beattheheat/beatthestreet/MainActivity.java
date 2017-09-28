@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,9 +15,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import com.beattheheat.beatthestreet.OC_API.OCTranspo;
+import com.beattheheat.beatthestreet.OC_API.SCallable;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private OCTranspo octAPI;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +51,9 @@ public class MainActivity extends AppCompatActivity
         // Scrollbar for text view
         TextView tv = (TextView) findViewById(R.id.textView3);
         tv.setMovementMethod(new ScrollingMovementMethod());
+
+        // OCTranspo API caller
+        octAPI = new OCTranspo(this.getApplicationContext());
     }
 
     @Override
@@ -87,10 +95,18 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         // Text View Stuff
-        TextView tv = (TextView) findViewById(R.id.textView3);
+        final TextView tv = (TextView) findViewById(R.id.textView3);
 
         if (id == R.id.nav_something) {
             tv.setText("test");
+        } else if (id == R.id.nav_get_routes_1929) {
+            Log.d("test", "test2");
+            octAPI.GetRouteSummaryForStop("1929", new SCallable<String>() {
+                @Override
+                public void call(String arg) {
+                    tv.setText(arg);
+                }
+            });
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
