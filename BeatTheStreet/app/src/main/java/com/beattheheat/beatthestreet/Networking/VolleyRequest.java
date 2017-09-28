@@ -1,4 +1,4 @@
-package com.beattheheat.beatthestreet.OC_API;
+package com.beattheheat.beatthestreet.Networking;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -14,7 +14,7 @@ import com.android.volley.toolbox.Volley;
  *
  */
 
-class VolleyRequest {
+public class VolleyRequest {
     @SuppressLint("StaticFieldLeak")
     private static VolleyRequest mInstance;
     @SuppressLint("StaticFieldLeak")

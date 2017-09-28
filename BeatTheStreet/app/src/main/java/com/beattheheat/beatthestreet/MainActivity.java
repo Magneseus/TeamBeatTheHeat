@@ -15,8 +15,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
-import com.beattheheat.beatthestreet.OC_API.OCTranspo;
-import com.beattheheat.beatthestreet.OC_API.SCallable;
+import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
+import com.beattheheat.beatthestreet.Networking.SCallable;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
