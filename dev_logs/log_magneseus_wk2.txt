@@ -1,2 +1,3 @@
 4hrs - Research into Android development practices
-6hrs - Work on integrating OCTranspo API into the application
+6hrs - Work on integrating the OCTranspo API into the application
+2hrs - Work on setting up the Google Maps API for the application
