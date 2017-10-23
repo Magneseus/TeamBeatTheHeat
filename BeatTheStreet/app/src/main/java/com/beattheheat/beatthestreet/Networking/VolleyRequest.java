@@ -12,6 +12,7 @@ import com.android.volley.toolbox.Volley;
  *
  * https://developer.android.com/training/volley/requestqueue.html
  *
+ * Singleton implementation of the VolleyRequest class
  */
 
 public class VolleyRequest {
@@ -21,11 +22,13 @@ public class VolleyRequest {
     private static Context mCtx;
     private RequestQueue mRequestQueue;
 
+    // Initialization, requires a context from an android activity
     private VolleyRequest(Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
     }
 
+    // Returns the singleton instance (or creates a new one if non-existent)
     public static synchronized VolleyRequest getInstance(Context context) {
         if (mInstance == null) {
             mInstance = new VolleyRequest(context);
@@ -33,6 +36,7 @@ public class VolleyRequest {
         return mInstance;
     }
 
+    // Returns the current request queue, so you can add requests to it
     public RequestQueue getRequestQueue() {
         if (mRequestQueue == null) {
             // getApplicationContext() is key, it keeps you from leaking the
@@ -42,6 +46,7 @@ public class VolleyRequest {
         return mRequestQueue;
     }
 
+    // Allows requests to be added directly, instead of getting the request queue and adding to it
     public <T> void addToRequestQueue(Request<T> req) {
         getRequestQueue().add(req);
     }
