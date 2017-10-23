@@ -20,11 +20,15 @@ import java.util.Map;
 /**
  * Created by Matt on 27-Sep-17.
  *
+ * A class to simplify calls to the OCTranspo API. Uses Volley to post GET requests to the OCTranspo
+ * servers, and parse the JSON returned into separate data classes we've defined.
  */
 
 public class OCTranspo {
+    // Volley request queue
     private RequestQueue req;
 
+    // Types of requests that can be made to the server
     public enum OC_TYPE {
         ROUTES_FOR_STOP,
         TIMES_FOR_STOP_ROUTE,
@@ -33,14 +37,18 @@ public class OCTranspo {
         SIZE
     }
 
+    // List of URLs to contact for data
     private String[] apiURLs;
 
+    // API Key information (tied to a personal account created for this application)
     private static final String appID =  "628f2e92";
     private static final String apiKey = "88f44bc3e17f5880763b436cff9a779d";
 
     public OCTranspo(Context ctx) {
+        // Create the volley request queue
         req = VolleyRequest.getInstance(ctx.getApplicationContext()).getRequestQueue();
 
+        // Set the API URLs
         apiURLs = new String[OC_TYPE.SIZE.ordinal()];
         apiURLs[OC_TYPE.ROUTES_FOR_STOP.ordinal()] = "https://api.octranspo1.com/v1.2/GetRouteSummaryForStop";
         apiURLs[OC_TYPE.TIMES_FOR_STOP_ROUTE.ordinal()] = "https://api.octranspo1.com/v1.2/GetNextTripsForStop";
@@ -48,6 +56,13 @@ public class OCTranspo {
         apiURLs[OC_TYPE.GTFS.ordinal()] = "https://api.octranspo1.com/v1.2/Gtfs";
     }
 
+    /**
+     * Makes a volley POST to get information from the OCTranspo API servers
+     *
+     * requestType:   Type of Request to be made, specified by the OCAPI. (See enum at top)
+     * requestParams: Parameters to give the POST request, specified by the type of request. (See public functions below)
+     * callback:      Callback function, given the raw RESPONSE string of the POST request.
+     */
     private void MakeVolleyPOST(OC_TYPE requestType, final HashMap<String, String> requestParams, final SCallable<String> callback) {
         StringRequest jReq = new StringRequest(
                 Request.Method.POST,
@@ -117,6 +132,6 @@ public class OCTranspo {
 
     // Retrieves specific records from all sections the of GTFS file.
     public void GTFS() {
-        //TODO: Specify how we're going to request this, also look into download managers for large filesize
+        //TODO: Specify how we're going to request this
     }
 }
