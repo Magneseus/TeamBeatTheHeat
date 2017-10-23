@@ -1,0 +1,3 @@
+5h: Setting up dev environment, reviewing Java and researching Android development
+3h: Reviewing OCTranspo API
+1h: Reviewing Google Maps API
