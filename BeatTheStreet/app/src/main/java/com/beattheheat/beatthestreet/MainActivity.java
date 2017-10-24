@@ -128,6 +128,8 @@ public class MainActivity extends AppCompatActivity
                     tv.setText(arg);
                 }
             });
+        } else if (id == R.id.nav_get_gtfs) {
+            octAPI.GTFS(this);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

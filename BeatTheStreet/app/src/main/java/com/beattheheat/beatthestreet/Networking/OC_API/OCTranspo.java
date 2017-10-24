@@ -15,6 +15,7 @@ import com.beattheheat.beatthestreet.Networking.VolleyRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -141,16 +142,40 @@ public class OCTranspo {
     }
 
     // Retrieves specific records from all sections the of GTFS file.
-    public void GTFS() {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("appID", appID);
-        params.put("apiKey", apiKey);
-        params.put("table", "");
-        params.put("format", "json");
-
+    public void GTFS(Context ctx) {
         // The HashMap to store all the tables inside of
         final HashMap<String, String> gtfsTable = new HashMap<String,String>();
 
+        // The application context (to prevent leaks)
+        final Context app_ctx = ctx.getApplicationContext();
+
+        StringRequest jReq = new StringRequest(
+                Request.Method.GET,
+                "http://www.octranspo1.com/files/google_transit.zip",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            FileOutputStream os;
+                            String fileName = "GTFS.zip";
+
+                            os = app_ctx.getApplicationContext().openFileOutput(fileName, app_ctx.MODE_PRIVATE);
+                            os.write(response.getBytes());
+                            os.close();
+                        } catch (Exception e) {
+                            Log.e("OC_ERR", "Error with callback response: " + e.toString());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("OC_ERR", "Error with OC_API GET request: " + error.toString());
+                    }
+                }
+        );
+
+        req.add(jReq);
 
         // TODO: Store the parsed objects on the disk somewhere (and check for existence on call)
         // TODO: Check the "calendar" table for start and end dates of regular service
