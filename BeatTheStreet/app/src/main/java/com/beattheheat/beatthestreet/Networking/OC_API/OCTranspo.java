@@ -12,8 +12,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 import com.beattheheat.beatthestreet.Networking.VolleyRequest;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +41,11 @@ public class OCTranspo {
         GTFS,
         SIZE
     }
+
+    // GTFS Tables (Tables for the main database in the API)
+    private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
+    // GTFS Zip URL (For smaller download)
+    private static final String GTFS_ZIP_URL = "http://www.octranspo1.com/files/google_transit.zip";
 
     // List of URLs to contact for data
     private String[] apiURLs;
@@ -132,6 +142,64 @@ public class OCTranspo {
 
     // Retrieves specific records from all sections the of GTFS file.
     public void GTFS() {
-        //TODO: Specify how we're going to request this
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("appID", appID);
+        params.put("apiKey", apiKey);
+        params.put("table", "");
+        params.put("format", "json");
+
+        // The HashMap to store all the tables inside of
+        final HashMap<String, String> gtfsTable = new HashMap<String,String>();
+
+
+        // TODO: Store the parsed objects on the disk somewhere (and check for existence on call)
+        // TODO: Check the "calendar" table for start and end dates of regular service
+        // TODO: Download and decompress the zip file (saves ~45MB of download)
+
+    }
+
+    /** Checks if the GTFS needs to be updated
+     *
+     * @param callback
+     *  - will place a -1 in the Integer argument if the operation to get date info failed
+     *  - will place a 0 in the Integer argument if the date is invalid
+     *  - will place a 1 in the Integer argument if the date is valid
+     */
+    private void CheckGTFSDateValid(final Calendar oldStartDate, final SCallable<Integer> callback) {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put("appID", appID);
+        params.put("apiKey", apiKey);
+        params.put("table", "calendar");
+        params.put("format", "json");
+
+        MakeVolleyPOST(OC_TYPE.GTFS, params, new SCallable<String>() {
+            @Override
+            public void call(String arg) {
+                try {
+                    // Parse returned text into a json
+                    JSONObject calendarJSON = new JSONObject(arg);
+
+                    // Get the end_date of the current schedule
+                    String start_date_string = calendarJSON.getJSONArray("Gtfs").getJSONObject(0).getString("start_date");
+                    Calendar start_date = Calendar.getInstance();
+                    start_date.set(
+                            Integer.parseInt(start_date_string.substring(0,4)),
+                            Integer.parseInt(start_date_string.substring(4,6)),
+                            Integer.parseInt(start_date_string.substring(6,8))
+                    );
+
+                    // Call the callback and give it a return value based on whether we've validated
+                    Integer returnCode = oldStartDate.equals(start_date) ? 1 : 0;
+                    callback.call(returnCode);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+
+                    // Give the callback the error code
+                    Integer returnCode = -1;
+                    callback.call(returnCode);
+                }
+            }
+        });
     }
 }
