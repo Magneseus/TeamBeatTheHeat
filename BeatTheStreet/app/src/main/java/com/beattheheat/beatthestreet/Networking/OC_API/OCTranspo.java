@@ -4,11 +4,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.beattheheat.beatthestreet.FileManagement.Unzipper;
+import com.beattheheat.beatthestreet.Networking.ByteRequest;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 import com.beattheheat.beatthestreet.Networking.VolleyRequest;
 
@@ -149,19 +152,29 @@ public class OCTranspo {
         // The application context (to prevent leaks)
         final Context app_ctx = ctx.getApplicationContext();
 
-        StringRequest jReq = new StringRequest(
+        ByteRequest bReq = new ByteRequest(
                 Request.Method.GET,
                 "http://www.octranspo1.com/files/google_transit.zip",
-                new Response.Listener<String>() {
+                new Response.Listener<Byte[]>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(Byte[] response) {
                         try {
                             FileOutputStream os;
                             String fileName = "GTFS.zip";
 
-                            os = app_ctx.getApplicationContext().openFileOutput(fileName, app_ctx.MODE_PRIVATE);
-                            os.write(response.getBytes());
+                            os = app_ctx.openFileOutput(fileName, app_ctx.MODE_PRIVATE);
+
+                            // Convert from Byte[] to byte[]
+                            byte[] bytes = new byte[response.length];
+                            for (int i = 0; i < response.length; i++)
+                                bytes[i] = response[i];
+
+                            os.write(bytes);
                             os.close();
+
+                            // TODO: move this somewhere else, do it asynchronously
+                            Unzipper uz = new Unzipper(app_ctx, fileName, app_ctx.getFilesDir().getPath());
+                            uz.Unzip();
                         } catch (Exception e) {
                             Log.e("OC_ERR", "Error with callback response: " + e.toString());
                         }
@@ -175,11 +188,9 @@ public class OCTranspo {
                 }
         );
 
-        req.add(jReq);
+        req.add(bReq);
 
-        // TODO: Store the parsed objects on the disk somewhere (and check for existence on call)
-        // TODO: Check the "calendar" table for start and end dates of regular service
-        // TODO: Download and decompress the zip file (saves ~45MB of download)
+        // TODO: check for existence on call
 
     }
 

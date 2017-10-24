@@ -130,6 +130,14 @@ public class MainActivity extends AppCompatActivity
             });
         } else if (id == R.id.nav_get_gtfs) {
             octAPI.GTFS(this);
+
+            String list = "";
+            for (String s : getFilesDir().list()) {
+                list += s;
+                list += "\n";
+            }
+
+            tv.setText(list);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
