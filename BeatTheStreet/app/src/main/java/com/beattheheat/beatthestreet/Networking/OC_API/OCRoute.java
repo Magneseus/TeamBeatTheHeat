@@ -75,7 +75,7 @@ public class OCRoute {
         return routeNo;
     }
 
-    public void setRouteNo(int routeNo) {
+    private void setRouteNo(int routeNo) {
         this.routeNo = routeNo;
     }
 
@@ -83,11 +83,11 @@ public class OCRoute {
         return routeNames;
     }
 
-    public void setRouteNames(List<String> routeNames) {
+    private void setRouteNames(List<String> routeNames) {
         this.routeNames = routeNames;
     }
 
-    public void addRouteName(String routeName) {
+    private void addRouteName(String routeName) {
         this.routeNames.add(routeName);
     }
 
@@ -95,11 +95,11 @@ public class OCRoute {
         return trips;
     }
 
-    public void setTrips(List<String> trips) {
+    private void setTrips(List<String> trips) {
         this.trips = trips;
     }
 
-    public void addTrip(String trip) {
+    private void addTrip(String trip) {
         this.trips.add(trip);
     }
 }

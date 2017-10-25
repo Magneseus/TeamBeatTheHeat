@@ -80,7 +80,7 @@ public class OCTrip {
         return tripId;
     }
 
-    public void setTripId(String tripId) {
+    private void setTripId(String tripId) {
         this.tripId = tripId;
     }
 
@@ -89,11 +89,11 @@ public class OCTrip {
         return stops;
     }
 
-    public void setStops(List<String> stops) {
+    private void setStops(List<String> stops) {
         this.stops = stops;
     }
 
-    public void addStop(String stop) {
+    private void addStop(String stop) {
         this.stops.add(stop);
     }
 
@@ -101,11 +101,11 @@ public class OCTrip {
         return stopTimes;
     }
 
-    public void setStopTimes(List<Date> stopTimes) {
+    private void setStopTimes(List<Date> stopTimes) {
         this.stopTimes = stopTimes;
     }
 
-    public void addStopTime(Date stopTime) {
+    private void addStopTime(Date stopTime) {
         this.stopTimes.add(stopTime);
     }
 }

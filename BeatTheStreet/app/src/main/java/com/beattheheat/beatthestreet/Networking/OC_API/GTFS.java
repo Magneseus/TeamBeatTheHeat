@@ -7,9 +7,9 @@ import java.util.HashMap;
  */
 
 public class GTFS {
-    public HashMap<Integer, OCRoute> routeTable;
-    public HashMap<String, OCTrip> tripTable;
-    public HashMap<String, OCStop> stopTable;
+    HashMap<Integer, OCRoute> routeTable;
+    HashMap<String, OCTrip> tripTable;
+    HashMap<String, OCStop> stopTable;
 
     public GTFS() {
         routeTable = new HashMap<>(200);
