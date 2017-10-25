@@ -1,6 +1,7 @@
 package com.beattheheat.beatthestreet.Networking;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.support.v4.app.ActivityCompat;
@@ -14,17 +15,22 @@ import com.google.android.gms.location.LocationServices;
 
 public class LocationWrapper {
     private static LocationWrapper myObj;
-    private static Location lastLocation;
-    private static GoogleApiClient googleApiClient;
+    private Location lastLocation;
+    private GoogleApiClient googleApiClient;
+    private Context appCtx;
 
-    private LocationWrapper() {
-
+    private LocationWrapper(Context ctx) {
+        // Get application context to avoid leaks
+        appCtx = ctx.getApplicationContext();
     }
 
-    public static LocationWrapper getInstance() {
+    public static LocationWrapper getInstance(Context ctx) {
         if (myObj == null) {
-            myObj = new LocationWrapper();
+            myObj = new LocationWrapper(ctx);
         }
+
+        // Set proper context
+        myObj.appCtx = ctx.getApplicationContext();
 
         return myObj;
     }
@@ -33,7 +39,7 @@ public class LocationWrapper {
         googleApiClient = client;
     }
 
-    private static void queryLocation() {
+    private void queryLocation() {
         /*if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -44,11 +50,21 @@ public class LocationWrapper {
             // for ActivityCompat#requestPermissions for more details.
             return;
         }*/
+        if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 googleApiClient);
     }
 
-    public static Location getLocation()
+    public Location getLocation()
     {
         if(lastLocation == null) {
             queryLocation();
