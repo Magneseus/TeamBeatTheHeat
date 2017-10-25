@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onStop() {
-        LocationWrapper.getInstance(this).connect();
+        LocationWrapper.getInstance(this).disconnect();
         super.onStop();
     }
 

@@ -16,7 +16,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 /**
- * Created by kylec on 2017-10-24.
+ *  Singleton wrapper for the GoogleApiClient Location service.
  */
 
 public class LocationWrapper
@@ -30,6 +30,8 @@ public class LocationWrapper
     private LocationRequest locReq;
     private Context appCtx;
 
+    // Constructor for Singleton class.
+    // Takes the context, which is needed for creation of the GoogleApiClient.
     private LocationWrapper(Context ctx) {
         // Get application context to avoid leaks
         appCtx = ctx.getApplicationContext();
@@ -40,14 +42,14 @@ public class LocationWrapper
                 .addApi(LocationServices.API)
                 .build();
 
+        // creates a request for frequent location updates
+        // TODO: Consider different location update rates
         locReq = new LocationRequest();
         locReq.setInterval(5 * 1000); // every 5s
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        //LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-        //.addLocationRequest(locReq);
     }
 
+    // Returns the instance of the LocationWrapper, creating it if null
     public static LocationWrapper getInstance(Context ctx) {
         if (myObj == null) {
             myObj = new LocationWrapper(ctx);
@@ -59,40 +61,23 @@ public class LocationWrapper
         return myObj;
     }
 
+    // Attempts to connect the googleApiClient
     public void connect() {
         googleApiClient.connect();
     }
 
+    // Disconnects the googleApiClient
     public void disconnect() {
         googleApiClient.disconnect();
     }
 
-    private void queryLocation() {
-        // ensure we have permission
-        if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                googleApiClient);
-    }
-
+    // Returns the last known location
     public Location getLocation()
     {
-        //if(lastLocation == null) {
-        //    queryLocation();
-        //}
-
         return lastLocation;
     }
 
+    // Callback for when the googleApiClient connects
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         int i = ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_FINE_LOCATION);
@@ -105,8 +90,6 @@ public class LocationWrapper
             //                                          int[] grantResults)
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
-            int x = 9;
-            x++;
             //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
             return;
         }
@@ -115,16 +98,19 @@ public class LocationWrapper
                 googleApiClient, locReq, this);
     }
 
+    // Callback for if the googleApiClient connection is suspended
     @Override
     public void onConnectionSuspended(int i) {
 
     }
 
+    // Callback for if the googleApiClient fails to connect
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
+    // Callback for when LocationServices sends a Location Update
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
