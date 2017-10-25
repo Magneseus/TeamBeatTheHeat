@@ -17,13 +17,13 @@ public class OCTrip {
     private List<String> stops;
     private List<Date> stopTimes;
 
-    public OCTrip(String tripId, List<String> stops, List<Date> stopTimes) {
+    private OCTrip(String tripId, List<String> stops, List<Date> stopTimes) {
         setTripId(tripId);
         setStops(stops);
         setStopTimes(stopTimes);
     }
 
-    public OCTrip(String tripId) {
+    private OCTrip(String tripId) {
         this(tripId, new ArrayList<String>(), new ArrayList<Date>());
     }
 

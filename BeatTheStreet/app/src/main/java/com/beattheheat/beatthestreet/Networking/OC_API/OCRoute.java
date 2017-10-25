@@ -12,13 +12,13 @@ public class OCRoute {
     private List<String> routeNames;
     private List<String> trips;
 
-    public OCRoute(int routeNo, List<String> routeNames, List<String> trips) {
+    private OCRoute(int routeNo, List<String> routeNames, List<String> trips) {
         setRouteNo(routeNo);
         setRouteNames(routeNames);
         setTrips(trips);
     }
 
-    public OCRoute(int routeNo, List<String> routeNames) {
+    private OCRoute(int routeNo, List<String> routeNames) {
         this(routeNo, routeNames, new ArrayList<String>());
     }
 
