@@ -10,16 +10,16 @@ import java.util.List;
 public class OCRoute {
     private int routeNo;
     private List<String> routeNames;
-    private List<OCTrip> trips;
+    private List<String> trips;
 
-    public OCRoute(int routeNo, List<String> routeNames, List<OCTrip> trips) {
+    public OCRoute(int routeNo, List<String> routeNames, List<String> trips) {
         setRouteNo(routeNo);
         setRouteNames(routeNames);
         setTrips(trips);
     }
 
     public OCRoute(int routeNo, List<String> routeNames) {
-        this(routeNo, routeNames, new ArrayList<OCTrip>());
+        this(routeNo, routeNames, new ArrayList<String>());
     }
 
 
@@ -37,8 +37,8 @@ public class OCRoute {
 
         String tripId = entries[2];
         String routeName = entries[3];
-        OCTrip tripToAdd = null;
 
+        /*
         // Check if the trip exists yet
         if (gtfs.tripTable.containsKey(tripId)) {
             tripToAdd = gtfs.tripTable.get(tripId);
@@ -46,19 +46,20 @@ public class OCRoute {
         else {
             throw new GTFSException("Unable to find trip ID: " + tripId + " for route: " + routeNo);
         }
+        */
 
         // Check if this route has already been entered
         if (gtfs.routeTable.containsKey(routeNo)) {
             gtfs.routeTable.get(routeNo).addRouteName(routeName);
-            gtfs.routeTable.get(routeNo).addTrip(tripToAdd);
+            gtfs.routeTable.get(routeNo).addTrip(tripId);
         }
         else {
             List<String> routeNames = new ArrayList<String>();
             routeNames.add(routeName);
-            List<OCTrip> trips = new ArrayList<OCTrip>();
-            trips.add(tripToAdd);
+            List<String> trips = new ArrayList<String>();
+            trips.add(tripId);
 
-            gtfs.routeTable.put(routeNo, new OCRoute(routeNo,routeNames, trips));
+            gtfs.routeTable.put(routeNo, new OCRoute(routeNo, routeNames, trips));
 
         }
     }
@@ -90,15 +91,15 @@ public class OCRoute {
         this.routeNames.add(routeName);
     }
 
-    public List<OCTrip> getTrips() {
+    public List<String> getTrips() {
         return trips;
     }
 
-    public void setTrips(List<OCTrip> trips) {
+    public void setTrips(List<String> trips) {
         this.trips = trips;
     }
 
-    public void addTrip(OCTrip trip) {
+    public void addTrip(String trip) {
         this.trips.add(trip);
     }
 }
