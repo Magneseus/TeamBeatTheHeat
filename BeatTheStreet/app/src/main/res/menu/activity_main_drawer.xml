@@ -15,6 +15,10 @@
             android:id="@+id/nav_get_routes_1929"
             android:icon="@android:drawable/btn_star_big_on"
             android:title="Stop 1929 (Char/Path)" />
+        <item
+            android:id="@+id/nav_get_location"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="View Location" />
     </group>
 
 </menu>

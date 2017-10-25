@@ -1,16 +1,10 @@
 package com.beattheheat.beatthestreet;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,11 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 
 /**
  * The main activity for our application. Based off the side-menu navigation activity.
@@ -34,13 +26,10 @@ import com.google.android.gms.location.LocationServices;
  */
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     // Our OCAPI instance, for bus/stop information
     private OCTranspo octAPI;
-    protected GoogleApiClient googleApiClient;
 
     // Initialization function (Constructor)
     @Override
@@ -75,22 +64,30 @@ public class MainActivity extends AppCompatActivity
         // OCTranspo API caller
         octAPI = new OCTranspo(this.getApplicationContext());
 
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
+        //if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+           // int x = 9;
+           // x++;
+           // ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+       // }
+
     }
 
     @Override
     protected void onStart() {
-        googleApiClient.connect();
+        LocationWrapper.getInstance(this).connect();
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        googleApiClient.disconnect();
+        LocationWrapper.getInstance(this).connect();
         super.onStop();
     }
 
@@ -145,6 +142,17 @@ public class MainActivity extends AppCompatActivity
                     tv.setText(arg);
                 }
             });
+
+        } else if (id == R.id.nav_get_location) {
+            Location loc = LocationWrapper.getInstance(this).getLocation();
+
+            if(loc == null)
+            {
+                tv.setText("No Location yet.");
+            } else {
+                tv.setText("Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude());
+            }
+
         } else if (id == R.id.nav_get_routes) {
             octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<String>() {
                 @Override
@@ -164,37 +172,5 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                googleApiClient);
-
-        if (lastLocation != null) {
-           setTitle("HAHAH");
-            // mLatitudeText.setText(String.valueOf(mLastLocation.getLatitude()));
-           // mLongitudeText.setText(String.valueOf(mLastLocation.getLongitude()));
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 }
