@@ -12,8 +12,8 @@ public class GTFS {
     public HashMap<String, OCStop> stopTable;
 
     public GTFS() {
-        routeTable = new HashMap<>(150);
-        tripTable = new HashMap<>(17000);
-        stopTable = new HashMap<>(5600);
+        routeTable = new HashMap<>(200);
+        tripTable = new HashMap<>(18000);
+        stopTable = new HashMap<>(5700);
     }
 }
