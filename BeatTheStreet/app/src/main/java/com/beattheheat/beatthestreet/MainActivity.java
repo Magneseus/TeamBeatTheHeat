@@ -1,20 +1,25 @@
 package com.beattheheat.beatthestreet;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+
+import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
@@ -61,6 +66,32 @@ public class MainActivity extends AppCompatActivity
 
         // OCTranspo API caller
         octAPI = new OCTranspo(this.getApplicationContext());
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+
+            return;
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        LocationWrapper.getInstance(this).connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        LocationWrapper.getInstance(this).disconnect();
+        super.onStop();
     }
 
     // Closes navigation drawer if open, does default action if not.
@@ -114,6 +145,17 @@ public class MainActivity extends AppCompatActivity
                     tv.setText(arg);
                 }
             });
+
+        } else if (id == R.id.nav_get_location) {
+            Location loc = LocationWrapper.getInstance(this).getLocation();
+
+            if(loc == null)
+            {
+                tv.setText("No Location yet.");
+            } else {
+                tv.setText("Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude());
+            }
+
         } else if (id == R.id.nav_get_routes) {
             octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<String>() {
                 @Override
@@ -140,5 +182,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        LocationWrapper.getInstance(this).startRequestingUpdates();
     }
 }
