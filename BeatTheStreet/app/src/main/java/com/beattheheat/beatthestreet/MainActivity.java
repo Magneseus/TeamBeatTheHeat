@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
+import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity
 
     // Our OCAPI instance, for bus/stop information
     private OCTranspo octAPI;
+
 
     // Initialization function (Constructor)
     @Override
@@ -92,6 +94,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         LocationWrapper.getInstance(this).disconnect();
         super.onStop();
+        NotificationUtil.getInstance().notify(this, 0, "Welcome to BeatTheStreet");
     }
 
     // Closes navigation drawer if open, does default action if not.
@@ -177,6 +180,8 @@ public class MainActivity extends AppCompatActivity
                     tv.setText("" + arg.booleanValue());
                 }
             });
+        } else if (id == R.id.nav_notify) {
+            NotificationUtil.getInstance().notify(this, 1, "New Notification", "yo you pressed the button", -1, true);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

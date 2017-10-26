@@ -18,10 +18,14 @@
             android:id="@+id/nav_get_location"
             android:icon="@android:drawable/btn_star_big_on"
             android:title="View Location" />
+        <item
+            android:id="@+id/nav_notify"
+            android:icon="@android:drawable/btn_radio"
+            android:title="Notification" />
+        <item
+            android:id="@+id/nav_get_gtfs"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="GTFS" />
     </group>
-    <item
-        android:id="@+id/nav_get_gtfs"
-        android:icon="@android:drawable/btn_star_big_on"
-        android:title="GTFS" />
 
 </menu>
