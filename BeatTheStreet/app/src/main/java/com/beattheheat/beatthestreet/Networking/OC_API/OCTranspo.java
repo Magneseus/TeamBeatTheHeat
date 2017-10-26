@@ -4,25 +4,17 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.beattheheat.beatthestreet.FileManagement.Unzipper;
-import com.beattheheat.beatthestreet.Networking.ByteRequest;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 import com.beattheheat.beatthestreet.Networking.VolleyRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.FileOutputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +29,9 @@ public class OCTranspo {
     // Volley request queue
     private RequestQueue req;
 
+    // GTFS Tables
+    private GTFS gtfsTable;
+
     // Types of requests that can be made to the server
     public enum OC_TYPE {
         ROUTES_FOR_STOP,
@@ -46,17 +41,12 @@ public class OCTranspo {
         SIZE
     }
 
-    // GTFS Tables (Tables for the main database in the API)
-    private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
-    // GTFS Zip URL (For smaller download)
-    private static final String GTFS_ZIP_URL = "http://www.octranspo1.com/files/google_transit.zip";
-
     // List of URLs to contact for data
-    private String[] apiURLs;
+    static String[] apiURLs;
 
     // API Key information (tied to a personal account created for this application)
-    private static final String appID =  "628f2e92";
-    private static final String apiKey = "88f44bc3e17f5880763b436cff9a779d";
+    static final String appID =  "628f2e92";
+    static final String apiKey = "88f44bc3e17f5880763b436cff9a779d";
 
     public OCTranspo(Context ctx) {
         // Create the volley request queue
@@ -68,6 +58,10 @@ public class OCTranspo {
         apiURLs[OC_TYPE.TIMES_FOR_STOP_ROUTE.ordinal()] = "https://api.octranspo1.com/v1.2/GetNextTripsForStop";
         apiURLs[OC_TYPE.TIMES_FOR_STOP.ordinal()] = "https://api.octranspo1.com/v1.2/GetNextTripsForStopAllRoutes";
         apiURLs[OC_TYPE.GTFS.ordinal()] = "https://api.octranspo1.com/v1.2/Gtfs";
+
+        // Load the GTFS
+        //LoadGTFS(ctx.getApplicationContext());
+        gtfsTable = new GTFS(ctx.getApplicationContext());
     }
 
     /**
@@ -77,7 +71,7 @@ public class OCTranspo {
      * requestParams: Parameters to give the POST request, specified by the type of request. (See public functions below)
      * callback:      Callback function, given the raw RESPONSE string of the POST request.
      */
-    private void MakeVolleyPOST(OC_TYPE requestType, final HashMap<String, String> requestParams, final SCallable<String> callback) {
+    void MakeVolleyPOST(OC_TYPE requestType, final HashMap<String, String> requestParams, final SCallable<String> callback) {
         StringRequest jReq = new StringRequest(
                 Request.Method.POST,
                 apiURLs[requestType.ordinal()],
@@ -142,101 +136,5 @@ public class OCTranspo {
         params.put("format", "json");
 
         MakeVolleyPOST(OC_TYPE.TIMES_FOR_STOP, params, callback);
-    }
-
-    // Retrieves specific records from all sections the of GTFS file.
-    public void GTFS(Context ctx) {
-        // The HashMap to store all the tables inside of
-        final HashMap<String, String> gtfsTable = new HashMap<String,String>();
-
-        // The application context (to prevent leaks)
-        final Context app_ctx = ctx.getApplicationContext();
-
-        ByteRequest bReq = new ByteRequest(
-                Request.Method.GET,
-                "http://www.octranspo1.com/files/google_transit.zip",
-                new Response.Listener<Byte[]>() {
-                    @Override
-                    public void onResponse(Byte[] response) {
-                        try {
-                            FileOutputStream os;
-                            String fileName = "GTFS.zip";
-
-                            os = app_ctx.openFileOutput(fileName, app_ctx.MODE_PRIVATE);
-
-                            // Convert from Byte[] to byte[]
-                            byte[] bytes = new byte[response.length];
-                            for (int i = 0; i < response.length; i++)
-                                bytes[i] = response[i];
-
-                            os.write(bytes);
-                            os.close();
-
-                            // TODO: move this somewhere else, do it asynchronously
-                            Unzipper uz = new Unzipper(app_ctx, fileName, app_ctx.getFilesDir().getPath());
-                            uz.Unzip();
-
-                        } catch (Exception e) {
-                            Log.e("OC_ERR", "Error with callback response: " + e.toString());
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("OC_ERR", "Error with OC_API GET request: " + error.toString());
-                    }
-                }
-        );
-
-        req.add(bReq);
-
-        // TODO: check for existence on call
-
-    }
-
-    /** Checks if the GTFS needs to be updated
-     *
-     * @param callback
-     *  - will place a -1 in the Integer argument if the operation to get date info failed
-     *  - will place a 0 in the Integer argument if the date is invalid
-     *  - will place a 1 in the Integer argument if the date is valid
-     */
-    private void CheckGTFSDateValid(final Calendar oldStartDate, final SCallable<Integer> callback) {
-        final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("appID", appID);
-        params.put("apiKey", apiKey);
-        params.put("table", "calendar");
-        params.put("format", "json");
-
-        MakeVolleyPOST(OC_TYPE.GTFS, params, new SCallable<String>() {
-            @Override
-            public void call(String arg) {
-                try {
-                    // Parse returned text into a json
-                    JSONObject calendarJSON = new JSONObject(arg);
-
-                    // Get the end_date of the current schedule
-                    String start_date_string = calendarJSON.getJSONArray("Gtfs").getJSONObject(0).getString("start_date");
-                    Calendar start_date = Calendar.getInstance();
-                    start_date.set(
-                            Integer.parseInt(start_date_string.substring(0,4)),
-                            Integer.parseInt(start_date_string.substring(4,6)),
-                            Integer.parseInt(start_date_string.substring(6,8))
-                    );
-
-                    // Call the callback and give it a return value based on whether we've validated
-                    Integer returnCode = oldStartDate.equals(start_date) ? 1 : 0;
-                    callback.call(returnCode);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-
-                    // Give the callback the error code
-                    Integer returnCode = -1;
-                    callback.call(returnCode);
-                }
-            }
-        });
     }
 }
