@@ -13,6 +13,8 @@ import java.util.zip.ZipInputStream;
 
 /**
  * Created by Matt on 24-Oct-17.
+ *
+ * Small convenience class to unzip packed zip files.
  */
 
 public class Unzipper {
