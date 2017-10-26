@@ -22,12 +22,11 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +45,10 @@ public class GTFS {
     HashMap<String, OCTrip> tripTable;
     HashMap<String, OCStop> stopTable;
 
+    private String[] routeList;
+    private String[] tripList;
+    private String[] stopList;
+
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
     // GTFS Zip URL (For smaller download)
@@ -59,9 +62,13 @@ public class GTFS {
 
 
     public GTFS(Context context) {
-        routeTable = new HashMap<>(200);
-        tripTable = new HashMap<>(18000);
-        stopTable = new HashMap<>(5700);
+        //routeTable = new HashMap<>(200);
+        //tripTable = new HashMap<>(18000);
+        //stopTable = new HashMap<>(5700);
+
+        routeList = new String[18000];
+        tripList = new String[760000];
+        stopList = new String[7000];
 
         appCtx = context.getApplicationContext();
 
@@ -140,11 +147,13 @@ public class GTFS {
         // Load the "trips.txt" file
         Log.d("tmp", "loading routes");
         try (FileInputStream fis = appCtx.openFileInput("trips.txt")) {
-            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
+            /*BufferedReader br = new BufferedReader( new InputStreamReader(fis));
             String line = br.readLine();
             while ((line = br.readLine()) != null) {
                 OCRoute.LoadRoute(this, line);
             }
+            */
+            (new FileToStrings(fis)).toStringsFast(routeList, 65536, '\n');
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("GTFS", "Error opening 'trips.txt'");
@@ -157,14 +166,17 @@ public class GTFS {
         Log.d("tmp", "loading trips");
         // Load the "stop_times.txt" file
         try (FileInputStream fis = appCtx.openFileInput("stop_times.txt")) {
-            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
+            /*BufferedReader br = new BufferedReader( new InputStreamReader(fis));
             String line = br.readLine();
             while ((line = br.readLine()) != null) {
                 OCTrip.LoadTrip(this, line);
             }
+            */
+            (new FileToStrings(fis)).toStringsFast(tripList, 65536, '\n');
+
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("GTFS", "Error opening 'trips.txt'");
+            Log.e("GTFS", "Error opening 'stop_times.txt'");
         }
 
 
@@ -174,14 +186,16 @@ public class GTFS {
         Log.d("tmp", "loading stops");
         // Load the "stops.txt" file
         try (FileInputStream fis = appCtx.openFileInput("stops.txt")) {
-            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
+            /*BufferedReader br = new BufferedReader( new InputStreamReader(fis));
             String line = br.readLine();
             while ((line = br.readLine()) != null) {
                 OCStop.LoadStop(this, line);
             }
+            */
+            (new FileToStrings(fis)).toStringsFast(stopList, 65536, '\n');
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e("GTFS", "Error opening 'trips.txt'");
+            Log.e("GTFS", "Error opening 'stops.txt'");
         }
 
         Log.d("tmp", "done");
