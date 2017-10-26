@@ -29,6 +29,7 @@ public class LocationWrapper
     private GoogleApiClient googleApiClient;
     private LocationRequest locReq;
     private Context appCtx;
+    private boolean requestingUpdates = false;
 
     // Constructor for Singleton class.
     // Takes the context, which is needed for creation of the GoogleApiClient.
@@ -72,30 +73,14 @@ public class LocationWrapper
     }
 
     // Returns the last known location
-    public Location getLocation()
-    {
+    public Location getLocation() {
         return lastLocation;
     }
 
     // Callback for when the googleApiClient connects
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        int i = ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_FINE_LOCATION);
-
-        if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-            return;
-        }
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                googleApiClient, locReq, this);
+        startRequestingUpdates();
     }
 
     // Callback for if the googleApiClient connection is suspended
@@ -114,5 +99,28 @@ public class LocationWrapper
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
+    }
+
+    // start listening for location updates
+    public void startRequestingUpdates()
+    {
+        // don't request updates if we already are
+        if(requestingUpdates) return;
+
+        if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
+            return;
+        }
+
+        requestingUpdates = true;
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                googleApiClient, locReq, this);
     }
 }
