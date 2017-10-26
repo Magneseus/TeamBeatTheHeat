@@ -82,6 +82,8 @@ public class GTFS {
         protected final Void doInBackground(SCallable<Boolean>... sCallables) {
             InternalLoadGTFS();
 
+            // TODO: have a wait here, while the async volley calls return
+
             // Callbacks
             for (SCallable<Boolean> callback : sCallables) {
                 callback.call(true);
