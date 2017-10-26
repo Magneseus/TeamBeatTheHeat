@@ -30,7 +30,7 @@ public class OCTranspo {
     private RequestQueue req;
 
     // GTFS Tables
-    private GTFS gtfsTable;
+    public GTFS gtfsTable;
 
     // Types of requests that can be made to the server
     public enum OC_TYPE {
@@ -62,6 +62,11 @@ public class OCTranspo {
         // Load the GTFS
         //LoadGTFS(ctx.getApplicationContext());
         gtfsTable = new GTFS(ctx.getApplicationContext());
+    }
+
+    @SafeVarargs
+    public final void LoadGTFS(SCallable<Boolean>... sCallables) {
+        gtfsTable.LoadGTFS(sCallables);
     }
 
     /**

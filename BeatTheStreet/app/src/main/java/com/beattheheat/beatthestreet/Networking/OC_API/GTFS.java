@@ -19,11 +19,13 @@ import com.beattheheat.beatthestreet.Networking.VolleyRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,14 +70,16 @@ public class GTFS {
 
     // Starts the asynchronous load of the GTFS files
     // All callbacks will be alerted with a T/F when files have been loaded
-    public void LoadGTFS(SCallable<Boolean> sCallables) {
+    @SafeVarargs
+    public final void LoadGTFS(SCallable<Boolean>... sCallables) {
         new GTFSDownload().execute(sCallables);
     }
 
     // Async task to load the GTFS files
     private class GTFSDownload extends AsyncTask<SCallable<Boolean>, Integer, Void> {
+        @SafeVarargs
         @Override
-        protected Void doInBackground(SCallable<Boolean>[] sCallables) {
+        protected final Void doInBackground(SCallable<Boolean>... sCallables) {
             InternalLoadGTFS();
 
             // Callbacks
@@ -112,6 +116,7 @@ public class GTFS {
                     public void call(Integer arg) {
                         // Valid GTFS
                         if (arg == 1) {
+                            Log.d("tmp", "valid gtfs, loading from disk");
                             LoadGTFSFromDisk();
                         }
                         // Invalid/corrupt/non-existent GTFS
@@ -133,10 +138,12 @@ public class GTFS {
          *    OCROUTE LOADING    *
          *************************/
         // Load the "trips.txt" file
+        Log.d("tmp", "loading routes");
         try (FileInputStream fis = appCtx.openFileInput("trips.txt")) {
-            List<String> lines = (new FileToStrings(fis).toStringList());
-            for (int i = 1; i < lines.size(); i++) {
-                OCRoute.LoadRoute(this, lines.get(i));
+            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
+            String line = br.readLine();
+            while ((line = br.readLine()) != null) {
+                OCRoute.LoadRoute(this, line);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -147,11 +154,13 @@ public class GTFS {
         /************************
          *    OCTRIP LOADING    *
          ************************/
+        Log.d("tmp", "loading trips");
         // Load the "stop_times.txt" file
         try (FileInputStream fis = appCtx.openFileInput("stop_times.txt")) {
-            List<String> lines = (new FileToStrings(fis).toStringList());
-            for (int i = 1; i < lines.size(); i++) {
-                OCTrip.LoadTrip(this, lines.get(i));
+            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
+            String line = br.readLine();
+            while ((line = br.readLine()) != null) {
+                OCTrip.LoadTrip(this, line);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -162,16 +171,20 @@ public class GTFS {
         /************************
          *    OCSTOP LOADING    *
          ************************/
+        Log.d("tmp", "loading stops");
         // Load the "stops.txt" file
         try (FileInputStream fis = appCtx.openFileInput("stops.txt")) {
-            List<String> lines = (new FileToStrings(fis).toStringList());
-            for (int i = 1; i < lines.size(); i++) {
-                OCStop.LoadStop(this, lines.get(i));
+            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
+            String line = br.readLine();
+            while ((line = br.readLine()) != null) {
+                OCStop.LoadStop(this, line);
             }
         } catch (IOException e) {
             e.printStackTrace();
             Log.e("GTFS", "Error opening 'trips.txt'");
         }
+
+        Log.d("tmp", "done");
     }
 
     private void LoadGTFSFromNet() {

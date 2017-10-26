@@ -29,7 +29,13 @@ public class OCStop {
         String[] entries = gtfsEntry.split(",");
 
         String stopId = entries[0];
-        int stopCode = Integer.parseInt(entries[1]);
+        int stopCode;
+        try {
+            stopCode = Integer.parseInt(entries[1]);
+        } catch (NumberFormatException nfe) {
+            // Stop code was missing, or not a number
+            stopCode = -1;
+        }
         String stopName = entries[2];
 
         gtfs.stopTable.put(stopId, new OCStop(stopId, stopCode, stopName));
