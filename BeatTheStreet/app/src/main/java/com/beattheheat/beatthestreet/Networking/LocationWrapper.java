@@ -15,6 +15,8 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
+import java.util.Collection;
 /**
  *  Singleton wrapper for the GoogleApiClient Location service.
  */
@@ -30,6 +32,7 @@ public class LocationWrapper
     private LocationRequest locReq;
     private Context appCtx;
     private boolean requestingUpdates = false;
+    private Collection<SCallable> subscribers;
 
     // Constructor for Singleton class.
     // Takes the context, which is needed for creation of the GoogleApiClient.
@@ -48,6 +51,8 @@ public class LocationWrapper
         locReq = new LocationRequest();
         locReq.setInterval(5 * 1000); // every 5s
         locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        subscribers = new ArrayList<SCallable>();
     }
 
     // Returns the instance of the LocationWrapper, creating it if null
@@ -64,6 +69,9 @@ public class LocationWrapper
 
     // Attempts to connect the googleApiClient
     public void connect() {
+        if(googleApiClient.isConnected())
+           return;
+
         googleApiClient.connect();
     }
 
@@ -75,6 +83,15 @@ public class LocationWrapper
     // Returns the last known location
     public Location getLocation() {
         return lastLocation;
+    }
+
+    public void subscribe(SCallable sub) {
+        // TODO: should we check for uniqueness?
+        subscribers.add(sub);
+    }
+
+    public void unsubscribe(SCallable sub) {
+        subscribers.remove(sub);
     }
 
     // Callback for when the googleApiClient connects
@@ -99,11 +116,14 @@ public class LocationWrapper
     @Override
     public void onLocationChanged(Location location) {
         lastLocation = location;
+
+        for(SCallable sub : subscribers) {
+            sub.call(null);
+        }
     }
 
     // start listening for location updates
-    public void startRequestingUpdates()
-    {
+    public void startRequestingUpdates() {
         // don't request updates if we already are
         if(requestingUpdates) return;
 
@@ -123,4 +143,5 @@ public class LocationWrapper
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 googleApiClient, locReq, this);
     }
+
 }

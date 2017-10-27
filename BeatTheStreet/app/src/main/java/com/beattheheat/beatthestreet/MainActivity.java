@@ -1,6 +1,7 @@
 package com.beattheheat.beatthestreet;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity
         // OCTranspo API caller
         octAPI = new OCTranspo(this.getApplicationContext());
 
+        // TODO: handle location being turned off.
+        // Could just treat all null location the same, regardless of reason
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
@@ -82,19 +85,54 @@ public class MainActivity extends AppCompatActivity
 
             return;
         }
+
+        /* TODO: Remove test code
+           This code shows off some features.
+              - subscribe(SCallable): calls the given function whenever we recieve a location update
+              - notify(Context, id, Title, Content): creates/updates notification
+
+              Then calculates the distance between your current location and my house.
+
+              Since this function is subscribed to location updates, whenever a new location update
+                is recieved, it raises a notification that gives the approximate distance the phone
+                is from my house.
+        */
+
+        final Context ctx = this;
+        LocationWrapper.getInstance(this).subscribe(new SCallable() {
+            @Override
+            public void call(Object arg) {
+                Location x1 = LocationWrapper.getInstance(ctx).getLocation();
+                if(x1 == null) return;
+
+                Location x2 = new Location("");
+                x2.setLatitude(44.7518833);
+                x2.setLongitude(-79.7102258);
+
+                float[] dist = new float[1];
+                Location.distanceBetween(x1.getLatitude(), x1.getLongitude(),
+                        x2.getLatitude(), x2.getLongitude(), dist);
+
+                NotificationUtil.getInstance().notify(ctx, 2, "Difference",
+                        dist[0] + "m R: " + Math.random());
+            }
+        });
+
+        NotificationUtil.getInstance().notify(this, 0, "Welcome to BeatTheStreet");
     }
 
+    // called when app is opened
     @Override
     protected void onStart() {
         LocationWrapper.getInstance(this).connect();
         super.onStart();
     }
 
+    // called when app is turned off
     @Override
-    protected void onStop() {
+    protected void onDestroy() {
         LocationWrapper.getInstance(this).disconnect();
-        super.onStop();
-        NotificationUtil.getInstance().notify(this, 0, "Welcome to BeatTheStreet");
+        super.onDestroy();
     }
 
     // Closes navigation drawer if open, does default action if not.
@@ -156,9 +194,8 @@ public class MainActivity extends AppCompatActivity
             {
                 tv.setText("No Location yet.");
             } else {
-                tv.setText("Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude());
+                tv.setText("Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude() + " R: " + Math.random());
             }
-
         } else if (id == R.id.nav_get_routes) {
             octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<String>() {
                 @Override
