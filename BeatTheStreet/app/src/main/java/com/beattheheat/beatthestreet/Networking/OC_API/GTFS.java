@@ -101,7 +101,6 @@ public class GTFS {
                     public void call(Integer arg) {
                         // Valid GTFS
                         if (arg == 1) {
-                            Log.d("tmp", "valid gtfs, loading from disk");
                             new LoadGTFSFromDisk().execute(gtfsPointer);
                         }
                         // Invalid/corrupt/non-existent GTFS

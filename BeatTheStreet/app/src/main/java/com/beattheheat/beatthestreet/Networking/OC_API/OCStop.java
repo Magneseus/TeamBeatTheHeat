@@ -1,5 +1,7 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
+import android.location.Location;
+
 /**
  * Created by Matt on 24-Oct-17.
  */
@@ -8,14 +10,15 @@ public class OCStop {
     private String stopId;
     private int stopCode;
     private String stopName;
-    // LAT AND LON
+    private Location location;
 
     // TODO: Add lat/lon coord vars
 
-    private OCStop(String stopId, int stopCode, String stopName) {
+    private OCStop(String stopId, int stopCode, String stopName, Location location) {
         setStopId(stopId);
         setStopCode(stopCode);
         setStopName(stopName);
+        setLocation(location);
     }
 
     /** The GTFS entry is assumed to be from the "stops.txt" table.
@@ -43,7 +46,11 @@ public class OCStop {
         }
         String stopName = entries[2];
 
-        gtfs.stopTable.put(stopId, new OCStop(stopId, stopCode, stopName));
+        Location location = new Location("GTFS");
+        location.setLatitude(Location.convert(entries[4]));
+        location.setLongitude(Location.convert(entries[5]));
+
+        gtfs.stopTable.put(stopId, new OCStop(stopId, stopCode, stopName, location));
     }
 
 
@@ -74,5 +81,13 @@ public class OCStop {
 
     public void setStopName(String stopName) {
         this.stopName = stopName;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }
