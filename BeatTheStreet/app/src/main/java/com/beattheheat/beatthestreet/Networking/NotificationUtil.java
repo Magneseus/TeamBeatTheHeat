@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.R;
+import android.net.Uri;
+import android.provider.Settings;
+import android.support.v4.app.NotificationBuilderWithBuilderAccessor;
 import android.support.v4.app.NotificationCompat;
 
 /**
@@ -35,18 +38,31 @@ public class NotificationUtil {
 
     public void notify(Context ctx, int id, String title, String text)
     {
-        notify(ctx, id, title, text, -1);
+        notify(ctx, id, title, text, defaultIcon);
     }
 
     public void notify(Context ctx, int id, String title, String text, int icon)
     {
-        notify(ctx, id, title, text, -1, false);
+        notify(ctx, id, title, text, icon, false);
     }
 
-    public void notify(Context ctx, int id, String title, String text, int icon, boolean persistent) {
-        if(icon < 0)
-        {
+    public void notify(Context ctx, int id, String title, String text, int icon, boolean persist)
+    {
+        notify(ctx, id, title, text, icon, persist, Settings.System.DEFAULT_NOTIFICATION_URI);
+    }
+
+    public void notify(Context ctx, int id, String title, String text, int icon, boolean persistent,
+                       Uri sound) {
+        if (ctx == null || id < 0) {
+            return;
+        }
+
+        if(icon < 0) {
             icon = defaultIcon;
+        }
+
+        if(sound == null) {
+            sound = Settings.System.DEFAULT_NOTIFICATION_URI;
         }
 
         Notification n = new Notification.Builder(ctx)
@@ -55,6 +71,8 @@ public class NotificationUtil {
                 .setOngoing(persistent)
                 .setSmallIcon(icon)
                 .setAutoCancel(true)
+                .setOnlyAlertOnce(true)
+                .setSound(sound)
                 .build();
 
         notify(ctx, id, n);
