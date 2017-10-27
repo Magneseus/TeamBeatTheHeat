@@ -38,9 +38,6 @@ public class FileToStrings {
         int ind = 0;
         int arrayInd = 0;
         while ((ind = str.indexOf(split, start_ind)) != -1) {
-
-
-
             output[arrayInd] = str.substring(start_ind, ind+1);
             start_ind = ind+1;
             arrayInd++;
