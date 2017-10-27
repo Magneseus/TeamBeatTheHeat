@@ -37,7 +37,12 @@ public class OCTrip {
      *
      */
     public static void LoadTrip(GTFS gtfs, String gtfsEntry) {
+        if (gtfsEntry.isEmpty())
+            return;
+
         String[] entries = gtfsEntry.split(",");
+        if (entries.length < 7)
+            return;
 
         String tripId = entries[0];
 

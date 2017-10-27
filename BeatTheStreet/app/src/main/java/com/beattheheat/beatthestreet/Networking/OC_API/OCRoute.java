@@ -1,5 +1,7 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +34,13 @@ public class OCRoute {
      *
      */
     public static void LoadRoute(GTFS gtfs, String gtfsEntry) {
+        if (gtfsEntry.isEmpty())
+            return;
+
         String[] entries = gtfsEntry.split(",");
+        if (entries.length < 5)
+            return;
+
         int routeNo = Integer.parseInt(entries[0].split("-")[0]);
 
         String tripId = entries[2];

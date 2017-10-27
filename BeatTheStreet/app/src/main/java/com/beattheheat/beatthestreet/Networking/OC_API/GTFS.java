@@ -19,15 +19,11 @@ import com.beattheheat.beatthestreet.Networking.VolleyRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,6 +35,8 @@ import java.util.Map;
  *  - will check for existence of GTFS files on disk, and then validate them against the server
  *  - if not valid, or not on disk, the GTFS will be downloaded and unzipped onto the disk
  */
+
+// TODO: Check for network access before making requests
 
 public class GTFS {
     // Tables
@@ -72,25 +70,8 @@ public class GTFS {
     // All callbacks will be alerted with a T/F when files have been loaded
     @SafeVarargs
     public final void LoadGTFS(SCallable<Boolean>... sCallables) {
-        new GTFSDownload().execute(sCallables);
-    }
-
-    // Async task to load the GTFS files
-    private class GTFSDownload extends AsyncTask<SCallable<Boolean>, Integer, Void> {
-        @SafeVarargs
-        @Override
-        protected final Void doInBackground(SCallable<Boolean>... sCallables) {
-            InternalLoadGTFS();
-
-            // TODO: have a wait here, while the async volley calls return
-
-            // Callbacks
-            for (SCallable<Boolean> callback : sCallables) {
-                callback.call(true);
-            }
-
-            return null;
-        }
+        // TODO: Handle list of scallables
+        InternalLoadGTFS();
     }
 
     // Retrieves the GTFS file if on disk and not out of date, or downloads the current one otherwise
@@ -104,6 +85,8 @@ public class GTFS {
                 gtfsOnDisk = true;
             }
         }
+
+        final GTFS gtfsPointer = this;
 
         // If GTFS is on disk, check date and if valid load all files
         if (gtfsOnDisk) {
@@ -119,7 +102,7 @@ public class GTFS {
                         // Valid GTFS
                         if (arg == 1) {
                             Log.d("tmp", "valid gtfs, loading from disk");
-                            LoadGTFSFromDisk();
+                            new LoadGTFSFromDisk().execute(gtfsPointer);
                         }
                         // Invalid/corrupt/non-existent GTFS
                         else if (arg == 0 || arg == -1) {
@@ -135,58 +118,71 @@ public class GTFS {
         }
     }
 
-    private void LoadGTFSFromDisk() {
-        /*************************
-         *    OCROUTE LOADING    *
-         *************************/
-        // Load the "trips.txt" file
-        Log.d("tmp", "loading routes");
-        try (FileInputStream fis = appCtx.openFileInput("trips.txt")) {
-            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
-            String line = br.readLine();
-            while ((line = br.readLine()) != null) {
-                OCRoute.LoadRoute(this, line);
+    // Async task to load the GTFS files
+    private class LoadGTFSFromDisk extends AsyncTask<GTFS, Integer, Void> {
+        @Override
+        protected final Void doInBackground(GTFS... gtfs) {
+            /*************************
+             *    OCROUTE LOADING    *
+             *************************/
+            // Load the "trips.txt" file
+            try (FileInputStream fis = appCtx.openFileInput("trips.txt")) {
+                String fileLines = (new FileToStrings(fis).toStringFast(65536));
+
+                int start_ind = 0;
+                int ind = 0;
+                while ((ind = fileLines.indexOf('\n', start_ind)) != -1) {
+                    if (start_ind != 0) OCRoute.LoadRoute(gtfs[0], fileLines.substring(start_ind, ind+1));
+                    start_ind = ind+1;
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("GTFS", "Error opening 'trips.txt'");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("GTFS", "Error opening 'trips.txt'");
-        }
+
+            /************************
+             *    OCTRIP LOADING    *
+             ************************/
+            /*Log.d("tmp", "loading trips");
+            // Load the "stops.txt" file
+            try (FileInputStream fis = appCtx.openFileInput("stop_times.txt")) {
+                String fileLines = (new FileToStrings(fis).toStringFast(65536));
+
+                int start_ind = 0;
+                int ind = 0;
+                while ((ind = fileLines.indexOf('\n', start_ind)) != -1) {
+                    if (start_ind != 0) OCTrip.LoadTrip(gtfs[0], fileLines.substring(start_ind, ind+1));
+                    start_ind = ind+1;
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("GTFS", "Error opening 'stop_times.txt'");
+            }*/
 
 
-        /************************
-         *    OCTRIP LOADING    *
-         ************************/
-        Log.d("tmp", "loading trips");
-        // Load the "stop_times.txt" file
-        try (FileInputStream fis = appCtx.openFileInput("stop_times.txt")) {
-            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
-            String line = br.readLine();
-            while ((line = br.readLine()) != null) {
-                OCTrip.LoadTrip(this, line);
+            /************************
+             *    OCSTOP LOADING    *
+             ************************/
+            // Load the "stops.txt" file
+            try (FileInputStream fis = appCtx.openFileInput("stops.txt")) {
+                String fileLines = (new FileToStrings(fis).toStringFast(65536));
+
+                int start_ind = 0;
+                int ind = 0;
+                while ((ind = fileLines.indexOf('\n', start_ind)) != -1) {
+                    if (start_ind != 0) OCStop.LoadStop(gtfs[0], fileLines.substring(start_ind, ind+1));
+                    start_ind = ind+1;
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e("GTFS", "Error opening 'stops.txt'");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("GTFS", "Error opening 'trips.txt'");
+
+            return null;
         }
-
-
-        /************************
-         *    OCSTOP LOADING    *
-         ************************/
-        Log.d("tmp", "loading stops");
-        // Load the "stops.txt" file
-        try (FileInputStream fis = appCtx.openFileInput("stops.txt")) {
-            BufferedReader br = new BufferedReader( new InputStreamReader(fis));
-            String line = br.readLine();
-            while ((line = br.readLine()) != null) {
-                OCStop.LoadStop(this, line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e("GTFS", "Error opening 'trips.txt'");
-        }
-
-        Log.d("tmp", "done");
     }
 
     private void LoadGTFSFromNet() {
@@ -195,6 +191,8 @@ public class GTFS {
         for (String s : gtfsTableNames) {
             appCtx.deleteFile(s + ".txt");
         }
+
+        final GTFS gtfsPointer = this;
 
         // Make a byte request to download the GTFS zip file
         ByteRequest bReq = new ByteRequest(
@@ -226,7 +224,7 @@ public class GTFS {
                             appCtx.deleteFile(fileName);
 
                             // Load the contents from disk now
-                            LoadGTFSFromDisk();
+                            new LoadGTFSFromDisk().execute(gtfsPointer);
 
                         } catch (Exception e) {
                             Log.e("OC_ERR", "Error with callback response: " + e.toString());
@@ -254,6 +252,8 @@ public class GTFS {
      *  - will place a 1 in the Integer argument if the date is valid
      */
     public void CheckGTFSDateValid(final String oldStartDate, final SCallable<Integer> callback) {
+        // TODO: Check local date before checking server
+
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("appID", OCTranspo.appID);
         params.put("apiKey", OCTranspo.apiKey);

@@ -26,7 +26,12 @@ public class OCStop {
      * AA010	8767	   SUSSEX / RIDEAU FALLS             45.439869	 -75.695839	 0
      */
     public static void LoadStop(GTFS gtfs, String gtfsEntry) {
+        if (gtfsEntry.isEmpty())
+            return;
+
         String[] entries = gtfsEntry.split(",");
+        if (entries.length < 9)
+            return;
 
         String stopId = entries[0];
         int stopCode;
