@@ -194,7 +194,8 @@ public class MainActivity extends AppCompatActivity
         final TextView tv = (TextView) findViewById(R.id.textView3);
         if (id == R.id.nav_view_stops) {
             // View all stops
-            // Starts a new activity that will display all stops saved from GTFS
+            /* Starts a new activity that will display all stops saved from GTFS
+               From there you can search for a stop and then go to a detailed stop view */
             Intent intent = new Intent(this, DisplayStopsActivity.class);
             startActivity(intent);
 
