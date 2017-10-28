@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
+    // TODO: ArrayList -> Hashmap
     private ArrayList<OCStop> stops;
     private Context context;
 
@@ -28,18 +29,16 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     @Override
     public StopViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // inflate the item Layout
+        // Inflate the item Layout
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.stop_layout, parent, false);
-        // set the view's size, margins, padding and layout parameters
-        StopViewHolder viewHolder = new StopViewHolder(view); // pass the view to View Holder
-        return viewHolder;
+        return new StopViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(StopViewHolder viewHolder , int position) {
-        // Set the stop name
+        // Set the stop name and code
         viewHolder.stopName.setText(stops.get(position).getStopName());
-        viewHolder.stopCode.setText("" + stops.get(position).getStopCode()); // stopCode is an int
+        viewHolder.stopCode.setText("" + stops.get(position).getStopCode());
 
         // TODO: On click, go to detailed stop page
         // Implement setOnClickListener event
@@ -56,8 +55,9 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         return stops.size();
     }
 
+    /* Helper class that takes OCStop info and
+       puts it into the layout at the appropriate position */
     static class StopViewHolder extends RecyclerView.ViewHolder {
-        // This is where we create a TextView for each thing in OCStop we want to display
         TextView stopName;
         TextView stopCode;
 
@@ -68,9 +68,11 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         }
     }
 
+    // Replaces the current list of stops with the ones that match the search
+    // TODO: ArrayList -> HashMap
     public void setFilter(ArrayList<OCStop> newList) {
         stops = new ArrayList<OCStop>();
         stops.addAll(newList);
-        notifyDataSetChanged(); // Let the adapter know we need to refresh
+        notifyDataSetChanged(); // Refresh the adapter
     }
 }

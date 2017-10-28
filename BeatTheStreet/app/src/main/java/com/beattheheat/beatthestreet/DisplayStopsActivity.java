@@ -20,8 +20,8 @@ import java.util.ArrayList;
 public class DisplayStopsActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
 
-    StopAdapter stopAdapter;
-    RecyclerView rv;
+    StopAdapter stopAdapter; // Takes OCStop data and puts it into stop_layout.xml
+    RecyclerView rv; // Only shows items on or near the screen, more efficient for long lists
     // Dummy data
     ArrayList<OCStop> dummyStops = new ArrayList<OCStop>();
 
@@ -34,7 +34,8 @@ public class DisplayStopsActivity extends AppCompatActivity
         /* stopId is string in format "AA000"
            stopCode is int from 0 to 9999
            stopName is string eg "Bank / Walkley"
-           stop Lat and Lon are not currently implemented */
+           stop Lat and Lon are currently just blank */
+        // TODO: Implement location-based search i.e."find stops near me"
         Location l = new Location("");
         dummyStops.add(new OCStop("AA000", 0, "Carleton Station", l));
         dummyStops.add(new OCStop("BB105", 105, "Bank / Walkley", l));
@@ -50,11 +51,12 @@ public class DisplayStopsActivity extends AppCompatActivity
         /* Set up a RecyclerView so we can display the stops nicely */
         rv = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
-        rv.setLayoutManager(llm);
+        rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
         stopAdapter = new StopAdapter(this, dummyStops);
         rv.setAdapter(stopAdapter);
     }
 
+    // Set up the search menu button
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_items, menu);
@@ -64,23 +66,34 @@ public class DisplayStopsActivity extends AppCompatActivity
         return true;
     }
 
+    // Do nothing, we update search results live so we don't need this method
     @Override
     public boolean onQueryTextSubmit(String query){
         return false;
     }
 
+
     @Override
     public boolean onQueryTextChange(String newText) {
         newText = newText.toLowerCase();
+
+        // Set up a new list that will contain the search results
         ArrayList<OCStop> newList = new ArrayList<OCStop>();
+
+        // TODO: Replace this dummy data
         for(OCStop stop : dummyStops) {
+            /* Stop names should all be in uppercase by default but search results were
+               behaving oddly so we're setting everything to lowercase */
             String stopName = stop.getStopName().toLowerCase();
             String stopCode = "" + stop.getStopCode();
+
+            // We search by stop name and by stop code so check both
             if(stopName.contains(newText) || stopCode.contains(newText)) {
-                // We search by stop name and by stop code so check both
                 newList.add(stop);
             }
         }
+
+        // Update the adapter with the newly filtered list
         stopAdapter.setFilter(newList);
         return true;
     }
