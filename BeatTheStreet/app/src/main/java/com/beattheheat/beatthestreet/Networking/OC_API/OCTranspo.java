@@ -57,13 +57,11 @@ public class OCTranspo {
         apiURLs[OC_TYPE.GTFS.ordinal()] = "https://api.octranspo1.com/v1.2/Gtfs";
 
         // Load the GTFS
-        //LoadGTFS(ctx.getApplicationContext());
         gtfsTable = new GTFS(ctx.getApplicationContext());
     }
 
-    @SafeVarargs
-    public final void LoadGTFS(SCallable<Boolean>... sCallables) {
-        gtfsTable.LoadGTFS(sCallables);
+    public final void LoadGTFS(SCallable<Boolean> sCallable) {
+        gtfsTable.LoadGTFS(sCallable);
     }
 
     /**
@@ -108,6 +106,9 @@ public class OCTranspo {
 
     // Retrieves the routes for a given stop number.
     public void GetRouteSummaryForStop(final String stopNo, final SCallable<String> callback) {
+        // Check if stops exist in GTFS
+
+
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("appID", appID);
         params.put("apiKey", apiKey);
