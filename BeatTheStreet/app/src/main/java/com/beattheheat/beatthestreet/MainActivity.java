@@ -74,8 +74,7 @@ public class MainActivity extends AppCompatActivity
         tv.setMovementMethod(new ScrollingMovementMethod());
 
         // OCTranspo API caller
-        octAPI = OCTranspo.getInstance();
-        octAPI.setup(this.getApplicationContext());
+        octAPI = new OCTranspo(this.getApplicationContext());
 
         // TODO: handle location being turned off.
         // Could just treat all null location the same, regardless of reason
@@ -193,11 +192,9 @@ public class MainActivity extends AppCompatActivity
 
         // Text View Stuff
         final TextView tv = (TextView) findViewById(R.id.textView3);
-
         if (id == R.id.nav_view_stops) {
             // View all stops
-            /* Starts a new activity that will display all stops saved from GTFS
-               From there you can search for a stop and then go to a detailed stop view */
+            // Starts a new activity that will display all stops saved from GTFS
             Intent intent = new Intent(this, DisplayStopsActivity.class);
             startActivity(intent);
 

@@ -5,9 +5,7 @@
     android:layout_height="wrap_content"
     android:padding="16dp" >
 
-    <!-- Layout for a bus stop to be displayed
-        Since we're using a RelativeLayout we can describe locations of items
-        based on where they are relative to other items -->
+    <!-- Layout for a bus stop to be displayed -->
     <TextView
         android:id="@+id/stop_name"
         android:layout_width="wrap_content"
