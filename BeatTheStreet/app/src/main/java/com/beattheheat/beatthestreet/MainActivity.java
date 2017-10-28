@@ -2,6 +2,7 @@ package com.beattheheat.beatthestreet;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -186,6 +187,12 @@ public class MainActivity extends AppCompatActivity
                     tv.setText(arg);
                 }
             });
+
+        } else if (id == R.id.nav_view_stops) {
+            // View all stops
+            // Starts a new activity that will display all stops saved from GTFS
+            Intent intent = new Intent(this, DisplayStopsActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_get_location) {
             Location loc = LocationWrapper.getInstance(this).getLocation();

@@ -13,8 +13,8 @@ public class OCStop {
     private Location location;
 
     // TODO: Add lat/lon coord vars
-
-    private OCStop(String stopId, int stopCode, String stopName, Location location) {
+    // TODO: Set constructor to private once dummy data is no longer required
+    public OCStop(String stopId, int stopCode, String stopName, Location location) {
         setStopId(stopId);
         setStopCode(stopCode);
         setStopName(stopName);
