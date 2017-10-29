@@ -9,6 +9,8 @@ import android.widget.TextView;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Created by Matt on 2017-10-27
@@ -18,13 +20,14 @@ import java.util.ArrayList;
 
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
-    // TODO: ArrayList -> Hashmap
     private ArrayList<OCStop> stops;
     private Context context;
 
-     StopAdapter(Context context, ArrayList<OCStop> stops) {
+     StopAdapter(Context context, HashMap<String, OCStop> stopsMap) {
         this.context = context;
-        this.stops = stops;
+        // TODO: Use hashmap directly instead of converting to arraylist
+        Collection<OCStop> values = stopsMap.values();
+        this.stops = new ArrayList<OCStop>(values);
     }
 
     @Override

@@ -45,7 +45,13 @@ public class OCTranspo {
     static final String appID =  "628f2e92";
     static final String apiKey = "88f44bc3e17f5880763b436cff9a779d";
 
-    public OCTranspo(Context ctx) {
+    private static volatile OCTranspo instance = new OCTranspo();
+
+    public static OCTranspo getInstance() {
+        return instance;
+    }
+
+    public void setup(Context ctx) {
         // Create the volley request queue
         req = VolleyRequest.getInstance(ctx.getApplicationContext()).getRequestQueue();
 

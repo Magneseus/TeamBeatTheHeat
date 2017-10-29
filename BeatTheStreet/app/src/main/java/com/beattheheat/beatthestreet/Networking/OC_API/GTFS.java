@@ -42,7 +42,8 @@ public class GTFS {
     // Tables
     HashMap<Integer, OCRoute> routeTable;
     HashMap<String, OCTrip> tripTable;
-    HashMap<String, OCStop> stopTable;
+    public HashMap<String, OCStop> stopTable;
+    // TODO: Remove public when getters are implemented
 
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
