@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity
         tv.setMovementMethod(new ScrollingMovementMethod());
 
         // OCTranspo API caller
-        octAPI = new OCTranspo(this.getApplicationContext());
+        octAPI = OCTranspo.getInstance();
+        octAPI.setup(this.getApplicationContext());
 
         // TODO: handle location being turned off.
         // Could just treat all null location the same, regardless of reason
