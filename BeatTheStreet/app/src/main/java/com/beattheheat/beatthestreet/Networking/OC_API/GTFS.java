@@ -202,13 +202,16 @@ public class GTFS {
                     callback.call(false);
             }
 
-            for (SCallable<Boolean> callback : callbacks)
-                callback.call(true);
-
             isLoading = false;
             isLoaded = true;
 
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            for (SCallable<Boolean> callback : callbacks)
+                callback.call(true);
         }
     }
 
