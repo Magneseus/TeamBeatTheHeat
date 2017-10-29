@@ -14,8 +14,7 @@ public class OCStop implements Comparable {
     private Location location;
 
     // TODO: Add lat/lon coord vars
-    // TODO: Set constructor to private once dummy data is no longer required
-    public OCStop(String stopId, int stopCode, String stopName, Location location) {
+    OCStop(String stopId, int stopCode, String stopName, Location location) {
         setStopId(stopId);
         setStopCode(stopCode);
         setStopName(stopName);
@@ -97,7 +96,6 @@ public class OCStop implements Comparable {
         this.location = location;
     }
 
-    // Helper function that allows for easy sorting based on stopCode
     @Override
     public int compareTo(@NonNull Object otherStop) {
         return this.getStopCode() - ((OCStop)otherStop).getStopCode();
