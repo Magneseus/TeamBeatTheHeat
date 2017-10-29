@@ -1,20 +1,20 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
 import android.location.Location;
+import android.support.annotation.NonNull;
 
 /**
  * Created by Matt on 24-Oct-17.
  */
 
-public class OCStop {
+public class OCStop implements Comparable {
     private String stopId;
     private int stopCode;
     private String stopName;
     private Location location;
 
     // TODO: Add lat/lon coord vars
-    // TODO: Set constructor to private once dummy data is no longer required
-    public OCStop(String stopId, int stopCode, String stopName, Location location) {
+    OCStop(String stopId, int stopCode, String stopName, Location location) {
         setStopId(stopId);
         setStopCode(stopCode);
         setStopName(stopName);
@@ -94,5 +94,10 @@ public class OCStop {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    @Override
+    public int compareTo(@NonNull Object otherStop) {
+        return this.getStopCode() - ((OCStop)otherStop).getStopCode();
     }
 }
