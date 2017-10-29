@@ -10,6 +10,7 @@ import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 
 /**
@@ -17,7 +18,7 @@ import java.util.HashMap;
  *
  * Takes data from OCStop objects and puts it into the RecyclerView layout
  */
-
+// TODO: Remove stops with no stopCode / stopCode == -1
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     private ArrayList<OCStop> stops;
@@ -28,6 +29,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         // TODO: Use hashmap directly instead of converting to arraylist
         Collection<OCStop> values = stopsMap.values();
         this.stops = new ArrayList<OCStop>(values);
+         Collections.sort(stops);
     }
 
     @Override
@@ -76,6 +78,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     public void setFilter(ArrayList<OCStop> newList) {
         stops = new ArrayList<OCStop>();
         stops.addAll(newList);
+        Collections.sort(stops);
         notifyDataSetChanged(); // Refresh the adapter
     }
 }
