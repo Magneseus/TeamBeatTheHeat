@@ -21,9 +21,11 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,11 +105,11 @@ public class GTFS {
     // Callback will be alerted with a T/F when files have been loaded
     public final void LoadGTFS(SCallable<Boolean> sCallable) {
         if (isLoaded) {
-            sCallable.call(true);
+            if (sCallable != null) sCallable.call(true);
         } else if (isLoading) {
-            callbacks.add(sCallable);
+            if (sCallable != null) callbacks.add(sCallable);
         } else {
-            callbacks.add(sCallable);
+            if (sCallable != null) callbacks.add(sCallable);
 
             isLoading = true;
             InternalLoadGTFS();
@@ -130,27 +132,13 @@ public class GTFS {
 
         // If GTFS is on disk, check date and if valid load all files
         if (gtfsOnDisk) {
-            try {
-                // Get the current start date from the calendar.txt file
-                FileInputStream fis = appCtx.openFileInput("calendar.txt");
-                String[] lines = (new FileToStrings(fis)).toStringArray();
-
-                // Compare against server
-                CheckGTFSDateValid(lines[1].split(",")[8], new SCallable<Integer>() {
-                    @Override
-                    public void call(Integer arg) {
-                        // Valid GTFS
-                        if (arg == 1) {
-                            new LoadGTFSFromDisk().execute(gtfsPointer);
-                        }
-                        // Invalid/corrupt/non-existent GTFS
-                        else if (arg == 0 || arg == -1) {
-                            LoadGTFSFromNet();
-                        }
-                    }
-                });
-            } catch(Exception e) {
-                e.printStackTrace();
+            // Check if date is valid
+            if (CheckGTFSDateValid()) {
+                // Valid GTFS
+                new LoadGTFSFromDisk().execute(gtfsPointer);
+            } else {
+                // Invalid/corrupt/non-existent GTFS
+                LoadGTFSFromNet();
             }
         } else {
             LoadGTFSFromNet();
@@ -296,18 +284,33 @@ public class GTFS {
         req.add(bReq);
     }
 
-    /** Checks if the GTFS needs to be updated
-     *
-     * @param oldStartDate - String, needs to be in format "YYYYMMDD"
-     *
-     * @param callback
-     *  - will place a -1 in the Integer argument if the operation to get date info failed
-     *  - will place a 0 in the Integer argument if the date is invalid
-     *  - will place a 1 in the Integer argument if the date is valid
-     */
-    public void CheckGTFSDateValid(final String oldStartDate, final SCallable<Integer> callback) {
-        // TODO: Check local date before checking server
+    /// Checks if the GTFS needs to be updated
+    public boolean CheckGTFSDateValid() {
+        // Get the current start date from the calendar.txt file
+        FileInputStream fis = null;
+        try {
+            fis = appCtx.openFileInput("calendar.txt");
+            String[] lines = (new FileToStrings(fis)).toStringArray();
 
+            String end_date_string = lines[1].split(",")[9];
+            Calendar end_date = Calendar.getInstance();
+            end_date.set(
+                    Integer.parseInt(end_date_string.substring(0, 4)),
+                    Integer.parseInt(end_date_string.substring(4,6)),
+                    Integer.parseInt(end_date_string.substring(6,8))
+            );
+
+            Calendar currentDate = Calendar.getInstance();
+
+            return currentDate.before(end_date);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+
+        /*
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("appID", OCTranspo.appID);
         params.put("apiKey", OCTranspo.apiKey);
@@ -350,7 +353,7 @@ public class GTFS {
         ) {
             /**
              * Passing some request parameters
-             */
+
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 return params;
@@ -358,5 +361,6 @@ public class GTFS {
         };
 
         req.add(jReq);
+        */
     }
 }
