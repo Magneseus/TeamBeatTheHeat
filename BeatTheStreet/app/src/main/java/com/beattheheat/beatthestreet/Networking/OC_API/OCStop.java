@@ -96,6 +96,7 @@ public class OCStop implements Comparable {
         this.location = location;
     }
 
+    // Helper function that allows for easy sorting based on stopCode
     @Override
     public int compareTo(@NonNull Object otherStop) {
         return this.getStopCode() - ((OCStop)otherStop).getStopCode();
