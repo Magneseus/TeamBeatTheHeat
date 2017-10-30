@@ -1,6 +1,5 @@
 package com.beattheheat.beatthestreet;
 
-import android.location.Location;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,8 +15,14 @@ import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// TODO: Replace up arrow with menu bar from main activity
-// TODO: Replace dummy data with real data. ArrayList -> HashMap
+/**
+ *  Created by Matt on 2017-10-27
+ *
+ *  Displays a list of all stops in the GTFS file that can be searched through.
+ *  Selecting a stop brings you to a detailed page showing live bus info.
+ */
+
+// TODO: Add main menu bar from MainActivity
 
 public class DisplayStopsActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
@@ -37,7 +42,7 @@ public class DisplayStopsActivity extends AppCompatActivity
         rv = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
-        stopAdapter = new StopAdapter(this, octAPI.gtfsTable.stopTable);
+        stopAdapter = new StopAdapter(octAPI.gtfsTable.stopTable);
         rv.setAdapter(stopAdapter);
     }
 
@@ -53,9 +58,7 @@ public class DisplayStopsActivity extends AppCompatActivity
 
     // Do nothing, we update search results live so we don't need this method
     @Override
-    public boolean onQueryTextSubmit(String query){
-        return false;
-    }
+    public boolean onQueryTextSubmit(String query) { return false; }
 
 
     @Override
@@ -63,9 +66,8 @@ public class DisplayStopsActivity extends AppCompatActivity
         newText = newText.toLowerCase();
 
         // Set up a new list that will contain the search results
-        ArrayList<OCStop> newList = new ArrayList<OCStop>();
+        ArrayList<OCStop> newList = new ArrayList<>();
 
-        // TODO: Replace this dummy data
         for(HashMap.Entry<String, OCStop> stop : octAPI.gtfsTable.stopTable.entrySet()) {
             /* Stop names should all be in uppercase by default but search results were
                behaving oddly so we're setting everything to lowercase */
