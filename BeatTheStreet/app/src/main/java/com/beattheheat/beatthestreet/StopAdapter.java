@@ -1,5 +1,6 @@
 package com.beattheheat.beatthestreet;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +9,7 @@ import android.widget.TextView;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 
 /**
  * Created by Matt on 2017-10-27
@@ -20,11 +19,12 @@ import java.util.HashMap;
 
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
+    private Context context;
     private ArrayList<OCStop> stops;
 
-     StopAdapter(HashMap<String, OCStop> stopsMap) {
-        Collection<OCStop> values = stopsMap.values();
-        this.stops = new ArrayList<OCStop>(values);
+     StopAdapter(Context context, ArrayList<OCStop> stopList) {
+         this.context = context;
+         this.stops = stopList;
          Collections.sort(stops);
     }
 
@@ -36,19 +36,18 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(StopViewHolder viewHolder , int position) {
+    public void onBindViewHolder(final StopViewHolder viewHolder , int position) {
         // Set the stop name and code
         viewHolder.stopName.setText(stops.get(position).getStopName());
         viewHolder.stopCode.setText("" + stops.get(position).getStopCode());
 
-        // TODO: On click, go to detailed stop page
-        // Implement setOnClickListener event
-       /* viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Do nothing for now
+                // Get stopCode and pass it back to DisplayStopsActivity
+                ((DisplayStopsActivity)context).onClick(viewHolder.stopCode.getText().toString());
             }
-        });*/
+        });
     }
 
     @Override

@@ -46,8 +46,7 @@ public class GTFS {
     // Tables
     HashMap<Integer, OCRoute> routeTable;
     HashMap<String, OCTrip> tripTable;
-    public HashMap<String, OCStop> stopTable;
-    // TODO: Remove public when getters are implemented
+    HashMap<String, OCStop> stopTable;
 
     HashMap<Integer, String> stopCodeToStopID;
 
