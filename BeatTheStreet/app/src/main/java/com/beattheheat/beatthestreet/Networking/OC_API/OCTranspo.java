@@ -69,6 +69,7 @@ public class OCTranspo {
 
         // Load the GTFS
         gtfsTable = new GTFS(ctx.getApplicationContext());
+        gtfsTable.LoadGTFS(null);
     }
 
     public final void LoadGTFS(SCallable<Boolean> sCallable) {
