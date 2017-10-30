@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +47,8 @@ public class GTFS {
     public HashMap<String, OCStop> stopTable;
     // TODO: Remove public when getters are implemented
 
+    HashMap<Integer, String> stopCodeToStopID;
+
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
     // GTFS Zip URL (For smaller download)
@@ -56,23 +60,59 @@ public class GTFS {
     // Volley queue
     private RequestQueue req;
 
+    // Callback for when loading the GTFS is finished
+    private ArrayList<SCallable<Boolean>> callbacks;
+    private boolean isLoaded;
+    private boolean isLoading;
+
 
     public GTFS(Context context) {
         routeTable = new HashMap<>(200);
         tripTable = new HashMap<>(18000);
         stopTable = new HashMap<>(5700);
+        stopCodeToStopID = new HashMap<>(5700);
 
         appCtx = context.getApplicationContext();
-
         req = VolleyRequest.getInstance(appCtx.getApplicationContext()).getRequestQueue();
+
+        callbacks = new ArrayList<>();
+        isLoaded = false;
+        isLoading = false;
+    }
+
+    public Collection<OCRoute> getRouteList() {
+        return routeTable.values();
+    }
+
+    public OCRoute getRoute(int routeNo) {
+        return routeTable.get(routeNo);
+    }
+
+    public Collection<OCStop> getStopList() {
+        return stopTable.values();
+    }
+
+    public OCStop getStop(int stopCode) {
+        return stopTable.get(stopCodeToStopID.get(stopCode));
+    }
+
+    public OCStop getStop(String stopID) {
+        return stopTable.get(stopID);
     }
 
     // Starts the asynchronous load of the GTFS files
-    // All callbacks will be alerted with a T/F when files have been loaded
-    @SafeVarargs
-    public final void LoadGTFS(SCallable<Boolean>... sCallables) {
-        // TODO: Handle list of scallables
-        InternalLoadGTFS();
+    // Callback will be alerted with a T/F when files have been loaded
+    public final void LoadGTFS(SCallable<Boolean> sCallable) {
+        if (isLoaded) {
+            sCallable.call(true);
+        } else if (isLoading) {
+            callbacks.add(sCallable);
+        } else {
+            callbacks.add(sCallable);
+
+            isLoading = true;
+            InternalLoadGTFS();
+        }
     }
 
     // Retrieves the GTFS file if on disk and not out of date, or downloads the current one otherwise
@@ -139,6 +179,9 @@ public class GTFS {
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("GTFS", "Error opening 'trips.txt'");
+
+                for (SCallable<Boolean> callback : callbacks)
+                    callback.call(false);
             }
 
             /************************
@@ -179,9 +222,21 @@ public class GTFS {
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("GTFS", "Error opening 'stops.txt'");
+
+                for (SCallable<Boolean> callback : callbacks)
+                    callback.call(false);
             }
 
+            isLoading = false;
+            isLoaded = true;
+
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            for (SCallable<Boolean> callback : callbacks)
+                callback.call(true);
         }
     }
 

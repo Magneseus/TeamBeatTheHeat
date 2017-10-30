@@ -26,12 +26,20 @@ public class LocationWrapper
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
 
+    // Singleton instance
     private static LocationWrapper myObj;
+
     private Location lastLocation;
     private GoogleApiClient googleApiClient;
     private LocationRequest locReq;
+
+    // Android Context
     private Context appCtx;
+
+    // are we currently listening for updates?
     private boolean requestingUpdates = false;
+
+    // callbacks to excecute when new locations are received
     private Collection<SCallable> subscribers;
 
     // Constructor for Singleton class.
@@ -144,4 +152,9 @@ public class LocationWrapper
                 googleApiClient, locReq, this);
     }
 
+    public void stopRequestingUpdates() {
+        requestingUpdates = false;
+
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+    }
 }

@@ -13,8 +13,7 @@ public class OCStop implements Comparable {
     private String stopName;
     private Location location;
 
-    // TODO: Add lat/lon coord vars
-    OCStop(String stopId, int stopCode, String stopName, Location location) {
+    private OCStop(String stopId, int stopCode, String stopName, Location location) {
         setStopId(stopId);
         setStopCode(stopCode);
         setStopName(stopName);
@@ -44,6 +43,10 @@ public class OCStop implements Comparable {
             // Stop code was missing, or not a number
             stopCode = -1;
         }
+
+        // If the stop isn't currently used, discard it
+        if (stopCode == -1) return;
+
         String stopName = entries[2];
 
         Location location = new Location("GTFS");
@@ -51,6 +54,7 @@ public class OCStop implements Comparable {
         location.setLongitude(Location.convert(entries[5]));
 
         gtfs.stopTable.put(stopId, new OCStop(stopId, stopCode, stopName, location));
+        gtfs.stopCodeToStopID.put(stopCode, stopId);
     }
 
 

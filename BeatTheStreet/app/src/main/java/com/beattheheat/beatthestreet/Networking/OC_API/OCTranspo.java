@@ -12,6 +12,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 import com.beattheheat.beatthestreet.Networking.VolleyRequest;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,13 +68,11 @@ public class OCTranspo {
         apiURLs[OC_TYPE.GTFS.ordinal()] = "https://api.octranspo1.com/v1.2/Gtfs";
 
         // Load the GTFS
-        //LoadGTFS(ctx.getApplicationContext());
         gtfsTable = new GTFS(ctx.getApplicationContext());
     }
 
-    @SafeVarargs
-    public final void LoadGTFS(SCallable<Boolean>... sCallables) {
-        gtfsTable.LoadGTFS(sCallables);
+    public final void LoadGTFS(SCallable<Boolean> sCallable) {
+        gtfsTable.LoadGTFS(sCallable);
     }
 
     /**
@@ -113,36 +116,82 @@ public class OCTranspo {
     }
 
     // Retrieves the routes for a given stop number.
-    public void GetRouteSummaryForStop(final String stopNo, final SCallable<String> callback) {
+    public void GetRouteSummaryForStop(final String stopNo, final SCallable<int[]> callback) {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("appID", appID);
         params.put("apiKey", apiKey);
         params.put("stopNo", stopNo);
         params.put("format", "json");
 
-        MakeVolleyPOST(OC_TYPE.ROUTES_FOR_STOP, params, callback);
-    }
+        MakeVolleyPOST(OC_TYPE.ROUTES_FOR_STOP, params, new SCallable<String>() {
+            @Override
+            public void call(String arg) {
+                try {
+                    JSONObject json = new JSONObject(arg);
+                    JSONArray routeList = json.getJSONObject("GetRouteSummaryForStopResult").getJSONObject("Routes").getJSONArray("Route");
 
-    // Retrieves next three trips on the route for a given stop number.
-    public void GetNextTripsForStop(final String stopNo, final String routeNo, final SCallable<String> callback) {
-        HashMap<String, String> params = new HashMap<String, String>();
-        params.put("appID", appID);
-        params.put("apiKey", apiKey);
-        params.put("stopNo", stopNo);
-        params.put("routeNo", routeNo);
-        params.put("format", "json");
+                    // Parse the json into a list of route numbers
+                    int[] routeNoList = new int[routeList.length()];
+                    for (int i = 0; i < routeList.length(); i++) {
+                        routeNoList[i] = routeList.getJSONObject(i).getInt("RouteNo");
+                    }
 
-        MakeVolleyPOST(OC_TYPE.TIMES_FOR_STOP_ROUTE, params, callback);
+                    // Give the callback the list of route numbers (can look them up in the gtfs table)
+                    callback.call(routeNoList);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e("OC_ERR", "Failed to parse json for route summary of stop no: " + stopNo);
+                }
+            }
+        });
     }
 
     // Retrieves next three trips for all routes for a given stop number.
-    public void GetNextTripsForStopAllRoutes(final String stopNo, final SCallable<String> callback) {
+    public void GetNextTripsForStopAllRoutes(final String stopNo, final SCallable<HashMap<Integer, OCBus[]>> callback) {
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("appID", appID);
         params.put("apiKey", apiKey);
         params.put("stopNo", stopNo);
         params.put("format", "json");
 
-        MakeVolleyPOST(OC_TYPE.TIMES_FOR_STOP, params, callback);
+        MakeVolleyPOST(OC_TYPE.TIMES_FOR_STOP, params, new SCallable<String>() {
+            @Override
+            public void call(String arg) {
+                try {
+                    JSONObject json = new JSONObject(arg);
+                    JSONArray routeList = json.getJSONObject("GetRouteSummaryForStopResult").getJSONObject("Routes").getJSONArray("Route");
+
+                    HashMap<Integer, OCBus[]> returnMap = new HashMap<>();
+
+                    // Go through the list of routes
+                    for (int i = 0; i < routeList.length(); i++) {
+                        // Pull out the object and the list of trips
+                        JSONObject route = routeList.getJSONObject(i);
+
+                        // Check if trips exist
+                        OCBus[] busList = null;
+                        if (route.has("Trips")) {
+                            JSONArray tripList = route.getJSONArray("Trips");
+                             busList = new OCBus[tripList.length()];
+
+                            // Go through the list of trips
+                            for (int j = 0; j < tripList.length(); j++) {
+                                JSONObject trip = tripList.getJSONObject(j);
+                                busList[j] = new OCBus(trip, route.getInt("RouteNo"), route.getString("RouteHeading"));
+                            }
+                        }
+
+                        // Put the list of buses in the hashmap
+                        returnMap.put(route.getInt("RouteNo"), busList);
+                    }
+
+                    callback.call(returnMap);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e("OC_ERR", "Failed to parse json for next trip summary of stop no: " + stopNo);
+                }
+            }
+        });
     }
 }

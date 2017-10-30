@@ -8,14 +8,13 @@ import android.content.Intent;
 import android.R;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.v4.app.NotificationBuilderWithBuilderAccessor;
-import android.support.v4.app.NotificationCompat;
 
 /**
  * Created by kylec on 2017-10-25.
  */
 
 public class NotificationUtil {
+    // Singleton instance
     private static NotificationUtil myObj;
     final private int defaultIcon = R.drawable.btn_default;
 

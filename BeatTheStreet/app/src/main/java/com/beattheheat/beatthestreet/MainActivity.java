@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -23,8 +24,12 @@ import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.NotificationUtil;
+import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The main activity for our application. Based off the side-menu navigation activity.
@@ -115,12 +120,20 @@ public class MainActivity extends AppCompatActivity
                 Location.distanceBetween(x1.getLatitude(), x1.getLongitude(),
                         x2.getLatitude(), x2.getLongitude(), dist);
 
-                NotificationUtil.getInstance().notify(ctx, 2, "Difference",
+                NotificationUtil.getInstance().notify(ctx, 1, "Distance",
                         dist[0] + "m R: " + Math.random());
+
+                if(dist[0] < 100) {
+                    NotificationUtil.getInstance().notify(ctx, 2, "You're here!",
+                            dist[0] + "m R: " + Math.random(), -1, false,
+                            Settings.System.DEFAULT_ALARM_ALERT_URI);
+
+                    LocationWrapper.getInstance(ctx).unsubscribe(this);
+                }
             }
         });
 
-        NotificationUtil.getInstance().notify(this, 0, "Welcome to BeatTheStreet");
+        NotificationUtil.getInstance().notify(this, 0, "Welcome to Test1");
     }
 
     // called when app is opened
@@ -181,15 +194,7 @@ public class MainActivity extends AppCompatActivity
         // Text View Stuff
         final TextView tv = (TextView) findViewById(R.id.textView3);
 
-        if (id == R.id.nav_get_routes_1929) {
-            octAPI.GetRouteSummaryForStop("1929", new SCallable<String>() {
-                @Override
-                public void call(String arg) {
-                    tv.setText(arg);
-                }
-            });
-
-        } else if (id == R.id.nav_view_stops) {
+        if (id == R.id.nav_view_stops) {
             // View all stops
             /* Starts a new activity that will display all stops saved from GTFS
                From there you can search for a stop and then go to a detailed stop view */
@@ -206,17 +211,26 @@ public class MainActivity extends AppCompatActivity
                 tv.setText("Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude() + " R: " + Math.random());
             }
         } else if (id == R.id.nav_get_routes) {
-            octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<String>() {
+            octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<int[]>() {
                 @Override
-                public void call(String arg) {
-                    tv.setText(arg);
+                public void call(int[] arg) {
+                    String s = "[";
+                    for (int i : arg) {
+                        s += i;
+                        s += ",";
+                    }
+                    s = s.substring(0, s.length()-1);
+                    s += "]";
+                    tv.setText(s);
                 }
             });
         } else if (id == R.id.nav_get_times_stop) {
-            octAPI.GetNextTripsForStopAllRoutes(stopNum.getText().toString(), new SCallable<String>() {
+            octAPI.GetNextTripsForStopAllRoutes(stopNum.getText().toString(), new SCallable<HashMap<Integer,OCBus[]>>() {
                 @Override
-                public void call(String arg) {
-                    tv.setText(arg);
+                public void call(HashMap<Integer,OCBus[]> arg) {
+                    for (Map.Entry<Integer,OCBus[]> entry : arg.entrySet()) {
+
+                    }
                 }
             });
         } else if (id == R.id.nav_get_gtfs) {
