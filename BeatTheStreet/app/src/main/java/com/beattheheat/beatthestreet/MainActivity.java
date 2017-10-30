@@ -23,8 +23,12 @@ import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.NotificationUtil;
+import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The main activity for our application. Based off the side-menu navigation activity.
@@ -188,15 +192,7 @@ public class MainActivity extends AppCompatActivity
         // Text View Stuff
         final TextView tv = (TextView) findViewById(R.id.textView3);
 
-        if (id == R.id.nav_get_routes_1929) {
-            octAPI.GetRouteSummaryForStop("1929", new SCallable<String>() {
-                @Override
-                public void call(String arg) {
-                    tv.setText(arg);
-                }
-            });
-
-        } else if (id == R.id.nav_get_location) {
+        if (id == R.id.nav_get_location) {
             Location loc = LocationWrapper.getInstance(this).getLocation();
 
             if(loc == null)
@@ -206,17 +202,26 @@ public class MainActivity extends AppCompatActivity
                 tv.setText("Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude() + " R: " + Math.random());
             }
         } else if (id == R.id.nav_get_routes) {
-            octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<String>() {
+            octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<int[]>() {
                 @Override
-                public void call(String arg) {
-                    tv.setText(arg);
+                public void call(int[] arg) {
+                    String s = "[";
+                    for (int i : arg) {
+                        s += i;
+                        s += ",";
+                    }
+                    s = s.substring(0, s.length()-1);
+                    s += "]";
+                    tv.setText(s);
                 }
             });
         } else if (id == R.id.nav_get_times_stop) {
-            octAPI.GetNextTripsForStopAllRoutes(stopNum.getText().toString(), new SCallable<String>() {
+            octAPI.GetNextTripsForStopAllRoutes(stopNum.getText().toString(), new SCallable<HashMap<Integer,OCBus[]>>() {
                 @Override
-                public void call(String arg) {
-                    tv.setText(arg);
+                public void call(HashMap<Integer,OCBus[]> arg) {
+                    for (Map.Entry<Integer,OCBus[]> entry : arg.entrySet()) {
+
+                    }
                 }
             });
         } else if (id == R.id.nav_get_gtfs) {
