@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +42,11 @@ import java.util.Map;
 
 public class GTFS {
     // Tables
-    public HashMap<Integer, OCRoute> routeTable;
-    public HashMap<String, OCTrip> tripTable;
-    public HashMap<String, OCStop> stopTable;
+    HashMap<Integer, OCRoute> routeTable;
+    HashMap<String, OCTrip> tripTable;
+    HashMap<String, OCStop> stopTable;
+
+    HashMap<Integer, String> stopCodeToStopID;
 
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
@@ -66,6 +69,7 @@ public class GTFS {
         routeTable = new HashMap<>(200);
         tripTable = new HashMap<>(18000);
         stopTable = new HashMap<>(5700);
+        stopCodeToStopID = new HashMap<>(5700);
 
         appCtx = context.getApplicationContext();
         req = VolleyRequest.getInstance(appCtx.getApplicationContext()).getRequestQueue();
@@ -73,6 +77,26 @@ public class GTFS {
         callbacks = new ArrayList<>();
         isLoaded = false;
         isLoading = false;
+    }
+
+    public Collection<OCRoute> getRouteList() {
+        return routeTable.values();
+    }
+
+    public OCRoute getRoute(int routeNo) {
+        return routeTable.get(routeNo);
+    }
+
+    public Collection<OCStop> getStopList() {
+        return stopTable.values();
+    }
+
+    public OCStop getStop(int stopCode) {
+        return stopTable.get(stopCodeToStopID.get(stopCode));
+    }
+
+    public OCStop getStop(String stopID) {
+        return stopTable.get(stopID);
     }
 
     // Starts the asynchronous load of the GTFS files

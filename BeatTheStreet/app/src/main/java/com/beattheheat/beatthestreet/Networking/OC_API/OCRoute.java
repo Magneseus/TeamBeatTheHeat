@@ -68,7 +68,6 @@ public class OCRoute {
             trips.add(tripId);
 
             gtfs.routeTable.put(routeNo, new OCRoute(routeNo, routeNames, trips));
-
         }
     }
 

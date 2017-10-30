@@ -12,8 +12,6 @@ public class OCStop {
     private String stopName;
     private Location location;
 
-    // TODO: Add lat/lon coord vars
-
     private OCStop(String stopId, int stopCode, String stopName, Location location) {
         setStopId(stopId);
         setStopCode(stopCode);
@@ -55,6 +53,7 @@ public class OCStop {
         location.setLongitude(Location.convert(entries[5]));
 
         gtfs.stopTable.put(stopId, new OCStop(stopId, stopCode, stopName, location));
+        gtfs.stopCodeToStopID.put(stopCode, stopId);
     }
 
 
