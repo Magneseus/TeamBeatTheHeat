@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -113,12 +114,20 @@ public class MainActivity extends AppCompatActivity
                 Location.distanceBetween(x1.getLatitude(), x1.getLongitude(),
                         x2.getLatitude(), x2.getLongitude(), dist);
 
-                NotificationUtil.getInstance().notify(ctx, 2, "Difference",
+                NotificationUtil.getInstance().notify(ctx, 1, "Distance",
                         dist[0] + "m R: " + Math.random());
+
+                if(dist[0] < 100) {
+                    NotificationUtil.getInstance().notify(ctx, 2, "You're here!",
+                            dist[0] + "m R: " + Math.random(), -1, false,
+                            Settings.System.DEFAULT_ALARM_ALERT_URI);
+
+                    LocationWrapper.getInstance(ctx).unsubscribe(this);
+                }
             }
         });
 
-        NotificationUtil.getInstance().notify(this, 0, "Welcome to BeatTheStreet");
+        NotificationUtil.getInstance().notify(this, 0, "Welcome to Test1");
     }
 
     // called when app is opened
