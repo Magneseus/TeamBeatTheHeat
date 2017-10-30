@@ -44,6 +44,10 @@ public class OCStop {
             // Stop code was missing, or not a number
             stopCode = -1;
         }
+
+        // If the stop isn't currently used, discard it
+        if (stopCode == -1) return;
+
         String stopName = entries[2];
 
         Location location = new Location("GTFS");
