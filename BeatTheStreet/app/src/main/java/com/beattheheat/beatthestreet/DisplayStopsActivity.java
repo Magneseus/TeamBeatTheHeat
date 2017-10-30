@@ -1,5 +1,6 @@
 package com.beattheheat.beatthestreet;
 
+import android.content.Intent;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,7 +14,6 @@ import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  *  Created by Matt on 2017-10-27
@@ -23,11 +23,11 @@ import java.util.HashMap;
  */
 
 // TODO: Add main menu bar from MainActivity
-
 public class DisplayStopsActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
 
     OCTranspo octAPI;
+    ArrayList<OCStop> stopList;
     StopAdapter stopAdapter; // Takes OCStop data and puts it into stop_layout.xml
     RecyclerView rv; // Only shows items on or near the screen, more efficient for long lists
 
@@ -37,12 +37,21 @@ public class DisplayStopsActivity extends AppCompatActivity
         setContentView(R.layout.activity_display_stops);
 
         octAPI = OCTranspo.getInstance();
+        stopList = new ArrayList<>(octAPI.gtfsTable.getStopList());
+
+        // Trim excess quotes from stopName
+        for(OCStop stop : stopList) {
+            String temp = stop.getStopName();
+            temp = temp.replaceAll("\"", "");
+            stop.setStopName(temp);
+            //stop.setStopName(stop.getStopName().replaceAll("\"", ""));
+        }
 
         /* Set up a RecyclerView so we can display the stops nicely */
         rv = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
-        stopAdapter = new StopAdapter(octAPI.gtfsTable.stopTable);
+        stopAdapter = new StopAdapter(this.getApplicationContext(), stopList);
         rv.setAdapter(stopAdapter);
     }
 
@@ -68,20 +77,28 @@ public class DisplayStopsActivity extends AppCompatActivity
         // Set up a new list that will contain the search results
         ArrayList<OCStop> newList = new ArrayList<>();
 
-        for(HashMap.Entry<String, OCStop> stop : octAPI.gtfsTable.stopTable.entrySet()) {
+        for(OCStop stop : stopList) {
             /* Stop names should all be in uppercase by default but search results were
                behaving oddly so we're setting everything to lowercase */
-            String stopName = stop.getValue().getStopName().toLowerCase();
-            String stopCode = "" + stop.getValue().getStopCode();
+            String stopName = stop.getStopName().toLowerCase();
+            String stopCode = "" + stop.getStopCode();
 
             // We search by stop name and by stop code so check both
             if(stopName.contains(newText) || stopCode.contains(newText)) {
-                newList.add(stop.getValue());
+                newList.add(stop);
             }
         }
 
         // Update the adapter with the newly filtered list
         stopAdapter.setFilter(newList);
         return true;
+    }
+
+    // User has tapped a stop, go to detailed stop page
+    public void onClick(String stopCodeStr) {
+        int stopCode = Integer.parseInt(stopCodeStr);
+        Intent intent = new Intent(this.getApplication(), DetailedStopActivity.class);
+        intent.putExtra("STOPCODE", stopCode);
+        startActivity(intent);
     }
 }
