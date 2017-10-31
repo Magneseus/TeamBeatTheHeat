@@ -310,6 +310,7 @@ public class GTFS {
 
         return false;
 
+        // TODO: Figure out why this crashes matt & laura's devices, cert errors n stuff
         /*
         final HashMap<String, String> params = new HashMap<String, String>();
         params.put("appID", OCTranspo.appID);
