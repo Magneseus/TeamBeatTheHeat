@@ -12,6 +12,8 @@ import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 /**
@@ -50,6 +52,13 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                         busList.add(busArray);
                 }
 
+                // Sort ArrayList of OCBus arrays by route number
+                Collections.sort(busList, new Comparator<OCBus[]>() {
+                    public int compare(OCBus[] busArray, OCBus[] otherArray) {
+                        return busArray[0].compareTo(otherArray[0]);
+                    }
+                });
+
                 // Set up the RecyclerView to display route and time info
                 rv = (RecyclerView) findViewById(R.id.rfs_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
@@ -60,10 +69,4 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         });
     }
 
-    private class OCBusParser {
-        String routeNumber;
-        String routeName;
-
-
-    }
 }

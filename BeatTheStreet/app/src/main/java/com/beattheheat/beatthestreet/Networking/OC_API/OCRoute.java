@@ -76,8 +76,6 @@ public class OCRoute implements Comparable {
         return this.getRouteNo() - ((OCRoute)otherRoute).getRouteNo();
     }
 
-
-
     /*********************
      * Getters & Setters *
      *********************/
