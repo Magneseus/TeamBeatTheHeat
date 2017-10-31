@@ -37,11 +37,14 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
 
     @Override
     public void onBindViewHolder(final RoutesForStopViewHolder viewHolder, int position) {
-        // Set the route number
+        // Set the route number view
         OCBus[] currentList = busList.get(position);
-        // TODO: Figure out if we want routeHeading or tripDestination
-        String currentNameNumber = ("" + currentList[0].getRouteNo() + " Heading: " + currentList[0].getRouteHeading() + " Destination: " + currentList[0].getTripDestination());
+        String currentNameNumber = ("" + currentList[0].getRouteNo() + " " + currentList[0].getRouteHeading());
         viewHolder.routeNumberName.setText(currentNameNumber);
+
+        // Set the trip views
+        for (int i = 0; i < currentList.length; i++)
+            viewHolder.trips[i].setText("" + currentList[i].getMinsTilArrival() + " min");
     }
 
     @Override
@@ -50,10 +53,14 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     // Helper class that takes info and puts it into the layout at the appropriate position
     static class RoutesForStopViewHolder extends RecyclerView.ViewHolder {
         TextView routeNumberName;
+        TextView[] trips = new TextView[3];
 
         RoutesForStopViewHolder(View itemView) {
             super(itemView);
             routeNumberName = (TextView)itemView.findViewById(R.id.rfs_route_number_name);
+            trips[0] = (TextView)itemView.findViewById((R.id.rfs_stop_time_0));
+            trips[1] = (TextView)itemView.findViewById((R.id.rfs_stop_time_1));
+            trips[2] = (TextView)itemView.findViewById((R.id.rfs_stop_time_2));
         }
     }
 }
