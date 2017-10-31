@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp" >
+
+    <!-- Layout for detailed stop information to be displayed
+        Displays routes that service a particular stop and the next
+        (up to) 3 stop times, if applicable -->
+
+    <TextView
+        android:id="@+id/rfs_route_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:textSize="20sp"
+        android:textColor="#000000" />
+
+    <!-- TODO: Add stop time info here. How do we account for 0 - 3 possible TextViews? -->
+
+</RelativeLayout>

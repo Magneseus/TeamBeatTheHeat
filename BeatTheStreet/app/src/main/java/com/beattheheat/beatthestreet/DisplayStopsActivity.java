@@ -44,7 +44,7 @@ public class DisplayStopsActivity extends AppCompatActivity
             stop.setStopName(stop.getStopName().replaceAll("\"", ""));
 
         /* Set up a RecyclerView so we can display the stops nicely */
-        rv = (RecyclerView) findViewById(R.id.recycler_view);
+        rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
         stopAdapter = new StopAdapter(this, stopList);
