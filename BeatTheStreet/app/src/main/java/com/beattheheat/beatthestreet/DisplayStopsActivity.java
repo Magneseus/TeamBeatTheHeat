@@ -96,5 +96,6 @@ public class DisplayStopsActivity extends AppCompatActivity
         Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);
         startActivity(intent);
+
     }
 }

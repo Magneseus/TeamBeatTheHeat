@@ -7,6 +7,10 @@
             android:icon="@android:drawable/btn_star_big_on"
             android:title="View Stops" />
         <item
+            android:id="@+id/nav_view_routes"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="View Routes" />
+        <item
             android:id="@+id/nav_get_routes"
             android:icon="@android:drawable/btn_star_big_on"
             android:title="Get Routes For Stop" />

@@ -199,7 +199,12 @@ public class MainActivity extends AppCompatActivity
                From there you can search for a stop and then go to a detailed stop view */
             Intent intent = new Intent(this, DisplayStopsActivity.class);
             startActivity(intent);
-
+        } else if (id == R.id.nav_view_routes) {
+            // View all stops
+            /* Starts a new activity that will display all routes saved from GTFS
+               From there you can search for a route and then go to a detailed route view */
+            Intent intent = new Intent(this, DisplayRoutesActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_get_location) {
             Location loc = LocationWrapper.getInstance(this).getLocation();
 
