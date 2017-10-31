@@ -31,7 +31,7 @@ public class OCBus {
     private Location gpsLocation;
     private float gpsSpeed;
 
-    public OCBus(JSONObject json, int routeNo, String routeHeading) {
+    OCBus(JSONObject json, int routeNo, String routeHeading) {
         setRouteNo(routeNo);
         setRouteHeading(routeHeading);
 

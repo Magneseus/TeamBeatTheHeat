@@ -16,7 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -83,7 +82,7 @@ public class OCTranspo {
      * requestParams: Parameters to give the POST request, specified by the type of request. (See public functions below)
      * callback:      Callback function, given the raw RESPONSE string of the POST request.
      */
-    void MakeVolleyPOST(OC_TYPE requestType, final HashMap<String, String> requestParams, final SCallable<String> callback) {
+    private void MakeVolleyPOST(OC_TYPE requestType, final HashMap<String, String> requestParams, final SCallable<String> callback) {
         StringRequest jReq = new StringRequest(
                 Request.Method.POST,
                 apiURLs[requestType.ordinal()],
