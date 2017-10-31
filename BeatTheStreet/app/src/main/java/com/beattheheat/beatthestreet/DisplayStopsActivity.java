@@ -93,7 +93,7 @@ public class DisplayStopsActivity extends AppCompatActivity
     // User has tapped a stop, go to detailed stop page
     public void onClick(String stopCodeStr) {
         //int stopCode = Integer.parseInt(stopCodeStr);
-        Intent intent = new Intent(this.getApplication(), DisplayRoutesForStopActivity.class);
+        Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);
         startActivity(intent);
     }

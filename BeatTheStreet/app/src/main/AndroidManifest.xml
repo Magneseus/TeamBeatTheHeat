@@ -48,7 +48,10 @@
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".DisplayStopsActivity"
-            android:label="Bus Stop Schedules"/>
+            android:label="Bus Stop Schedules" />
+        <activity
+            android:name=".DisplayRoutesForStopActivity"
+            android:label="Stop Information" />
     </application>
 
 </manifest>
