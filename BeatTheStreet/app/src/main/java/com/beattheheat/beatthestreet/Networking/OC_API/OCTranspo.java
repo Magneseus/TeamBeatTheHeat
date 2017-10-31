@@ -160,31 +160,78 @@ public class OCTranspo {
             @Override
             public void call(String arg) {
                 try {
-                    JSONObject json = new JSONObject(arg);
-                    JSONArray routeList = json.getJSONObject("GetRouteSummaryForStopResult").getJSONObject("Routes").getJSONArray("Route");
-
                     HashMap<Integer, OCBus[]> returnMap = new HashMap<>();
 
-                    // Go through the list of routes
-                    for (int i = 0; i < routeList.length(); i++) {
-                        // Pull out the object and the list of trips
-                        JSONObject route = routeList.getJSONObject(i);
+                    JSONObject json = new JSONObject(arg);
+                    JSONArray routeList = null;
 
-                        // Check if trips exist
-                        OCBus[] busList = null;
-                        if (route.has("Trips")) {
-                            JSONArray tripList = route.getJSONArray("Trips");
-                             busList = new OCBus[tripList.length()];
+                    // Check if Routes is an array or object
+                    if (json.getJSONObject("GetRouteSummaryForStopResult").has("Routes")) {
+                        Object routesObj = json.getJSONObject("GetRouteSummaryForStopResult").get("Routes");
+                        if (routesObj instanceof JSONArray) {
+                            routeList = json.getJSONObject("GetRouteSummaryForStopResult").getJSONArray("Routes");
+                        } else if (routesObj instanceof JSONObject) {
+                            JSONObject routesJSONObj = json.getJSONObject("GetRouteSummaryForStopResult").getJSONObject("Routes");
 
-                            // Go through the list of trips
-                            for (int j = 0; j < tripList.length(); j++) {
-                                JSONObject trip = tripList.getJSONObject(j);
-                                busList[j] = new OCBus(trip, route.getInt("RouteNo"), route.getString("RouteHeading"));
+                            if (routesJSONObj.has("Route")) {
+                                Object routeObj = routesJSONObj.get("Route");
+
+                                // Check if route is an array or object
+                                if (routeObj instanceof JSONArray) {
+                                    routeList = routesJSONObj.getJSONArray("Route");
+                                } else if (routeObj instanceof JSONObject) {
+                                    routeList = new JSONArray();
+                                    routeList.put(routesJSONObj.getJSONObject("Route"));
+                                }
+                            } else {
+                                routeList = null;
                             }
                         }
+                    }
 
-                        // Put the list of buses in the hashmap
-                        returnMap.put(route.getInt("RouteNo"), busList);
+                    if (routeList != null) {
+                        // Go through the list of routes
+                        for (int i = 0; i < routeList.length(); i++) {
+                            // Pull out the object and the list of trips
+                            JSONObject route = routeList.getJSONObject(i);
+
+                            if (route.has("Trips")) {
+                                JSONArray tripList = null;
+                                OCBus[] busList = null;
+
+                                // Check if Trips is an array or object
+                                Object tripsObj = route.get("Trips");
+                                if (tripsObj instanceof JSONArray) {
+                                    tripList = route.getJSONArray("Trips");
+                                } else if (tripsObj instanceof JSONObject) {
+                                    JSONObject tripsJSONObj = route.getJSONObject("Trips");
+
+                                    if (tripsJSONObj.has("Trip")) {
+                                        Object tripObj = tripsJSONObj.get("Trip");
+
+                                        // Check if route is an array or object
+                                        if (tripObj instanceof JSONArray) {
+                                            tripList = tripsJSONObj.getJSONArray("Trip");
+                                        } else if (tripObj instanceof JSONObject) {
+                                            tripList = new JSONArray();
+                                            tripList.put(tripsJSONObj.getJSONObject("Trip"));
+                                        }
+                                    }
+                                }
+
+                                // Iterate through the trips list
+                                if (tripList != null) {
+                                    busList = new OCBus[tripList.length()];
+                                    for (int j = 0; j < tripList.length(); j++) {
+                                        JSONObject trip = tripList.getJSONObject(j);
+                                        busList[j] = new OCBus(trip, route.getInt("RouteNo"), route.getString("RouteHeading"));
+                                    }
+                                }
+
+                                // Put the list of buses in the hashmap
+                                returnMap.put(route.getInt("RouteNo"), busList);
+                            }
+                        }
                     }
 
                     callback.call(returnMap);
