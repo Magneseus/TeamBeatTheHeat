@@ -1,5 +1,6 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
  * Created by Matt on 24-Oct-17.
  */
 
-public class OCRoute {
+public class OCRoute implements Comparable {
     private int routeNo;
     private List<String> routeNames;
     private List<String> trips;
@@ -71,6 +72,9 @@ public class OCRoute {
         }
     }
 
+    public int compareTo(@NonNull Object otherRoute) {
+        return this.getRouteNo() - ((OCRoute)otherRoute).getRouteNo();
+    }
 
 
 
