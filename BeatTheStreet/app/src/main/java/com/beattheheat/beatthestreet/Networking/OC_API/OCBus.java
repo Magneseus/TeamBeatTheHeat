@@ -72,7 +72,7 @@ public class OCBus {
 
 
     public boolean isTimeLive() {
-        return getUpdateAge() != -1.0f;
+        return getUpdateAge() > 0.0f;
     }
 
     /*********************
