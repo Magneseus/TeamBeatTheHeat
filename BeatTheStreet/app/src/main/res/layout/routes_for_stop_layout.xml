@@ -10,7 +10,7 @@
         (up to) 3 stop times, if applicable -->
 
     <TextView
-        android:id="@+id/rfs_route_number"
+        android:id="@+id/rfs_route_number_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"

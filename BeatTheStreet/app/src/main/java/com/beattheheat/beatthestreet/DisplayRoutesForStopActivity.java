@@ -21,12 +21,12 @@ import java.util.HashMap;
  */
 
 // TODO: Add main menu bar from MainActivity
+    // Every OCBus in the HashMap also has a routeNo stored in it so we can just pull the buses out
 public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
     OCTranspo octAPI;
-    HashMap<Integer, OCBus[]> buses; // Integer is the route number
-                                     // OCBus[] is array (null up to 3) of upcoming stop times
+    ArrayList<OCBus[]> busList;
     RoutesForStopAdapter rfsAdapter; //Places route data into the RecyclerView's layout
     RecyclerView rv;
 
@@ -43,16 +43,26 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
             @Override
             public void call(HashMap<Integer, OCBus[]> arg) {
-                buses = new HashMap<>(arg);
+                busList = new ArrayList<>();
+                // Filter out routes that have no upcoming stops
+                for (OCBus[] busArray : arg.values()) {
+                    if (busArray != null && busArray.length > 0)
+                        busList.add(busArray);
+                }
 
                 // Set up the RecyclerView to display route and time info
                 rv = (RecyclerView) findViewById(R.id.rfs_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm); // llm makes rv have a linear layout
-                rfsAdapter = new RoutesForStopAdapter(context, buses);
+                rfsAdapter = new RoutesForStopAdapter(context, busList);
                 rv.setAdapter(rfsAdapter);
             }
         });
+    }
+
+    private class OCBusParser {
+        String routeNumber;
+        String routeName;
 
 
     }

@@ -21,14 +21,11 @@ import java.util.HashMap;
 class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.RoutesForStopViewHolder> {
 
     private Context context;
-    private HashMap<Integer, OCBus[]> buses;
-    private ArrayList<Integer> routeNumbers;
+    private ArrayList<OCBus[]> busList;
 
-    RoutesForStopAdapter(Context context, HashMap<Integer, OCBus[]> buses) {
+    RoutesForStopAdapter(Context context, ArrayList<OCBus[]> busList) {
         this.context = context;
-        this.buses = buses;
-        if (buses != null)
-            this.routeNumbers = new ArrayList<>(buses.keySet());
+        this.busList = new ArrayList<>(busList);
     }
 
     @Override
@@ -41,19 +38,22 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     @Override
     public void onBindViewHolder(final RoutesForStopViewHolder viewHolder, int position) {
         // Set the route number
-        viewHolder.routeNumber.setText(routeNumbers.get(position).toString());
+        OCBus[] currentList = busList.get(position);
+        // TODO: Figure out if we want routeHeading or tripDestination
+        String currentNameNumber = ("" + currentList[0].getRouteNo() + " Heading: " + currentList[0].getRouteHeading() + " Destination: " + currentList[0].getTripDestination());
+        viewHolder.routeNumberName.setText(currentNameNumber);
     }
 
     @Override
-    public int getItemCount() { return buses == null ? 0 : buses.size(); }
+    public int getItemCount() { return busList.size(); }
 
     // Helper class that takes info and puts it into the layout at the appropriate position
     static class RoutesForStopViewHolder extends RecyclerView.ViewHolder {
-        TextView routeNumber;
+        TextView routeNumberName;
 
         RoutesForStopViewHolder(View itemView) {
             super(itemView);
-            routeNumber = (TextView)itemView.findViewById(R.id.rfs_route_number);
+            routeNumberName = (TextView)itemView.findViewById(R.id.rfs_route_number_name);
         }
     }
 }
