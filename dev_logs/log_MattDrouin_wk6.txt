@@ -1,0 +1,7 @@
+50 hours:
+        -Research into Android development practices (which methods/data structures are more appropriate for which task, etc)
+        -UI development
+                -Presenting searchable list of all stops
+                -Presenting list of upcoming trips using live data at chosen stop
+                -Implementing (relatively) efficient ways to display large amounts of data
+        -Debugging, debugging, debugging
