@@ -41,7 +41,7 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     @Override
     public void onBindViewHolder(final RoutesForStopViewHolder viewHolder, int position) {
         // Set the route number
-        viewHolder.routeNumber.setText(routeNumbers.get(position));
+        viewHolder.routeNumber.setText(routeNumbers.get(position).toString());
     }
 
     @Override
