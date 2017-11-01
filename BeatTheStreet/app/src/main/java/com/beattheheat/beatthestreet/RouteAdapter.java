@@ -44,12 +44,17 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
         // Set the route name and direction
         viewHolder.routeName.setText(String.valueOf(routes.get(position).getRouteNo()));
 
-        Set<String> uniqueNames = new HashSet<String>(routes.get(position).getRouteNames());
-
-        String directions = "";
-        for (String dir : uniqueNames){
-            directions += dir + " ";
+        String dir1 = routes.get(position).getRouteNames().get(0);
+        String dir2 = "";
+        for(int i = 0; i <routes.get(position).getRouteNames().size(); i++){
+            if (!routes.get(position).getRouteNames().get(i).equals(dir1)){
+                dir2 = routes.get(position).getRouteNames().get(i);
+                break;
+            }
         }
+
+        String directions = dir1 + " / " + dir2;
+        directions = directions.replaceAll("\"", "");
 
         viewHolder.routeDirection.setText(directions);
 
