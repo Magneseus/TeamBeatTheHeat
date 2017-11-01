@@ -34,6 +34,11 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
              @Override
              public int compare(OCStop o1, OCStop o2) {
                  Location user = LocationWrapper.getInstance(context).getLocation();
+                 if (user == null) {
+                     user = new Location("NO_GPS");
+                     user.setLongitude(-75.696353);
+                     user.setLatitude(45.384906);
+                 }
 
                  float dist1 = o1.getLocation().distanceTo(user);
                  float dist2 = o2.getLocation().distanceTo(user);

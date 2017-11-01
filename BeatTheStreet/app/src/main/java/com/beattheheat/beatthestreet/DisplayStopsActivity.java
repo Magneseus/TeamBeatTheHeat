@@ -23,6 +23,7 @@ import java.util.ArrayList;
  */
 
 // TODO: Add main menu bar from MainActivity
+// TODO: If no GPS available, sort by number
 public class DisplayStopsActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
 
