@@ -92,10 +92,15 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             public void run() {
                 float difference = busTime - start;
 
+                // TODO: give a little bus icon to this notification
+                // TODO: ping the servers to update bus time ever so often
+                // TODO: color notif red if bus is more than X minutes off (7?)
                 NotificationUtil.getInstance().notify(ctx, 0, "Bus", "Bus will arrive in " +
                         difference + " minutes.");
 
-                handler.postDelayed(runPointer.run, 1000);
+                if (difference >= 0) {
+                    handler.postDelayed(runPointer.run, 1000);
+                }
             }
         };
 
