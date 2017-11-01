@@ -83,7 +83,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         }
         final Context ctx = this;
 
-        final float start = SystemClock.elapsedRealtime()/60000;
+        final float start = System.currentTimeMillis()/60000;
 
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
