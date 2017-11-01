@@ -1,11 +1,14 @@
 package com.beattheheat.beatthestreet;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
+import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCRoute;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
@@ -69,4 +72,34 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         });
     }
 
+    // User has tapped a stop, go to detailed stop page
+    public void onClick(final float busTime) {
+        // TODO: clean up this disgusting mess
+        class RunnablePointer {
+            public Runnable run;
+            public RunnablePointer(Runnable run) {
+                this.run = run;
+            }
+        }
+        final Context ctx = this;
+
+        final float start = SystemClock.elapsedRealtime()/60000;
+
+        final Handler handler = new Handler();
+        final RunnablePointer runPointer = new RunnablePointer(null);
+        runPointer.run = new Runnable() {
+            @Override
+            public void run() {
+                float difference = busTime - start;
+
+                NotificationUtil.getInstance().notify(ctx, 0, "Bus", "Bus will arrive in " +
+                        difference + " minutes.");
+
+                handler.postDelayed(runPointer.run, 1000);
+            }
+        };
+
+
+        handler.postDelayed(runPointer.run, 1000);
+    }
 }
