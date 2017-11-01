@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,12 +26,13 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     private Context context;
     private ArrayList<OCStop> stops;
+    public Comparator<OCStop> locationSort;
 
      StopAdapter(final Context context, ArrayList<OCStop> stopList) {
          this.context = context;
          this.stops = stopList;
 
-         Comparator<OCStop> locationSort = new Comparator<OCStop>() {
+         locationSort = new Comparator<OCStop>() {
              @Override
              public int compare(OCStop o1, OCStop o2) {
                  Location user = LocationWrapper.getInstance(context).getLocation();
@@ -88,12 +90,20 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         }
     }
 
-    // Replaces the current list of stops with the ones that match the search
     void setFilter(ArrayList<OCStop> newList) {
+        setFilter(newList, null);
+    }
+
+    // Replaces the current list of stops with the ones that match the search
+    void setFilter(ArrayList<OCStop> newList, Comparator<OCStop> comparator) {
         stops = new ArrayList<>();
         stops.addAll(newList);
 
-        Collections.sort(stops);
+        if (comparator != null) {
+            Collections.sort(stops, comparator);
+        } else {
+            Collections.sort(stops);
+        }
         notifyDataSetChanged(); // Refresh the adapter
     }
 }

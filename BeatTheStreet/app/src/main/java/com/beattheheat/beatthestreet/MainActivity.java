@@ -220,23 +220,27 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextChange(String newText) {
         newText = newText.toLowerCase();
 
-        // Set up a new list that will contain the search results
-        ArrayList<OCStop> newList = new ArrayList<>();
+        if (!newText.equals("")) {
+            // Set up a new list that will contain the search results
+            ArrayList<OCStop> newList = new ArrayList<>();
 
-        for(OCStop stop : stopList) {
-            /* Stop names should all be in uppercase by default but search results were
-               behaving oddly so we're setting everything to lowercase */
-            String stopName = stop.getStopName().toLowerCase();
-            String stopCode = "" + stop.getStopCode();
+            for (OCStop stop : stopList) {
+                /* Stop names should all be in uppercase by default but search results were
+                   behaving oddly so we're setting everything to lowercase */
+                String stopName = stop.getStopName().toLowerCase();
+                String stopCode = "" + stop.getStopCode();
 
-            // We search by stop name and by stop code so check both
-            if(stopName.contains(newText) || stopCode.contains(newText)) {
-                newList.add(stop);
+                // We search by stop name and by stop code so check both
+                if (stopName.contains(newText) || stopCode.contains(newText)) {
+                    newList.add(stop);
+                }
             }
-        }
 
-        // Update the adapter with the newly filtered list
-        stopAdapter.setFilter(newList);
+            // Update the adapter with the newly filtered list
+            stopAdapter.setFilter(newList);
+        } else {
+            stopAdapter.setFilter(stopList, stopAdapter.locationSort);
+        }
         return true;
     }
 
