@@ -14,9 +14,13 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Menu;
@@ -27,9 +31,11 @@ import android.widget.TextView;
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
+import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,10 +45,14 @@ import java.util.Map;
  */
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
 
     // Our OCAPI instance, for bus/stop information
     private OCTranspo octAPI;
+
+    ArrayList<OCStop> stopList;
+    StopAdapter stopAdapter; // Takes OCStop data and puts it into stop_layout.xml
+    RecyclerView rv; // Only shows items on or near the screen, more efficient for long lists
 
 
     // Initialization function (Constructor)
@@ -53,15 +63,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -70,10 +71,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        // Scrollbar for text view
-        TextView tv = (TextView) findViewById(R.id.textView3);
-        tv.setMovementMethod(new ScrollingMovementMethod());
 
         // OCTranspo API caller
         octAPI = OCTranspo.getInstance();
@@ -159,6 +156,25 @@ public class MainActivity extends AppCompatActivity
         });
 
         NotificationUtil.getInstance().notify(this, 0, "Welcome to Test1");*/
+
+        octAPI.LoadGTFS(new SCallable<Boolean>() {
+            @Override
+            public void call(Boolean arg) {
+                stopList = new ArrayList<>(octAPI.gtfsTable.getStopList());
+                // Trim excess quotes from stopName
+                for(OCStop stop : stopList)
+                    stop.setStopName(stop.getStopName().replaceAll("\"", ""));
+
+                /* Set up a RecyclerView so we can display the stops nicely */
+                rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
+                LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
+                rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
+                stopAdapter = new StopAdapter(ctx, stopList);
+                rv.setAdapter(stopAdapter);
+            }
+        });
+
+
     }
 
     // called when app is opened
@@ -188,24 +204,48 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.menu_items, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        searchView.setOnQueryTextListener(this);
         return true;
     }
 
+    // Do nothing, we update search results live so we don't need this method
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    public boolean onQueryTextSubmit(String query) { return false; }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        newText = newText.toLowerCase();
+
+        // Set up a new list that will contain the search results
+        ArrayList<OCStop> newList = new ArrayList<>();
+
+        for(OCStop stop : stopList) {
+            /* Stop names should all be in uppercase by default but search results were
+               behaving oddly so we're setting everything to lowercase */
+            String stopName = stop.getStopName().toLowerCase();
+            String stopCode = "" + stop.getStopCode();
+
+            // We search by stop name and by stop code so check both
+            if(stopName.contains(newText) || stopCode.contains(newText)) {
+                newList.add(stop);
+            }
         }
 
-        return super.onOptionsItemSelected(item);
+        // Update the adapter with the newly filtered list
+        stopAdapter.setFilter(newList);
+        return true;
+    }
+
+    // User has tapped a stop, go to detailed stop page
+    public void onClick(String stopCodeStr) {
+        //int stopCode = Integer.parseInt(stopCodeStr);
+        Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
+        intent.putExtra("STOPCODE", stopCodeStr);
+        startActivity(intent);
     }
 
     @Override
@@ -213,62 +253,12 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        // Get Stop number
-        TextView stopNum = (TextView) findViewById(R.id.text_stopNo);
-
-        // Text View Stuff
-        final TextView tv = (TextView) findViewById(R.id.textView3);
-        if (id == R.id.nav_view_stops) {
-            // View all stops
-            /* Starts a new activity that will display all stops saved from GTFS
-               From there you can search for a stop and then go to a detailed stop view */
-            Intent intent = new Intent(this, DisplayStopsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_view_routes) {
+        if (id == R.id.nav_view_routes) {
             // View all stops
             /* Starts a new activity that will display all routes saved from GTFS
                From there you can search for a route and then go to a detailed route view */
             Intent intent = new Intent(this, DisplayRoutesActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_get_location) {
-            Location loc = LocationWrapper.getInstance(this).getLocation();
-
-            if(loc == null)
-            {
-                tv.setText("No Location yet.");
-            } else {
-                tv.setText("Lat: " + loc.getLatitude() + " Lon: " + loc.getLongitude() + " R: " + Math.random());
-            }
-        } else if (id == R.id.nav_get_routes) {
-            octAPI.GetRouteSummaryForStop(stopNum.getText().toString(), new SCallable<int[]>() {
-                @Override
-                public void call(int[] arg) {
-                    String s = "[";
-                    for (int i : arg) {
-                        s += i;
-                        s += ",";
-                    }
-                    s = s.substring(0, s.length()-1);
-                    s += "]";
-                    tv.setText(s);
-                }
-            });
-        } else if (id == R.id.nav_get_times_stop) {
-            octAPI.GetNextTripsForStopAllRoutes(stopNum.getText().toString(), new SCallable<HashMap<Integer,OCBus[]>>() {
-                @Override
-                public void call(HashMap<Integer,OCBus[]> arg) {
-                    for (Map.Entry<Integer,OCBus[]> entry : arg.entrySet()) {
-
-                    }
-                }
-            });
-        } else if (id == R.id.nav_get_gtfs) {
-            octAPI.LoadGTFS(new SCallable<Boolean>() {
-                @Override
-                public void call(Boolean arg) {
-                    tv.setText("" + arg.booleanValue());
-                }
-            });
         } else if (id == R.id.nav_notify) {
             NotificationUtil.getInstance().notify(this, 1, "New Notification", "yo you pressed the button", -1, true);
         }

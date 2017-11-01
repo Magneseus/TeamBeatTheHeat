@@ -67,7 +67,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
             @Override
             public void onClick(View view) {
                 // Get stopCode and pass it back to DisplayStopsActivity
-                ((DisplayStopsActivity)context).onClick(viewHolder.stopCode.getText().toString());
+                ((MainActivity)context).onClick(viewHolder.stopCode.getText().toString());
             }
         });
     }

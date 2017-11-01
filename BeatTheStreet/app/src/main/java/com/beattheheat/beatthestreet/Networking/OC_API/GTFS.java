@@ -145,6 +145,10 @@ public class GTFS {
         }
     }
 
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+
     // Async task to load the GTFS files
     private class LoadGTFSFromDisk extends AsyncTask<GTFS, Integer, Void> {
         @Override
