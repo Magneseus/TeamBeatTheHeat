@@ -38,13 +38,21 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     @Override
     public void onBindViewHolder(final RoutesForStopViewHolder viewHolder, int position) {
         // Set the route number view
-        OCBus[] currentList = busList.get(position);
+        final OCBus[] currentList = busList.get(position);
         String currentNameNumber = ("" + currentList[0].getRouteNo() + " " + currentList[0].getRouteHeading());
         viewHolder.routeNumberName.setText(currentNameNumber);
 
         // Set the trip views
         for (int i = 0; i < currentList.length; i++)
-            viewHolder.trips[i].setText("" + currentList[i].getMinsTilArrival() + " min");
+            viewHolder.trips[i].setText(currentList[i].getMinsTilArrival() + " min");
+
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Get stopCode and pass it back to DisplayStopsActivity
+                        ((DisplayRoutesForStopActivity)context).onClick(currentList[0].getMinsTilArrival());
+            }
+        });
     }
 
     @Override
