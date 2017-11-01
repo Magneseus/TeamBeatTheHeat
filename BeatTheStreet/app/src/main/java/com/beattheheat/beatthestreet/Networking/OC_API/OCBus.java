@@ -1,6 +1,7 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -72,7 +73,7 @@ public class OCBus {
 
 
     public boolean isTimeLive() {
-        return getUpdateAge() != -1.0f;
+        return getUpdateAge() > 0.0f;
     }
 
     /*********************
@@ -157,5 +158,9 @@ public class OCBus {
 
     public void setGpsSpeed(float gpsSpeed) {
         this.gpsSpeed = gpsSpeed;
+    }
+
+    public int compareTo(@NonNull Object otherBus) {
+        return this.getRouteNo() - ((OCBus)otherBus).getRouteNo();
     }
 }

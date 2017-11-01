@@ -40,18 +40,14 @@ public class DisplayStopsActivity extends AppCompatActivity
         stopList = new ArrayList<>(octAPI.gtfsTable.getStopList());
 
         // Trim excess quotes from stopName
-        for(OCStop stop : stopList) {
-            String temp = stop.getStopName();
-            temp = temp.replaceAll("\"", "");
-            stop.setStopName(temp);
-            //stop.setStopName(stop.getStopName().replaceAll("\"", ""));
-        }
+        for(OCStop stop : stopList)
+            stop.setStopName(stop.getStopName().replaceAll("\"", ""));
 
         /* Set up a RecyclerView so we can display the stops nicely */
-        rv = (RecyclerView) findViewById(R.id.recycler_view);
+        rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
-        stopAdapter = new StopAdapter(this.getApplicationContext(), stopList);
+        stopAdapter = new StopAdapter(this, stopList);
         rv.setAdapter(stopAdapter);
     }
 
@@ -95,11 +91,10 @@ public class DisplayStopsActivity extends AppCompatActivity
     }
 
     // User has tapped a stop, go to detailed stop page
-    public void onClick(String stopCodeStr) {/*
-    // TODO: Uncomment this function when corresponding class is implemented
+    public void onClick(String stopCodeStr) {
         //int stopCode = Integer.parseInt(stopCodeStr);
-        Intent intent = new Intent(this.getApplication(), DisplayRoutesForStopActivity.class);
+        Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);
-        startActivity(intent);*/
+        startActivity(intent);
     }
 }

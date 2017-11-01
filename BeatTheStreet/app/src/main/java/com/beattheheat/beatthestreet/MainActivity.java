@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -106,8 +108,31 @@ public class MainActivity extends AppCompatActivity
         */
 
         final Context ctx = this;
-        LocationWrapper.getInstance(this).subscribe(new SCallable() {
+
+        class RunnablePointer {
+            public Runnable run;
+            public RunnablePointer(Runnable run) {
+                this.run = run;
+            }
+        }
+
+        final long start = SystemClock.elapsedRealtime();
+        final Handler handler = new Handler();
+        final RunnablePointer runPointer = new RunnablePointer(null);
+        runPointer.run = new Runnable() {
             @Override
+            public void run() {
+                NotificationUtil.getInstance().notify(ctx, 0, "Timer", "" + (SystemClock.elapsedRealtime()
+                        - start)/1000 + "s");
+                handler.postDelayed(runPointer.run, 100);
+            }
+        };
+
+
+        handler.postDelayed(runPointer.run, 100);
+
+       /* LocationWrapper.getInstance(this).subscribe(new SCallable() {
+            @Override,
             public void call(Object arg) {
                 Location x1 = LocationWrapper.getInstance(ctx).getLocation();
                 if(x1 == null) return;
@@ -133,7 +158,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        NotificationUtil.getInstance().notify(this, 0, "Welcome to Test1");
+        NotificationUtil.getInstance().notify(this, 0, "Welcome to Test1");*/
     }
 
     // called when app is opened
@@ -199,7 +224,12 @@ public class MainActivity extends AppCompatActivity
                From there you can search for a stop and then go to a detailed stop view */
             Intent intent = new Intent(this, DisplayStopsActivity.class);
             startActivity(intent);
-
+        } else if (id == R.id.nav_view_routes) {
+            // View all stops
+            /* Starts a new activity that will display all routes saved from GTFS
+               From there you can search for a route and then go to a detailed route view */
+            Intent intent = new Intent(this, DisplayRoutesActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_get_location) {
             Location loc = LocationWrapper.getInstance(this).getLocation();
 

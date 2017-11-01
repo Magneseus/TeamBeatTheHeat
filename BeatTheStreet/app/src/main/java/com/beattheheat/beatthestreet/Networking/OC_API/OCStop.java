@@ -13,7 +13,8 @@ public class OCStop implements Comparable {
     private String stopName;
     private Location location;
 
-    private OCStop(String stopId, int stopCode, String stopName, Location location) {
+    // TODO: Add lat/lon coord vars
+    OCStop(String stopId, int stopCode, String stopName, Location location) {
         setStopId(stopId);
         setStopCode(stopCode);
         setStopName(stopName);

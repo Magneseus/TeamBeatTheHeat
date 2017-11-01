@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:padding="16dp" >
+
+    <!-- Layout for detailed stop information to be displayed
+        Displays routes that service a particular stop and the next
+        (up to) 3 stop times, if applicable -->
+
+    <TextView
+        android:id="@+id/rfs_route_number_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:textSize="20sp"
+        android:textColor="#000000" />
+
+    <TextView
+        android:id="@+id/rfs_stop_time_0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rfs_route_number_name"
+        android:layout_marginEnd="16dp" />
+
+    <TextView
+        android:id="@+id/rfs_stop_time_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rfs_route_number_name"
+        android:layout_toEndOf="@id/rfs_stop_time_0"
+        android:layout_marginEnd="16dp" />
+
+    <TextView
+        android:id="@+id/rfs_stop_time_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rfs_route_number_name"
+        android:layout_toEndOf="@id/rfs_stop_time_1"/>
+
+</RelativeLayout>
