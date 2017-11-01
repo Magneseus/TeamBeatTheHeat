@@ -76,6 +76,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
     public void onClick(final float minUntilBus) {
         // TODO: clean up this disgusting mess
         class RunnablePointer {
+            public int iterations = 0;
             public Runnable run;
             public RunnablePointer(Runnable run) {
                 this.run = run;
@@ -83,23 +84,22 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         }
         final Context ctx = this;
 
-        // convert minutes until bus into destination time
-        final float endTimeMillis = System.currentTimeMillis() + minUntilBus * 60000;
-
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
         runPointer.run = new Runnable() {
             @Override
             public void run() {
-                float difference = endTimeMillis - System.currentTimeMillis();
+                // difference in milliseconds
+                float millisUntilBus = minUntilBus*60000 - runPointer.iterations*1000;
 
                 // TODO: give a little bus icon to this notification
                 // TODO: ping the servers to update bus time ever so often
                 // TODO: color notif red if bus is more than X minutes off (7?)
                 NotificationUtil.getInstance().notify(ctx, 0, "Bus", "Bus will arrive in " +
-                        (difference/60000) + " minutes.");
+                        (millisUntilBus/60000) + " minutes.");
 
-                if (difference >= 0) {
+                if (millisUntilBus >= 0) {
+                    runPointer.iterations++;
                     handler.postDelayed(runPointer.run, 1000);
                 }
             }
