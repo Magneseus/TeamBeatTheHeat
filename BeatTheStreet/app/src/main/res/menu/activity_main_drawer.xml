@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_view_stops"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="View Stops" />
+        <item
+            android:id="@+id/nav_view_routes"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="View Routes" />
+        <item
+            android:id="@+id/nav_get_routes"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="Get Routes For Stop" />
+        <item
+            android:id="@+id/nav_get_times_stop"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="Get Times For Stop" />
+        <item
+            android:id="@+id/nav_get_routes_1929"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="Stop 1929 (Char/Path)" />
+        <item
+            android:id="@+id/nav_get_location"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="View Location" />
+        <item
+            android:id="@+id/nav_notify"
+            android:icon="@android:drawable/btn_radio"
+            android:title="Notification" />
+        <item
+            android:id="@+id/nav_get_gtfs"
+            android:icon="@android:drawable/btn_star_big_on"
+            android:title="GTFS" />
+    </group>
+
+</menu>

@@ -1,0 +1,6 @@
+4hrs - Work on data structures for OCTranspo API
+3hrs - Work on loading GTFS from net/loading from disk
+    4hrs - work on optimizing this to load faster (ongoing)
+3hrs - Making all calls to loading functions asynchronous, so as to not block the main thread
+2hrs - Creating a nicer wrapper around the API calls, so that other programmers can avoid boilerplate
+1hr  - debugging the differing results returned by OCAPI (they're not consistent in the slightest)
