@@ -73,10 +73,9 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
     }
 
     // User has tapped a stop, go to detailed stop page
-    public void onClick(final float minUntilBus) {
+    public void onClick(final float busTime) {
         // TODO: clean up this disgusting mess
         class RunnablePointer {
-            public int iterations = 0;
             public Runnable run;
             public RunnablePointer(Runnable run) {
                 this.run = run;
@@ -84,18 +83,19 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         }
         final Context ctx = this;
 
+        final float start = (System.currentTimeMillis()/60000) + busTime;
+
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
         runPointer.run = new Runnable() {
             @Override
             public void run() {
-                float millisUntilBus = minUntilBus*60000 - runPointer.iterations*1000;
+                float difference = start - (System.currentTimeMillis()/60000);
 
                 NotificationUtil.getInstance().notify(ctx, 0, "Bus", "Bus will arrive in " +
-                        (millisUntilBus/60000) + " minutes.");
+                        difference + " minutes.");
 
-                if (millisUntilBus >= 0) {
-                    runPointer.iterations++;
+                if (difference >= 0) {
                     handler.postDelayed(runPointer.run, 1000);
                 }
             }
