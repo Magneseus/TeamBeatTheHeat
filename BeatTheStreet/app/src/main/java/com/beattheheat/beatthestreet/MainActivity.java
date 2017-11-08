@@ -92,7 +92,70 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        /* TODO: Remove test code
+           This code shows off some features.
+              - subscribe(SCallable): calls the given function whenever we recieve a location update
+              - notify(Context, id, Title, Content): creates/updates notification
+
+              Then calculates the distance between your current location and my house.
+
+              Since this function is subscribed to location updates, whenever a new location update
+                is recieved, it raises a notification that gives the approximate distance the phone
+                is from my house.
+        */
+
         final Context ctx = this;
+
+        class RunnablePointer {
+            public Runnable run;
+            public RunnablePointer(Runnable run) {
+                this.run = run;
+            }
+        }
+
+        final long start = SystemClock.elapsedRealtime();
+        final Handler handler = new Handler();
+        final RunnablePointer runPointer = new RunnablePointer(null);
+        runPointer.run = new Runnable() {
+            @Override
+            public void run() {
+                NotificationUtil.getInstance().notify(ctx, 0, "Timer", "" + (SystemClock.elapsedRealtime()
+                        - start)/1000 + "s");
+                handler.postDelayed(runPointer.run, 100);
+            }
+        };
+
+
+        handler.postDelayed(runPointer.run, 100);
+
+       /* LocationWrapper.getInstance(this).subscribe(new SCallable() {
+            @Override,
+            public void call(Object arg) {
+                Location x1 = LocationWrapper.getInstance(ctx).getLocation();
+                if(x1 == null) return;
+
+                Location x2 = new Location("");
+                x2.setLatitude(44.7518833);
+                x2.setLongitude(-79.7102258);
+
+                float[] dist = new float[1];
+                Location.distanceBetween(x1.getLatitude(), x1.getLongitude(),
+                        x2.getLatitude(), x2.getLongitude(), dist);
+
+                NotificationUtil.getInstance().notify(ctx, 1, "Distance",
+                        dist[0] + "m R: " + Math.random());
+
+                if(dist[0] < 100) {
+                    NotificationUtil.getInstance().notify(ctx, 2, "You're here!",
+                            dist[0] + "m R: " + Math.random(), -1, false,
+                            Settings.System.DEFAULT_ALARM_ALERT_URI);
+
+                    LocationWrapper.getInstance(ctx).unsubscribe(this);
+                }
+            }
+        });
+
+        NotificationUtil.getInstance().notify(this, 0, "Welcome to Test1");*/
 
         octAPI.LoadGTFS(new SCallable<Boolean>() {
             @Override
