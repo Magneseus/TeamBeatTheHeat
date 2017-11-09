@@ -1,5 +1,6 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -48,6 +49,9 @@ public class GTFS {
     HashMap<String, OCStop> stopTable;
     HashMap<Integer, String> stopCodeToStopID;
 
+    // Trip database
+    OCTripDatabase tripTable;
+
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
     // GTFS Zip URL (For smaller download)
@@ -76,6 +80,9 @@ public class GTFS {
         callbacks = new ArrayList<>();
         isLoaded = false;
         isLoading = false;
+
+        // Load/Build the OCTripDatabase
+        tripTable = Room.databaseBuilder(appCtx, OCTripDatabase.class, "trip-db").build();
     }
 
     public Collection<OCRoute> getRouteList() {
@@ -172,25 +179,38 @@ public class GTFS {
                     callback.call(false);
             }
 
-            /************************
-             *    OCTRIP LOADING    *
-             ************************/
-            /*Log.d("tmp", "loading trips");
-            // Load the "stops.txt" file
-            try (FileInputStream fis = appCtx.openFileInput("stop_times.txt")) {
-                String fileLines = (new FileToStrings(fis).toStringFast(65536));
+            if (tripTable.tripDAO().loadFirstRow() == null) {
+                /************************
+                 *    OCTRIP LOADING    *
+                 ************************/
 
-                int start_ind = 0;
-                int ind = 0;
-                while ((ind = fileLines.indexOf('\n', start_ind)) != -1) {
-                    if (start_ind != 0) OCTrip.LoadTrip(gtfs[0], fileLines.substring(start_ind, ind+1));
-                    start_ind = ind+1;
+                ArrayList<OCTrip> trips = new ArrayList<>();
+                OCTrip[] tripsA;
+
+                Log.d("tmp", String.format("loading trips %d", System.currentTimeMillis()));
+                // Load the "stops.txt" file
+                try (FileInputStream fis = appCtx.openFileInput("stop_times.txt")) {
+                    String fileLines = (new FileToStrings(fis).toStringFast(65536));
+
+                    int start_ind = 0;
+                    int ind = 0;
+                    while ((ind = fileLines.indexOf('\n', start_ind)) != -1) {
+                        if (start_ind != 0) //OCTrip.LoadTrip(gtfs[0], fileLines.substring(start_ind, ind+1));
+                        {
+                            trips.add(new OCTrip(fileLines.substring(start_ind, ind+1)));
+                        }
+                        start_ind = ind+1;
+                    }
+
+                    tripsA = new OCTrip[trips.size()];
+                    trips.toArray(tripsA);
+                    tripTable.tripDAO().insertTrips(tripsA);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("GTFS", "Error opening 'stop_times.txt'");
                 }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("GTFS", "Error opening 'stop_times.txt'");
-            }*/
+                Log.d("tmp", String.format("done trips %d", System.currentTimeMillis()));
+            }
 
 
             /************************
