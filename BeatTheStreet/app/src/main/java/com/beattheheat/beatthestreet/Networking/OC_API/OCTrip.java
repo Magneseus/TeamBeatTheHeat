@@ -1,118 +1,113 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
-import android.util.Log;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-// TODO: Convert to something that isn't java.util.Date
+import android.arch.persistence.room.*;
 
 /**
  * Created by Matt on 24-Oct-17.
  */
 
+@Entity
 public class OCTrip {
-    private String tripId;
-    private List<String> stops;
-    private List<Date> stopTimes;
-
-    private OCTrip(String tripId, List<String> stops, List<Date> stopTimes) {
-        setTripId(tripId);
-        setStops(stops);
-        setStopTimes(stopTimes);
-    }
-
-    private OCTrip(String tripId) {
-        this(tripId, new ArrayList<String>(), new ArrayList<Date>());
-    }
-
-
-    /** The GTFS entry is assumed to be from the "stop_times.txt" table
-     *
-     * Example:
-     *
-     * trip_id	                            arrival_time	departure_time	stop_id	 stop_sequence	pickup_type	 drop_off_type
-     * 49754901-SEPT17-SEPDA17-Weekday-21	05:48:00	    05:48:00	    RF900	 1	            0	         0
-     *
+    /*
+    trip_id	                            arrival_time	departure_time	stop_id	 stop_sequence	pickup_type	 drop_off_type
+    49754901-SEPT17-SEPDA17-Weekday-21	05:48:00	    05:48:00	    RF900	 1	            0	         0
      */
-    public static void LoadTrip(GTFS gtfs, String gtfsEntry) {
-        if (gtfsEntry.isEmpty())
-            return;
+    public OCTrip() {
 
-        String[] entries = gtfsEntry.split(",");
-        if (entries.length < 7)
-            return;
+    }
 
-        String tripId = entries[0];
+    public OCTrip(String line) {
+        String[] s = line.split(",");
 
-        // Try to parse the timestamp into a Date obj
-        String stopTimeString = entries[1];
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        Date stopTime = null;
-        try {
-            stopTime = sdf.parse(stopTimeString);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            Log.e("DATE", "Unable to parse GTFS stop time. Trip ID: " + tripId);
-        }
+        setTripID(s[0]);
 
-        String stopId = entries[3];
+        setArrivalHour(Integer.parseInt(s[1].substring(0, 2)));
+        setArrivalHour(Integer.parseInt(s[1].substring(3, 5)));
+        setArrivalHour(Integer.parseInt(s[1].substring(6, 8)));
 
-        // Check if this trip has already been entered
-        if (gtfs.tripTable.containsKey(tripId)) {
-            gtfs.tripTable.get(tripId).addStop(stopId);
-            gtfs.tripTable.get(tripId).addStopTime(stopTime);
-        }
-        else {
-            List<String> stops = new ArrayList<String>();
-            stops.add(stopId);
-            List<Date> stopTimes = new ArrayList<Date>();
-            stopTimes.add(stopTime);
+        setStopID(s[3]);
 
-            gtfs.tripTable.put(tripId, new OCTrip(tripId, stops, stopTimes));
-
-        }
+        setStopSequence(Integer.parseInt(s[4]));
     }
 
 
+    @PrimaryKey(autoGenerate = true)
+    private int id;
 
-    /*********************
-     * GETTERS & SETTERS *
-     *********************/
+    @ColumnInfo(name = "trip_id")
+    private String tripID;
 
-    public String getTripId() {
-        return tripId;
+    @ColumnInfo(name = "stop_id")
+    private String stopID;
+
+
+    @ColumnInfo(name = "arrival_hour")
+    private int arrivalHour;
+
+    @ColumnInfo(name = "arrival_minute")
+    private int arrivalMinute;
+
+    @ColumnInfo(name = "arrival_second")
+    private int arrivalSecond;
+
+    @ColumnInfo(name = "stop_sequence")
+    private int stopSequence;
+
+
+    public int getId() {
+        return id;
     }
 
-    private void setTripId(String tripId) {
-        this.tripId = tripId;
+    public void setId(int id) {
+        this.id = id;
     }
 
-
-    public List<String> getStops() {
-        return stops;
+    public String getTripID() {
+        return tripID;
     }
 
-    private void setStops(List<String> stops) {
-        this.stops = stops;
+    public void setTripID(String tripID) {
+        this.tripID = tripID;
     }
 
-    private void addStop(String stop) {
-        this.stops.add(stop);
+    public String getStopID() {
+        return stopID;
     }
 
-    public List<Date> getStopTimes() {
-        return stopTimes;
+    public void setStopID(String stopID) {
+        this.stopID = stopID;
     }
 
-    private void setStopTimes(List<Date> stopTimes) {
-        this.stopTimes = stopTimes;
+    public int getStopSequence() {
+        return stopSequence;
     }
 
-    private void addStopTime(Date stopTime) {
-        this.stopTimes.add(stopTime);
+    public void setStopSequence(int stopSequence) {
+        this.stopSequence = stopSequence;
+    }
+
+    public int getArrivalHour() {
+        return arrivalHour;
+    }
+
+    public void setArrivalHour(int arrivalHour) {
+        this.arrivalHour = arrivalHour;
+    }
+
+    public int getArrivalMinute() {
+        return arrivalMinute;
+    }
+
+    public void setArrivalMinute(int arrivalMinute) {
+        this.arrivalMinute = arrivalMinute;
+    }
+
+    public int getArrivalSecond() {
+        return arrivalSecond;
+    }
+
+    public void setArrivalSecond(int arrivalSecond) {
+        this.arrivalSecond = arrivalSecond;
     }
 }

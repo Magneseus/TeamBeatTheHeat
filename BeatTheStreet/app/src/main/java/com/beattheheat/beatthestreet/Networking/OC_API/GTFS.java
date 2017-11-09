@@ -45,9 +45,7 @@ import java.util.Map;
 public class GTFS {
     // Tables
     HashMap<Integer, OCRoute> routeTable;
-    HashMap<String, OCTrip> tripTable;
     HashMap<String, OCStop> stopTable;
-
     HashMap<Integer, String> stopCodeToStopID;
 
     // GTFS Tables (Tables for the main database in the API)
@@ -69,7 +67,6 @@ public class GTFS {
 
     public GTFS(Context context) {
         routeTable = new HashMap<>(200);
-        tripTable = new HashMap<>(18000);
         stopTable = new HashMap<>(5700);
         stopCodeToStopID = new HashMap<>(5700);
 
