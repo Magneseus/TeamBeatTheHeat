@@ -125,6 +125,7 @@ public class GTFS {
         /* Check if the gtfs files exist on disk
          * Check for: "calendar.txt"
          */
+        Log.d("GTFS", "Checking for GTFS on disk...");
         boolean gtfsOnDisk = false;
         for (File f : appCtx.getFilesDir().listFiles()) {
             if (f.getName().equals("calendar.txt")) {
@@ -137,14 +138,18 @@ public class GTFS {
         // If GTFS is on disk, check date and if valid load all files
         if (gtfsOnDisk) {
             // Check if date is valid
+            Log.d("GTFS", "Checking valid date...");
             if (CheckGTFSDateValid()) {
                 // Valid GTFS
+                Log.d("GTFS", "Loading from disk...");
                 new LoadGTFSFromDisk().execute(gtfsPointer);
             } else {
+                Log.d("GTFS", "Downloading from net...");
                 // Invalid/corrupt/non-existent GTFS
                 LoadGTFSFromNet();
             }
         } else {
+            Log.d("GTFS", "Downloading from net...");
             LoadGTFSFromNet();
         }
     }
@@ -209,6 +214,9 @@ public class GTFS {
                     e.printStackTrace();
                     Log.e("GTFS", "Error opening 'stop_times.txt'");
                 }
+
+                appCtx.deleteFile("stop_times.txt");
+
                 Log.d("tmp", String.format("done trips %d", System.currentTimeMillis()));
             }
 
