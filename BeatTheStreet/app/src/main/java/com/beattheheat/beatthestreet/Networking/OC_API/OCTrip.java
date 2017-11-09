@@ -20,6 +20,10 @@ public class OCTrip {
     public OCTrip(String line) {
         String[] s = line.split(",");
 
+        if (s.length < 7) {
+            return;
+        }
+
         setTripID(s[0]);
 
         setArrivalHour(Integer.parseInt(s[1].substring(0, 2)));
