@@ -8,33 +8,14 @@ import android.arch.persistence.room.*;
  */
 
 @Entity
-public class OCTrip {
+public class OCTrips {
     /*
     trip_id	                            arrival_time	departure_time	stop_id	 stop_sequence	pickup_type	 drop_off_type
     49754901-SEPT17-SEPDA17-Weekday-21	05:48:00	    05:48:00	    RF900	 1	            0	         0
      */
-    public OCTrip() {
+    public OCTrips() {
 
     }
-
-    public OCTrip(String line) {
-        String[] s = line.split(",");
-
-        if (s.length < 7) {
-            return;
-        }
-
-        setTripID(s[0]);
-
-        setArrivalHour(Integer.parseInt(s[1].substring(0, 2)));
-        setArrivalHour(Integer.parseInt(s[1].substring(3, 5)));
-        setArrivalHour(Integer.parseInt(s[1].substring(6, 8)));
-
-        setStopID(s[3]);
-
-        setStopSequence(Integer.parseInt(s[4]));
-    }
-
 
     @PrimaryKey(autoGenerate = true)
     private int id;

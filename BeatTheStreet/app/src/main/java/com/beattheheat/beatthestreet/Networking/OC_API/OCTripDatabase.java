@@ -8,7 +8,7 @@ import android.arch.persistence.room.RoomDatabase;
  */
 
 
-@Database(entities = {OCTrip.class}, version = 1)
+@Database(entities = {OCTrips.class}, version = 1)
 public abstract class OCTripDatabase extends RoomDatabase {
-    public abstract  OCTripDAO tripDAO();
+    public abstract OCTripDAO tripDAO();
 }

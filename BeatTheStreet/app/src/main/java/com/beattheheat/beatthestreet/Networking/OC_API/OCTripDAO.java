@@ -8,30 +8,30 @@ import android.arch.persistence.room.*;
 
 @Dao
 public interface OCTripDAO {
-    @Query("SELECT * FROM octrip LIMIT 1")
-    public OCTrip loadFirstRow();
+    @Query("SELECT Count(*) FROM octrips")
+    public int numRows();
 
-    @Query("SELECT * FROM octrip WHERE trip_id = :searchTripID")
-    public OCTrip[] loadAllTripsWithID(String searchTripID);
+    @Query("SELECT * FROM OCTrips WHERE trip_id = :searchTripID")
+    public OCTrips[] loadAllTripsWithID(String searchTripID);
 
-    @Query("SELECT * FROM octrip WHERE stop_id = :searchStopID")
-    public OCTrip[] loadALlTripsWithStopID(String searchStopID);
+    @Query("SELECT * FROM OCTrips WHERE stop_id = :searchStopID")
+    public OCTrips[] loadALlTripsWithStopID(String searchStopID);
 
 
     @Insert
-    public void insertTrip(OCTrip tripToInsert);
+    public void insertTrip(OCTrips tripToInsert);
 
     @Insert
-    public void insertTrips(OCTrip... tripsToInsert);
+    public void insertTrips(OCTrips... tripsToInsert);
 
 
     @Delete
-    public void deleteTrip(OCTrip tripToDelete);
+    public void deleteTrip(OCTrips tripToDelete);
 
     @Delete
-    public int deleteTrips(OCTrip... tripsToDelete);
+    public int deleteTrips(OCTrips... tripsToDelete);
 
 
     @Update
-    public int updateTrips(OCTrip... tripsToUpdate);
+    public int updateTrips(OCTrips... tripsToUpdate);
 }
