@@ -288,7 +288,7 @@ public class GTFS {
                             os.close();
 
                             // Extract the files contents to the internal storage
-                            Unzipper uz = new Unzipper(appCtx, fileName, appCtx.getFilesDir().getPath());
+                            Unzipper uz = new Unzipper(appCtx, fileName);
                             uz.Unzip();
 
                             // Delete the zip file
