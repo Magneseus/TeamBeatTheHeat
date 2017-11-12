@@ -112,6 +112,14 @@ public class GTFS {
         return stopTable.get(stopID);
     }
 
+    public OCTrips[] getTripsForRouteAtStop(int routeNo, int stopCode) {
+        return getTripsForRouteAtStop(routeNo, stopCodeToStopID.get(stopCode));
+    }
+
+    public OCTrips[] getTripsForRouteAtStop(int routeNo, String stopID) {
+        return tripTable.tripDAO().loadAllTripTimesWithStopID(getRoute(routeNo).getTrips(), stopID);
+    }
+
     // Starts the asynchronous load of the GTFS files
     // Callback will be alerted with a T/F when files have been loaded
     public final void LoadGTFS(SCallable<Boolean> sCallable) {
