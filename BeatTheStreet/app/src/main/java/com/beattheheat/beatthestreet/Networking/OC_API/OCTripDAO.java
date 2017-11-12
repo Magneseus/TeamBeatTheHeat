@@ -2,6 +2,8 @@ package com.beattheheat.beatthestreet.Networking.OC_API;
 
 import android.arch.persistence.room.*;
 
+import java.util.List;
+
 /**
  * Created by Matt on 09-Nov-17.
  */
@@ -15,7 +17,13 @@ public interface OCTripDAO {
     public OCTrips[] loadAllTripsWithID(String searchTripID);
 
     @Query("SELECT * FROM OCTrips WHERE stop_id = :searchStopID")
-    public OCTrips[] loadALlTripsWithStopID(String searchStopID);
+    public OCTrips[] loadAllTripsWithStopID(String searchStopID);
+
+    @Query("SELECT * FROM octrips WHERE trip_id = :searchTripID AND stop_id = :searchStopID")
+    public OCTrips[] loadAllTripTimesWithStopID(String searchTripID, String searchStopID);
+
+    @Query("SELECT * FROM octrips WHERE trip_id IN (:searchTripID) AND stop_id = :searchStopID")
+    public OCTrips[] loadAllTripTimesWithStopID(List<String> searchTripID, String searchStopID);
 
 
     @Insert

@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,7 +60,7 @@ public class GTFS {
     HashMap<Integer, String> stopCodeToStopID;
 
     // Trip database
-    OCTripDatabase tripTable;
+    public OCTripDatabase tripTable;
 
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
