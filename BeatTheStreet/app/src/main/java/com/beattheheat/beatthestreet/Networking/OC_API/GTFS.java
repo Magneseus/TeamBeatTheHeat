@@ -60,7 +60,7 @@ public class GTFS {
     HashMap<Integer, String> stopCodeToStopID;
 
     // Trip database
-    public OCTripDatabase tripTable;
+    private OCTripDatabase tripTable;
 
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
