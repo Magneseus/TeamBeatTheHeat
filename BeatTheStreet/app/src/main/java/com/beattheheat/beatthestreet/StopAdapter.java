@@ -26,7 +26,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     private Context context;
     private ArrayList<OCStop> stops;
-    public Comparator<OCStop> locationSort;
+    Comparator<OCStop> locationSort;
 
      StopAdapter(final Context context, ArrayList<OCStop> stopList) {
          this.context = context;
@@ -37,9 +37,11 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
              public int compare(OCStop o1, OCStop o2) {
                  Location user = LocationWrapper.getInstance(context).getLocation();
                  if (user == null) {
+                     // Try to sort by stopCode if GPS isn't available
                      user = new Location("NO_GPS");
-                     user.setLongitude(-75.696353);
-                     user.setLatitude(45.384906);
+                     //user.setLongitude(-75.696353);
+                     //user.setLatitude(45.384906);
+                     return o1.getStopCode() - o2.getStopCode();
                  }
 
                  float dist1 = o1.getLocation().distanceTo(user);
@@ -91,11 +93,17 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     }
 
     void setFilter(ArrayList<OCStop> newList) {
-        setFilter(newList, null);
+        //setFilter(newList, null);
+        stops = new ArrayList<>(); // Reset our stop list with the new list
+        stops.addAll(newList);
+
+        Collections.sort(stops, locationSort); // Resort the list
+
+        notifyDataSetChanged(); // Refresh the adapter
     }
 
     // Replaces the current list of stops with the ones that match the search
-    void setFilter(ArrayList<OCStop> newList, Comparator<OCStop> comparator) {
+/*    void setFilter(ArrayList<OCStop> newList, Comparator<OCStop> comparator) {
         stops = new ArrayList<>();
         stops.addAll(newList);
 
@@ -105,5 +113,5 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
             Collections.sort(stops);
         }
         notifyDataSetChanged(); // Refresh the adapter
-    }
+    }*/
 }
