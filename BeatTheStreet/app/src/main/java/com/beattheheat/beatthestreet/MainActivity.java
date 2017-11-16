@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        LocationWrapper.create(this);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -87,8 +89,6 @@ public class MainActivity extends AppCompatActivity
             // for ActivityCompat#requestPermissions for more details.
             //ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-
-            return;
         }
 
         final Context ctx = this;
@@ -114,14 +114,14 @@ public class MainActivity extends AppCompatActivity
     // called when app is opened
     @Override
     protected void onStart() {
-        LocationWrapper.getInstance(this).connect();
+        LocationWrapper.getInstance().connect();
         super.onStart();
     }
 
     // called when app is turned off
     @Override
     protected void onDestroy() {
-        LocationWrapper.getInstance(this).disconnect();
+        LocationWrapper.getInstance().disconnect();
         super.onDestroy();
     }
 
@@ -207,6 +207,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        LocationWrapper.getInstance(this).startRequestingUpdates();
+        if(LocationWrapper.getInstance() != null) {
+            LocationWrapper.getInstance().startRequestingUpdates();
+        }
     }
 }

@@ -13,10 +13,13 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.IllegalFormatException;
+
 /**
  *  Singleton wrapper for the GoogleApiClient Location service.
  */
@@ -55,24 +58,38 @@ public class LocationWrapper
                 .build();
 
         // creates a request for frequent location updates
-        // TODO: Consider different location update rates
-        locReq = new LocationRequest();
-        locReq.setInterval(5 * 1000); // every 5s
-        locReq.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        //  TODO: Consider different location update rates
+        locReq = new LocationRequest().setInterval(5 * 1000)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         subscribers = new ArrayList<SCallable>();
     }
 
-    // Returns the instance of the LocationWrapper, creating it if null
-    public static LocationWrapper getInstance(Context ctx) {
-        if (myObj == null) {
-            myObj = new LocationWrapper(ctx);
-        }
+    public static void create(Context ctx) {
+        myObj = new LocationWrapper(ctx);
 
         // Set proper context
         myObj.appCtx = ctx.getApplicationContext();
+    }
 
+    // Returns the instance of the LocationWrapper
+    public static LocationWrapper getInstance() {
         return myObj;
+    }
+
+    /*
+        Sets the location request and starts listening for updates with it.
+        Throws IllegalArgumentException if accuracy isn't one of the accepted
+        4 values (check LocationRequest for valid values).
+    */
+    public void setLocationRequest(int frequencyInMillis, int accuracy)
+            throws IllegalArgumentException {
+
+        locReq = new LocationRequest()
+                .setInterval(frequencyInMillis)
+                .setPriority(accuracy);
+
+        startRequestingUpdates();
     }
 
     // Attempts to connect the googleApiClient
@@ -111,13 +128,17 @@ public class LocationWrapper
     // Callback for if the googleApiClient connection is suspended
     @Override
     public void onConnectionSuspended(int i) {
+        // TODO: onConnectionSuspended for location services
 
+        System.out.println("what");
     }
 
     // Callback for if the googleApiClient fails to connect
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        // TODO: onConnectionFailed for location services
 
+        System.out.println("maybe this?");
     }
 
     // Callback for when LocationServices sends a Location Update
@@ -132,8 +153,11 @@ public class LocationWrapper
 
     // start listening for location updates
     public void startRequestingUpdates() {
-        // don't request updates if we already are
-        if(requestingUpdates) return;
+        // if we're already listening for updates, but we receive this call, assume we've changed
+        // the location request
+        if(requestingUpdates) {
+            stopRequestingUpdates();
+        };
 
         if (ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(appCtx, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling

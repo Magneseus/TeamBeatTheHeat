@@ -37,7 +37,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
          locationSort = new Comparator<OCStop>() {
              @Override
              public int compare(OCStop o1, OCStop o2) {
-                 Location user = LocationWrapper.getInstance(context).getLocation();
+                 Location user = LocationWrapper.getInstance().getLocation();
                  if (user == null) {
                      // Try to sort by stopCode if GPS isn't available
                      user = new Location("NO_GPS");
