@@ -8,4 +8,6 @@
     <string name="action_settings">Settings</string>
     <string name="text_view_str">Nothing to see here. Move along.</string>
     <string name="title_activity_maps">Map</string>
+    <string name="fav_stop_prefs" translatable="false">com.beattheheat.beatthestreet.fav_stop_prefs</string>
+    <string name="fav_route_prefs" translatable="false">com.beattheheat.beatthestreet.fav_route_prefs</string>
 </resources>
