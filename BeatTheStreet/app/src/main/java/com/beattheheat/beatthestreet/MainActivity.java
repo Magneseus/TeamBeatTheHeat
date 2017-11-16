@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity
 
     // Our OCAPI instance, for bus/stop information
     private OCTranspo octAPI;
-
     ArrayList<OCStop> stopList;
     StopAdapter stopAdapter; // Takes OCStop data and puts it into stop_layout.xml
     RecyclerView rv; // Only shows items on or near the screen, more efficient for long lists
@@ -155,33 +154,28 @@ public class MainActivity extends AppCompatActivity
     public boolean onQueryTextChange(String newText) {
         newText = newText.toLowerCase();
 
-        if (!newText.equals("")) {
-            // Set up a new list that will contain the search results
-            ArrayList<OCStop> newList = new ArrayList<>();
+        // Set up a new list that will contain the search results
+        ArrayList<OCStop> newList = new ArrayList<>();
 
-            for (OCStop stop : stopList) {
-                /* Stop names should all be in uppercase by default but search results were
-                   behaving oddly so we're setting everything to lowercase */
-                String stopName = stop.getStopName().toLowerCase();
-                String stopCode = "" + stop.getStopCode();
+        for (OCStop stop : stopList) {
+            /* Stop names should all be in uppercase by default but search results were
+               behaving oddly so we're setting everything to lowercase */
+            String stopName = stop.getStopName().toLowerCase();
+            String stopCode = "" + stop.getStopCode();
 
-                // We search by stop name and by stop code so check both
-                if (stopName.contains(newText) || stopCode.contains(newText)) {
-                    newList.add(stop);
-                }
+            // We search by stop name and by stop code so check both
+            if (stopName.contains(newText) || stopCode.contains(newText)) {
+                newList.add(stop);
             }
-
-            // Update the adapter with the newly filtered list
-            stopAdapter.setFilter(newList);
-        } else {
-            stopAdapter.setFilter(stopList, stopAdapter.locationSort);
         }
+
+        // Update the adapter with the newly filtered list
+        stopAdapter.setFilter(newList);
         return true;
     }
 
     // User has tapped a stop, go to detailed stop page
     public void onClick(String stopCodeStr) {
-        //int stopCode = Integer.parseInt(stopCodeStr);
         Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);
         startActivity(intent);
@@ -192,8 +186,12 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_view_routes) {
+        if (id == R.id.nav_view_stops) {
             // View all stops
+            Intent intent = new Intent(this, DisplayStopsActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_view_routes) {
+            // View all routes
             /* Starts a new activity that will display all routes saved from GTFS
                From there you can search for a route and then go to a detailed route view */
             Intent intent = new Intent(this, DisplayRoutesActivity.class);

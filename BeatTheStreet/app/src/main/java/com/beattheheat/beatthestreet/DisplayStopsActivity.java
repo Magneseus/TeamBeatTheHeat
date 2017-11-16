@@ -26,8 +26,8 @@ import java.util.ArrayList;
  *  Selecting a stop brings you to a detailed page showing live bus info.
  */
 
-// TODO: Add main menu bar from MainActivity
-// TODO: If no GPS available, sort by number
+// TODO: Add up arrow to return to MainActivity
+// TODO: Test sorting by stopCode if GPS not available
 public class DisplayStopsActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
 
@@ -136,8 +136,6 @@ public class DisplayStopsActivity extends AppCompatActivity
         };
 
         handler.postDelayed(runPointer.run, 1000);
-
-
 
         Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);

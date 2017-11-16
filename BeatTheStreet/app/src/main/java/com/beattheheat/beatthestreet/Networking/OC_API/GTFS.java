@@ -1,7 +1,14 @@
 package com.beattheheat.beatthestreet.Networking.OC_API;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
+import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -15,6 +22,7 @@ import com.beattheheat.beatthestreet.FileManagement.Unzipper;
 import com.beattheheat.beatthestreet.Networking.ByteRequest;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 import com.beattheheat.beatthestreet.Networking.VolleyRequest;
+import com.beattheheat.beatthestreet.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,10 +32,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,10 +56,11 @@ import java.util.Map;
 public class GTFS {
     // Tables
     HashMap<Integer, OCRoute> routeTable;
-    HashMap<String, OCTrip> tripTable;
     HashMap<String, OCStop> stopTable;
-
     HashMap<Integer, String> stopCodeToStopID;
+
+    // Trip database
+    private OCTripDatabase tripTable;
 
     // GTFS Tables (Tables for the main database in the API)
     private String[] gtfsTableNames = {"agency", "calendar", "calendar_dates", "routes", "stops", "stop_times", "trips"};
@@ -69,7 +81,6 @@ public class GTFS {
 
     public GTFS(Context context) {
         routeTable = new HashMap<>(200);
-        tripTable = new HashMap<>(18000);
         stopTable = new HashMap<>(5700);
         stopCodeToStopID = new HashMap<>(5700);
 
@@ -101,6 +112,14 @@ public class GTFS {
         return stopTable.get(stopID);
     }
 
+    public OCTrips[] getTripsForRouteAtStop(int routeNo, int stopCode) {
+        return getTripsForRouteAtStop(routeNo, stopCodeToStopID.get(stopCode));
+    }
+
+    public OCTrips[] getTripsForRouteAtStop(int routeNo, String stopID) {
+        return tripTable.tripDAO().loadAllTripTimesWithStopID(getRoute(routeNo).getTrips(), stopID);
+    }
+
     // Starts the asynchronous load of the GTFS files
     // Callback will be alerted with a T/F when files have been loaded
     public final void LoadGTFS(SCallable<Boolean> sCallable) {
@@ -121,6 +140,7 @@ public class GTFS {
         /* Check if the gtfs files exist on disk
          * Check for: "calendar.txt"
          */
+        Log.d("GTFS", "Checking for GTFS on disk...");
         boolean gtfsOnDisk = false;
         for (File f : appCtx.getFilesDir().listFiles()) {
             if (f.getName().equals("calendar.txt")) {
@@ -133,14 +153,18 @@ public class GTFS {
         // If GTFS is on disk, check date and if valid load all files
         if (gtfsOnDisk) {
             // Check if date is valid
+            Log.d("GTFS", "Checking valid date...");
             if (CheckGTFSDateValid()) {
                 // Valid GTFS
+                Log.d("GTFS", "Loading from disk...");
                 new LoadGTFSFromDisk().execute(gtfsPointer);
             } else {
+                Log.d("GTFS", "Downloading from net...");
                 // Invalid/corrupt/non-existent GTFS
                 LoadGTFSFromNet();
             }
         } else {
+            Log.d("GTFS", "Downloading from net...");
             LoadGTFSFromNet();
         }
     }
@@ -176,27 +200,6 @@ public class GTFS {
             }
 
             /************************
-             *    OCTRIP LOADING    *
-             ************************/
-            /*Log.d("tmp", "loading trips");
-            // Load the "stops.txt" file
-            try (FileInputStream fis = appCtx.openFileInput("stop_times.txt")) {
-                String fileLines = (new FileToStrings(fis).toStringFast(65536));
-
-                int start_ind = 0;
-                int ind = 0;
-                while ((ind = fileLines.indexOf('\n', start_ind)) != -1) {
-                    if (start_ind != 0) OCTrip.LoadTrip(gtfs[0], fileLines.substring(start_ind, ind+1));
-                    start_ind = ind+1;
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e("GTFS", "Error opening 'stop_times.txt'");
-            }*/
-
-
-            /************************
              *    OCSTOP LOADING    *
              ************************/
             // Load the "stops.txt" file
@@ -218,8 +221,50 @@ public class GTFS {
                     callback.call(false);
             }
 
+            /************************
+             *    OCTRIP LOADING    *
+             ************************/
+            // Check if the database has already been extracted
+            if (!appCtx.getDatabasePath("octrips.db").exists()) {
+                Log.d("GTFS", "Extracting database from apk...");
+
+                try {
+                    // Copy the zip file to internal storage
+                    InputStream in = appCtx.getResources().openRawResource(R.raw.octrips);
+                    OutputStream out = new FileOutputStream(new File(appCtx.getFilesDir().getPath(), "octrips.zip"));
+
+                    byte[] buf = new byte[1024];
+                    int read;
+                    while ((read = in.read(buf)) != -1) {
+                        out.write(buf, 0, read);
+                    }
+
+                    in.close();
+                    out.flush();
+                    out.close();
+
+                    // Extract the zip file contents
+                    String dbPath = appCtx.getDatabasePath("octrips.db").getPath();
+                    dbPath = dbPath.substring(0, dbPath.lastIndexOf('/'));
+
+                    Unzipper uz = new Unzipper(appCtx, "octrips.zip", dbPath);
+                    uz.Unzip();
+                    appCtx.deleteFile("octrips.zip");
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e("GTFS", "Failed to unzip/extract database from resources.");
+                }
+            }
+
+            // Setup the Room database
+            Log.d("GTFS", "Preparing Room db...");
+            tripTable = Room.databaseBuilder(appCtx, OCTripDatabase.class, "octrips.db").build();
+
             isLoading = false;
             isLoaded = true;
+
+            Log.d("GTFS", "Done loading.");
 
             return null;
         }
@@ -263,11 +308,14 @@ public class GTFS {
                             os.close();
 
                             // Extract the files contents to the internal storage
-                            Unzipper uz = new Unzipper(appCtx, fileName, appCtx.getFilesDir().getPath());
+                            Unzipper uz = new Unzipper(appCtx, fileName);
                             uz.Unzip();
 
                             // Delete the zip file
                             appCtx.deleteFile(fileName);
+
+                            // Delete the unnecessary files
+                            appCtx.deleteFile("stop_times.txt");
 
                             // Load the contents from disk now
                             new LoadGTFSFromDisk().execute(gtfsPointer);

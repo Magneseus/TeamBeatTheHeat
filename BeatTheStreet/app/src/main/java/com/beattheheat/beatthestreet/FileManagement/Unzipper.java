@@ -22,13 +22,16 @@ public class Unzipper {
     private String fileName;
     private String location;
 
+    public Unzipper(Context ctx, String filename) {
+        this(ctx, filename, "");
+    }
+
     public Unzipper(Context ctx, String fileName, String location) {
         // Get application context to avoid static leaks
         this.app_ctx = ctx.getApplicationContext();
+        this.location = location;
 
         this.fileName = fileName;
-        this.location = location;
-        checkDirectory("");
     }
 
     public void Unzip() {
@@ -41,12 +44,17 @@ public class Unzipper {
             while ((ze = zis.getNextEntry()) != null) {
                 // Check if the entry is a directory
                 if (ze.isDirectory()) {
-                    checkDirectory(ze.getName());
                     zis.closeEntry();
                 }
                 else {
                     // Open a file out stream to place contents on disk
-                    FileOutputStream fos = app_ctx.openFileOutput(ze.getName(), Context.MODE_PRIVATE);
+
+                    FileOutputStream fos;
+                    if (location.equals("")) {
+                        fos = app_ctx.openFileOutput(ze.getName(), Context.MODE_PRIVATE);
+                    } else {
+                        fos = new FileOutputStream(new File(location, ze.getName()));
+                    }
 
                     int len;
                     byte[] buf = new byte[1024];
@@ -61,16 +69,6 @@ public class Unzipper {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    // Checks if the specified directory exists, and creates it if not
-    private void checkDirectory(String dir)
-    {
-        File f = new File(location + dir);
-        if(!f.isDirectory())
-        {
-            f.mkdirs();
         }
     }
 }
