@@ -83,7 +83,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             }
         }
         final Context ctx = this;
-
+/*
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
         runPointer.run = new Runnable() {
@@ -104,7 +104,18 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 }
             }
         };
-
+*/
+        final long start = SystemClock.elapsedRealtime();
+        final Handler handler = new Handler();
+        final RunnablePointer runPointer = new RunnablePointer(null);
+        runPointer.run = new Runnable() {
+            @Override
+            public void run() {
+                NotificationUtil.getInstance().notify(ctx, 0, "Timer", "" + (SystemClock.elapsedRealtime()
+                        - start)/1000 + "s");
+                handler.postDelayed(runPointer.run, 1000);
+            }
+        };
 
         handler.postDelayed(runPointer.run, 1000);
     }
