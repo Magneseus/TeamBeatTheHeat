@@ -6,12 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,11 +22,13 @@ import java.util.Comparator;
  * Takes data from OCStop objects and puts it into the RecyclerView layout
  */
 
+// TODO: Favorites-based sorting
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     private Context context;
     private ArrayList<OCStop> stops;
-    Comparator<OCStop> locationSort;
+    private Comparator<OCStop> locationSort;
+    private FavoritesStorage faveStops;
 
      StopAdapter(final Context context, ArrayList<OCStop> stopList) {
          this.context = context;
@@ -39,8 +41,8 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
                  if (user == null) {
                      // Try to sort by stopCode if GPS isn't available
                      user = new Location("NO_GPS");
-                     //user.setLongitude(-75.696353);
-                     //user.setLatitude(45.384906);
+                     user.setLongitude(-75.696353);
+                     user.setLatitude(45.384906);
                      return o1.getStopCode() - o2.getStopCode();
                  }
 
@@ -52,6 +54,8 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
          };
 
          Collections.sort(stops, locationSort);
+
+         faveStops = new FavoritesStorage(context);
     }
 
     @Override
@@ -65,13 +69,34 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     public void onBindViewHolder(final StopViewHolder viewHolder , int position) {
         // Set the stop name and code
         viewHolder.stopName.setText(stops.get(position).getStopName());
-        viewHolder.stopCode.setText("" + stops.get(position).getStopCode());
+        final String stopCodeStr = "" + stops.get(position).getStopCode();
+        viewHolder.stopCode.setText(stopCodeStr);
+
+        // Set whether we start with a fav or unfav icon
+        if (faveStops.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE))
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+        else
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+
+        // Favorite/Unfavorite functionality
+        viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (faveStops.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                    // Route was added to favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+                } else {
+                    // Route was removed from favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+                }
+            }
+        });
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Get stopCode and pass it back to DisplayStopsActivity
-                ((MainActivity)context).onClick(viewHolder.stopCode.getText().toString());
+                ((DisplayStopsActivity)context).onClick(viewHolder.stopCode.getText().toString());
             }
         });
     }
@@ -82,13 +107,15 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     /* Helper class that takes OCStop info and
        puts it into the layout at the appropriate position */
     static class StopViewHolder extends RecyclerView.ViewHolder {
-        TextView stopName;
-        TextView stopCode;
+        TextView  stopName;
+        TextView  stopCode;
+        ImageView favIcon;
 
         StopViewHolder(View itemView) {
             super(itemView);
-            stopName = (TextView)itemView.findViewById(R.id.stop_name);
-            stopCode = (TextView)itemView.findViewById(R.id.stop_code);
+            stopName = itemView.findViewById(R.id.stop_name);
+            stopCode = itemView.findViewById(R.id.stop_code);
+            favIcon  = itemView.findViewById(R.id.stop_fav_button);
         }
     }
 
