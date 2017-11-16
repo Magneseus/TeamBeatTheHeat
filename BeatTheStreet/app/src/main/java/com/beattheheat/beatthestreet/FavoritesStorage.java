@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Matt on 15-Nov-17.
@@ -35,6 +36,16 @@ public class FavoritesStorage {
 
         stopFavs = (Map<String, Integer>) stopPrefs.getAll();
         routeFavs = (Map<String, Integer>) routePrefs.getAll();
+    }
+
+    // Get the set of all favorite stops
+    public Set<String> getAllFavStops() {
+        return stopFavs.keySet();
+    }
+
+    // Get the set of all favorite routes
+    public Set<String> getAllFavRoutes() {
+        return routeFavs.keySet();
     }
 
     // Check if a stop/route is currently favorited
