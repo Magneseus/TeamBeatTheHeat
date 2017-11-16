@@ -112,6 +112,8 @@ public class OCTranspo {
             }
         };
 
+        jReq.setRetryPolicy(VolleyRequest.longerWaitPolicy);
+
         req.add(jReq);
     }
 
