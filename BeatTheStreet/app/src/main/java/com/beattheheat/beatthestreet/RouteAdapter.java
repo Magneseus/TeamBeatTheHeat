@@ -25,7 +25,7 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
     private ArrayList<OCRoute> routes;
     private Context context;
 
-    RouteAdapter(Context context, ArrayList<OCRoute> routeList) {
+    RouteAdapter(final Context context, ArrayList<OCRoute> routeList) {
         this.context = context;
         this.routes = routeList;
         Collections.sort(routes);
@@ -39,32 +39,24 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final RouteViewHolder viewHolder , int position) {
+    public void onBindViewHolder(final RouteViewHolder viewHolder , final int position) {
 
         // Set the route name and direction
+        String direction = routes.get(position).getRouteNames().get(0).replaceAll("\"", "");
+
         viewHolder.routeName.setText(String.valueOf(routes.get(position).getRouteNo()));
 
-        String dir1 = routes.get(position).getRouteNames().get(0);
-        String dir2 = "";
-        for(int i = 0; i <routes.get(position).getRouteNames().size(); i++){
-            if (!routes.get(position).getRouteNames().get(i).equals(dir1)){
-                dir2 = routes.get(position).getRouteNames().get(i);
-                break;
-            }
-        }
+        viewHolder.routeDirection.setText(direction);
 
-        String directions = dir1 + " / " + dir2;
-        directions = directions.replaceAll("\"", "");
+        final String routeDesc = routes.get(position).getRouteNo() + " " + routes.get(position).getRouteNames().get(0);
 
-        viewHolder.routeDirection.setText(directions);
-
-        // TODO: On click, go to detailed routes page
-        // Implement setOnClickListener event
-       /*viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Get stopCode and pass it back to DisplayRoutes
+                ((DisplayRoutesActivity)context).onClick(routeDesc);
             }
-        });*/
+        });
     }
 
     @Override

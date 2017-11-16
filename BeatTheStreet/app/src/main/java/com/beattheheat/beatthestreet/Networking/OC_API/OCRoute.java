@@ -21,7 +21,7 @@ public class OCRoute implements Comparable {
         setTrips(trips);
     }
 
-    private OCRoute(int routeNo, List<String> routeNames) {
+    public OCRoute(int routeNo, List<String> routeNames) {
         this(routeNo, routeNames, new ArrayList<String>());
     }
 

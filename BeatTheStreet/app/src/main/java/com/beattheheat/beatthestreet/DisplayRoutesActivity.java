@@ -1,5 +1,6 @@
 package com.beattheheat.beatthestreet;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -28,13 +29,47 @@ public class DisplayRoutesActivity extends AppCompatActivity
         setContentView(R.layout.activity_display_routes);
 
         octAPI = OCTranspo.getInstance();
-        routeList = new ArrayList<> (octAPI.gtfsTable.getRouteList());
+        routeList = new ArrayList<>(octAPI.gtfsTable.getRouteList());
+
+        ArrayList<OCRoute> newRouteList = organizeRoutes(routeList);
 
         rv = (RecyclerView) findViewById(R.id.recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm);
-        routeAdapter = new RouteAdapter(this.getApplicationContext(), routeList);
+        routeAdapter = new RouteAdapter(this, newRouteList);
         rv.setAdapter(routeAdapter);
+    }
+
+
+    protected ArrayList<OCRoute> organizeRoutes(ArrayList<OCRoute> rL) {
+        ArrayList<OCRoute> returnList = new ArrayList<>();
+
+        for (OCRoute route : rL) {
+
+            String dir1 = route.getRouteNames().get(0);
+            String dir2 = "";
+            for (int i = 0; i < route.getRouteNames().size(); i++) {
+                if (!route.getRouteNames().get(i).equals(dir1)) {
+                    dir2 = route.getRouteNames().get(i);
+                    break;
+                }
+            }
+
+            ArrayList<String> routeNames1 = new ArrayList<String>();
+            ArrayList<String> routeNames2 = new ArrayList<String>();
+            routeNames1.add(dir1);
+            routeNames2.add(dir2);
+
+            OCRoute newRoute1 = new OCRoute(route.getRouteNo(), routeNames1);
+            OCRoute newRoute2 = new OCRoute(route.getRouteNo(), routeNames2);
+
+            returnList.add(newRoute1);
+            returnList.add(newRoute2);
+
+        }
+
+
+        return returnList;
     }
 
     // Set up the search menu button
@@ -49,13 +84,13 @@ public class DisplayRoutesActivity extends AppCompatActivity
 
     //search for route number
     @Override
-    public boolean onQueryTextSubmit(String searchText){
+    public boolean onQueryTextSubmit(String searchText) {
         ArrayList<OCRoute> newList = new ArrayList<OCRoute>();
 
-        for( OCRoute route : routeList) {
+        for (OCRoute route : routeList) {
             int routeName = route.getRouteNo();
 
-            if(routeName == Integer.parseInt(searchText)) {
+            if (routeName == Integer.parseInt(searchText)) {
                 newList.add(route);
             }
         }
@@ -69,5 +104,11 @@ public class DisplayRoutesActivity extends AppCompatActivity
         return false;
     }
 
+    //@Override
+    public void onClick(String route) {
+        Intent intent = new Intent(this, DisplayStopsForRouteActivity.class);
+        intent.putExtra("ROUTE", route);
+        startActivity(intent);
+    }
 }
 

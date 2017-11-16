@@ -55,6 +55,9 @@
         <activity
             android:name=".DisplayRoutesActivity"
             android:label="Bus Routes"/>
+        <activity
+            android:name=".DisplayStopsForRouteActivity"
+            android:label="Bus Stops"/>
     </application>
 
 </manifest>

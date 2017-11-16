@@ -13,8 +13,11 @@ public interface OCTripDAO {
     @Query("SELECT Count(*) FROM octrips")
     public int numRows();
 
-    @Query("SELECT * FROM OCTrips WHERE trip_id = :searchTripID")
+    @Query("SELECT * FROM octrips WHERE trip_id = :searchTripID")
     public OCTrips[] loadAllTripsWithID(String searchTripID);
+
+    @Query("SELECT stop_id FROM OCTrips WHERE trip_id = :searchTripID")
+    public String[] loadAllStopsWithID(String searchTripID);
 
     @Query("SELECT * FROM OCTrips WHERE stop_id = :searchStopID")
     public OCTrips[] loadAllTripsWithStopID(String searchStopID);

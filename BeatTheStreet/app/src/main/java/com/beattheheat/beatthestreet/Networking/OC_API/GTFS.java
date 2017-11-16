@@ -120,6 +120,18 @@ public class GTFS {
         return tripTable.tripDAO().loadAllTripTimesWithStopID(getRoute(routeNo).getTrips(), stopID);
     }
 
+    public OCTrips[] getAllTripsWithID(String routeID) {
+        return tripTable.tripDAO().loadAllTripsWithID(routeID);
+    }
+
+    public String[] getAllStopsWithID(String routeID) {
+        return tripTable.tripDAO().loadAllStopsWithID(routeID);
+    }
+
+    public int getNumRows() {
+        return tripTable.tripDAO().numRows();
+    }
+
     // Starts the asynchronous load of the GTFS files
     // Callback will be alerted with a T/F when files have been loaded
     public final void LoadGTFS(SCallable<Boolean> sCallable) {
@@ -259,6 +271,7 @@ public class GTFS {
 
             // Setup the Room database
             Log.d("GTFS", "Preparing Room db...");
+            //tripTable = Room.databaseBuilder(appCtx, OCTripDatabase.class, "octrips.db").allowMainThreadQueries().build();
             tripTable = Room.databaseBuilder(appCtx, OCTripDatabase.class, "octrips.db").build();
 
             isLoading = false;
