@@ -25,8 +25,9 @@ public class VolleyRequest {
     private RequestQueue mRequestQueue;
 
     // A Longer wait policy for requests
-    public static DefaultRetryPolicy longerWaitPolicy = new DefaultRetryPolicy(4000,
-                                              DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+    public static DefaultRetryPolicy longerWaitPolicy = new DefaultRetryPolicy(
+                                              4000,
+                                              10,
                                               DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     // Initialization, requires a context from an android activity
