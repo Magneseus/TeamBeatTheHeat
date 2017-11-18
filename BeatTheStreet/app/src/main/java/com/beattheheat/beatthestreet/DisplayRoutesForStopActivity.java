@@ -29,6 +29,7 @@ import java.util.HashMap;
 public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
+    String stopName;
     OCTranspo octAPI;
     ArrayList<OCBus[]> busList;
     RoutesForStopAdapter rfsAdapter; //Places route data into the RecyclerView's layout
@@ -40,8 +41,14 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         setContentView(R.layout.activity_display_routes_for_stop);
 
         // Get stop info based on the stopcode we're given
-        stopCode = getIntent().getStringExtra("STOPCODE");
         octAPI = OCTranspo.getInstance();
+        stopCode = getIntent().getStringExtra("STOPCODE");
+        stopName = getIntent().getStringExtra("STOPNAME");
+
+        // Set the activity title
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle(stopName);
+
         final Context context = this;
         // TODO: Catch errors if no connection
         // TODO: Loading screen?
