@@ -97,9 +97,9 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
         RoutesForStopViewHolder(View itemView) {
             super(itemView);
             routeNumberName = itemView.findViewById(R.id.rfs_route_number_name);
-            trips[0] = itemView.findViewById((R.id.rfs_stop_time_0));
-            trips[1] = itemView.findViewById((R.id.rfs_stop_time_1));
-            trips[2] = itemView.findViewById((R.id.rfs_stop_time_2));
+            trips[0] = itemView.findViewById(R.id.rfs_stop_time_0);
+            trips[1] = itemView.findViewById(R.id.rfs_stop_time_1);
+            trips[2] = itemView.findViewById(R.id.rfs_stop_time_2);
             icons[0] = itemView.findViewById(R.id.rfs_icon_0);
             icons[1] = itemView.findViewById(R.id.rfs_icon_1);
             icons[2] = itemView.findViewById(R.id.rfs_icon_2);
