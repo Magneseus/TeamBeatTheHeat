@@ -38,6 +38,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
          locationSort = new Comparator<OCStop>() {
              @Override
              public int compare(OCStop o1, OCStop o2) {
+                 // TODO: stopCode sorting if no GPS available
                  Location user = LocationWrapper.getInstance().getLocation();
                  if (user == null) {
                      // Try to sort by stopCode if GPS isn't available
@@ -122,7 +123,6 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     }
 
     void setFilter(ArrayList<OCStop> newList) {
-        //setFilter(newList, null);
         stops = new ArrayList<>(); // Reset our stop list with the new list
         stops.addAll(newList);
 
@@ -130,17 +130,4 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
         notifyDataSetChanged(); // Refresh the adapter
     }
-
-    // Replaces the current list of stops with the ones that match the search
-/*    void setFilter(ArrayList<OCStop> newList, Comparator<OCStop> comparator) {
-        stops = new ArrayList<>();
-        stops.addAll(newList);
-
-        if (comparator != null) {
-            Collections.sort(stops, comparator);
-        } else {
-            Collections.sort(stops);
-        }
-        notifyDataSetChanged(); // Refresh the adapter
-    }*/
 }

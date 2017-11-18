@@ -1,19 +1,13 @@
 package com.beattheheat.beatthestreet;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
-import android.view.MenuItem;
 
-import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 
@@ -26,9 +20,7 @@ import java.util.ArrayList;
  *  Selecting a stop brings you to a detailed page showing live bus info.
  */
 
-// TODO: Add up arrow to return to MainActivity
-// TODO: Test sorting by stopCode if GPS not available
-// TODO: Change activity name from "Bus Stop Schedules" to something better
+// TODO: Sorting by stopCode if GPS not available
 public class DisplayStopsActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
 
@@ -61,8 +53,7 @@ public class DisplayStopsActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_items, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView)MenuItemCompat.getActionView(menuItem);
+        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
         searchView.setOnQueryTextListener(this);
         return true;
     }

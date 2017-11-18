@@ -41,7 +41,7 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     public void onBindViewHolder(final RoutesForStopViewHolder viewHolder, int position) {
         // Set the route number view
         final OCBus[] currentList = busList.get(position);
-        String currentNameNumber = ("" + currentList[0].getRouteNo() + " " + currentList[0].getRouteHeading());
+        String currentNameNumber = (currentList[0].getRouteNo() + " " + currentList[0].getRouteHeading());
         viewHolder.routeNumberName.setText(currentNameNumber);
 
         // Set up the trip views
@@ -64,6 +64,7 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
             currentTrip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    // TODO: Replace this with something better
                     currentCard.setBackgroundColor(Color.BLACK);
                 }
             });
@@ -83,7 +84,7 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     @Override
     public int getItemCount() { return busList.size(); }
 
-    // Helper class that takes info and puts it into the layout at the appropriate position
+    // Helper class that connects data in the adapter to the appropriate parts of the layout
     static class RoutesForStopViewHolder extends RecyclerView.ViewHolder {
         TextView routeNumberName;
         TextView[]  trips = new TextView[3];

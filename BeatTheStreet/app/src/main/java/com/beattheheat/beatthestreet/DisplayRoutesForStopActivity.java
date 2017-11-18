@@ -1,14 +1,11 @@
 package com.beattheheat.beatthestreet;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
@@ -24,8 +21,6 @@ import java.util.HashMap;
  *  Displays a list of all routes that service a stop and the next (up to) 3 stop times
  */
 
-// TODO: Add up arrow to return to route search
-// TODO: Context sensitive activity title
 public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
@@ -40,7 +35,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_routes_for_stop);
 
-        // Get stop info based on the stopcode we're given
+        // Get stop info based on the stopCode we're given
         octAPI = OCTranspo.getInstance();
         stopCode = getIntent().getStringExtra("STOPCODE");
         stopName = getIntent().getStringExtra("STOPNAME");
@@ -50,7 +45,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(stopName);
 
         final Context context = this;
-        // TODO: Catch errors if no connection
+        // TODO: Error screen if no connection
         // TODO: Loading screen?
         octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
             @Override
