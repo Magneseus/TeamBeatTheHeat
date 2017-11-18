@@ -345,6 +345,8 @@ public class GTFS {
                 }
         );
 
+        bReq.setRetryPolicy(VolleyRequest.longerWaitPolicy);
+
         req.add(bReq);
     }
 

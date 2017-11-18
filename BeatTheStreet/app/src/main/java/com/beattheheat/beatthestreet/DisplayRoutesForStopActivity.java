@@ -1,16 +1,12 @@
 package com.beattheheat.beatthestreet;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
-import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
-import com.beattheheat.beatthestreet.Networking.OC_API.OCRoute;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
@@ -25,11 +21,10 @@ import java.util.HashMap;
  *  Displays a list of all routes that service a stop and the next (up to) 3 stop times
  */
 
-// TODO: Add main menu bar from MainActivity
-    // Every OCBus in the HashMap also has a routeNo stored in it so we can just pull the buses out
 public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
+    String stopName;
     OCTranspo octAPI;
     ArrayList<OCBus[]> busList;
     RoutesForStopAdapter rfsAdapter; //Places route data into the RecyclerView's layout
@@ -40,11 +35,18 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_routes_for_stop);
 
-        // Get stop info based on the stopcode we're given
-        stopCode = getIntent().getStringExtra("STOPCODE");
+        // Get stop info based on the stopCode we're given
         octAPI = OCTranspo.getInstance();
+        stopCode = getIntent().getStringExtra("STOPCODE");
+        stopName = getIntent().getStringExtra("STOPNAME");
+
+        // Set the activity title
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setTitle(stopName);
+
         final Context context = this;
-        // TODO: Catch errors if no connection
+        // TODO: Error screen if no connection
+        // TODO: Loading screen?
         octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
             @Override
             public void call(HashMap<Integer, OCBus[]> arg) {
@@ -63,7 +65,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 });
 
                 // Set up the RecyclerView to display route and time info
-                rv = (RecyclerView) findViewById(R.id.rfs_recycler_view);
+                rv = findViewById(R.id.rfs_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm); // llm makes rv have a linear layout
                 rfsAdapter = new RoutesForStopAdapter(context, busList);
@@ -72,9 +74,9 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         });
     }
 
-    // User has tapped a stop, go to detailed stop page
-    public void onClick(final float minUntilBus) {
-        // TODO: clean up this disgusting mess
+    // User has tapped a route at this stop, go to timetable page
+    public void onClick(int routeNumber) {
+/*        // TODO: clean up this disgusting mess
         class RunnablePointer {
             public int iterations = 0;
             public Runnable run;
@@ -83,7 +85,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             }
         }
         final Context ctx = this;
-/*
+
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
         runPointer.run = new Runnable() {
@@ -104,7 +106,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 }
             }
         };
-*/
+
         final long start = SystemClock.elapsedRealtime();
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
@@ -117,6 +119,6 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             }
         };
 
-        handler.postDelayed(runPointer.run, 1000);
+        handler.postDelayed(runPointer.run, 1000);*/
     }
 }

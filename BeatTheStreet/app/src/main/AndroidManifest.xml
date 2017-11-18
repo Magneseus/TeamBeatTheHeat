@@ -48,10 +48,22 @@
             android:label="@string/title_activity_maps" />
         <activity
             android:name=".DisplayStopsActivity"
-            android:label="Bus Stop Schedules"/>
+            android:label="Bus Stops"
+            android:parentActivityName=".MainActivity" >
+            <!-- meta-data tag to support older APIs -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".DisplayRoutesForStopActivity"
-            android:label="Stop Information" />
+            android:label="Stop Information"
+            android:parentActivityName=".DisplayStopsActivity" >
+            <!-- meta-data tag to support older APIs -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".DisplayStopsActivity" />
+        </activity>
         <activity
             android:name=".DisplayRoutesActivity"
             android:label="Bus Routes"/>

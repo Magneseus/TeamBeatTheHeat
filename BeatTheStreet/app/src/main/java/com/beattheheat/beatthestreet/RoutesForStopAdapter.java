@@ -1,16 +1,18 @@
 package com.beattheheat.beatthestreet;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Matt on 2017-10-30.
@@ -39,18 +41,42 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     public void onBindViewHolder(final RoutesForStopViewHolder viewHolder, int position) {
         // Set the route number view
         final OCBus[] currentList = busList.get(position);
-        String currentNameNumber = ("" + currentList[0].getRouteNo() + " " + currentList[0].getRouteHeading());
+        String currentNameNumber = (currentList[0].getRouteNo() + " " + currentList[0].getRouteHeading());
         viewHolder.routeNumberName.setText(currentNameNumber);
 
-        // Set the trip views
-        for (int i = 0; i < currentList.length; i++)
-            viewHolder.trips[i].setText(currentList[i].getMinsTilArrival() + " min");
+        // Set up the trip views
+        String minsTilArrival;
+        String busTimeIsLive = "GPS";
+        for (int i = 0; i < currentList.length; i++) {
+            final TextView currentTrip = viewHolder.trips[i];
+            final CardView currentCard = viewHolder.cards[i];
 
+            // Set time till arrival
+            minsTilArrival = currentList[i].getMinsTilArrival() + " min";
+            currentTrip.setText(minsTilArrival);
+
+            // Set whether time is live
+            if (currentList[i].isTimeLive())
+                viewHolder.gps[i].setText(busTimeIsLive);
+
+            // Set up a click listener so we can set an alarm for this trip
+            // TODO: Implement alarm here
+            currentTrip.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO: Replace this with something better
+                    currentCard.setBackgroundColor(Color.BLACK);
+                }
+            });
+
+        }
+
+        // Click listener to go to timetable for chosen route at current stop
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Get stopCode and pass it back to DisplayStopsActivity
-                ((DisplayRoutesForStopActivity)context).onClick(currentList[0].getMinsTilArrival());
+                // Get route number and pass it back to DisplayStopsActivity
+                ((DisplayRoutesForStopActivity)context).onClick(currentList[0].getRouteNo());
             }
         });
     }
@@ -58,17 +84,29 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
     @Override
     public int getItemCount() { return busList.size(); }
 
-    // Helper class that takes info and puts it into the layout at the appropriate position
+    // Helper class that connects data in the adapter to the appropriate parts of the layout
     static class RoutesForStopViewHolder extends RecyclerView.ViewHolder {
         TextView routeNumberName;
-        TextView[] trips = new TextView[3];
+        TextView[]  trips = new TextView[3];
+        ImageView[] icons = new ImageView[3];
+        TextView[]  gps   = new TextView[3];
+        CardView[]  cards = new CardView[3];
 
         RoutesForStopViewHolder(View itemView) {
             super(itemView);
-            routeNumberName = (TextView)itemView.findViewById(R.id.rfs_route_number_name);
-            trips[0] = (TextView)itemView.findViewById((R.id.rfs_stop_time_0));
-            trips[1] = (TextView)itemView.findViewById((R.id.rfs_stop_time_1));
-            trips[2] = (TextView)itemView.findViewById((R.id.rfs_stop_time_2));
+            routeNumberName = itemView.findViewById(R.id.rfs_route_number_name);
+            trips[0] = itemView.findViewById((R.id.rfs_stop_time_0));
+            trips[1] = itemView.findViewById((R.id.rfs_stop_time_1));
+            trips[2] = itemView.findViewById((R.id.rfs_stop_time_2));
+            icons[0] = itemView.findViewById(R.id.rfs_icon_0);
+            icons[1] = itemView.findViewById(R.id.rfs_icon_1);
+            icons[2] = itemView.findViewById(R.id.rfs_icon_2);
+            gps[0]   = itemView.findViewById(R.id.rfs_gps_0);
+            gps[1]   = itemView.findViewById(R.id.rfs_gps_1);
+            gps[2]   = itemView.findViewById(R.id.rfs_gps_2);
+            cards[0] = itemView.findViewById(R.id.rfs_card_0);
+            cards[1] = itemView.findViewById(R.id.rfs_card_1);
+            cards[2] = itemView.findViewById(R.id.rfs_card_2);
         }
     }
 }

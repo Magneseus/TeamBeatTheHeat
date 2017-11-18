@@ -3,6 +3,7 @@ package com.beattheheat.beatthestreet.Networking;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -22,6 +23,12 @@ public class VolleyRequest {
     @SuppressLint("StaticFieldLeak")
     private static Context mCtx;
     private RequestQueue mRequestQueue;
+
+    // A Longer wait policy for requests
+    public static DefaultRetryPolicy longerWaitPolicy = new DefaultRetryPolicy(
+                                              4000,
+                                              10,
+                                              DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     // Initialization, requires a context from an android activity
     private VolleyRequest(Context context) {
