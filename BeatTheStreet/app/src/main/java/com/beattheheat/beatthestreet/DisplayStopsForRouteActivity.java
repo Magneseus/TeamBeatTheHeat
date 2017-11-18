@@ -28,7 +28,7 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
 
     OCTranspo octAPI;
     ArrayList<OCRoute> routeList;
-    StopsForRouteAdapter sfrAdapter; //Places route data into the RecyclerView's layout
+    StopsForRouteAdapter sfrAdapter;
     RecyclerView rv;
 
     @Override
@@ -57,8 +57,6 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
 
         String [] stopIds = octAPI.gtfsTable.getAllStopsWithID(tripId);
 
-       // new QueryTripsTable().execute(tripId);
-
         ArrayList<OCStop> stopNames = new ArrayList<OCStop>();
         for (int j = 0; j < stopIds.length; j++){
             stopNames.add(octAPI.gtfsTable.getStop(stopIds[j]));
@@ -71,10 +69,8 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
         rv.setAdapter(sfrAdapter);
         }
 
-
     // User has tapped a stop, go to detailed stop page
     public void onClick(String stopCodeStr) {
-        //int stopCode = Integer.parseInt(stopCodeStr);
         class RunnablePointer {
             public Runnable run;
             public RunnablePointer(Runnable run) {
@@ -119,16 +115,4 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
         startActivity(intent);
 
     }
-
-    // Async task to query trips
-   /* private class QueryTripsTable extends AsyncTask<String, Void, String[]> {
-
-        protected String[] doInBackground(String... tripId) {
-            return octAPI.gtfsTable.getAllStopsWithID(tripId[0]);
-        }
-
-        protected void onPostExecute(String[] result) {
-        }
-
-    }*/
 }
