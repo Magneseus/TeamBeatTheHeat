@@ -28,6 +28,7 @@ import java.util.ArrayList;
 
 // TODO: Add up arrow to return to MainActivity
 // TODO: Test sorting by stopCode if GPS not available
+// TODO: Change activity name from "Bus Stop Schedules" to something better
 public class DisplayStopsActivity extends AppCompatActivity
         implements SearchView.OnQueryTextListener {
 

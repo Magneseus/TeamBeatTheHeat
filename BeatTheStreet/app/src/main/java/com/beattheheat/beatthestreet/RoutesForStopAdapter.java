@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Matt on 2017-10-30.
@@ -43,8 +42,11 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
         viewHolder.routeNumberName.setText(currentNameNumber);
 
         // Set the trip views
-        for (int i = 0; i < currentList.length; i++)
-            viewHolder.trips[i].setText(currentList[i].getMinsTilArrival() + " min");
+        String minsTilArrival;
+        for (int i = 0; i < currentList.length; i++) {
+            minsTilArrival = currentList[i].getMinsTilArrival() + " min";
+            viewHolder.trips[i].setText(minsTilArrival);
+        }
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,10 +67,10 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
 
         RoutesForStopViewHolder(View itemView) {
             super(itemView);
-            routeNumberName = (TextView)itemView.findViewById(R.id.rfs_route_number_name);
-            trips[0] = (TextView)itemView.findViewById((R.id.rfs_stop_time_0));
-            trips[1] = (TextView)itemView.findViewById((R.id.rfs_stop_time_1));
-            trips[2] = (TextView)itemView.findViewById((R.id.rfs_stop_time_2));
+            routeNumberName = itemView.findViewById(R.id.rfs_route_number_name);
+            trips[0] = itemView.findViewById((R.id.rfs_stop_time_0));
+            trips[1] = itemView.findViewById((R.id.rfs_stop_time_1));
+            trips[2] = itemView.findViewById((R.id.rfs_stop_time_2));
         }
     }
 }

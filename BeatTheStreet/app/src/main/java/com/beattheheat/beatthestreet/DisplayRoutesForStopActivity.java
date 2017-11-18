@@ -10,7 +10,6 @@ import android.support.v7.widget.RecyclerView;
 
 import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
-import com.beattheheat.beatthestreet.Networking.OC_API.OCRoute;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
@@ -25,8 +24,8 @@ import java.util.HashMap;
  *  Displays a list of all routes that service a stop and the next (up to) 3 stop times
  */
 
-// TODO: Add main menu bar from MainActivity
-    // Every OCBus in the HashMap also has a routeNo stored in it so we can just pull the buses out
+// TODO: Add up arrow to return to route search
+// TODO: Context sensitive activity title
 public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
@@ -63,7 +62,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 });
 
                 // Set up the RecyclerView to display route and time info
-                rv = (RecyclerView) findViewById(R.id.rfs_recycler_view);
+                rv = findViewById(R.id.rfs_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm); // llm makes rv have a linear layout
                 rfsAdapter = new RoutesForStopAdapter(context, busList);

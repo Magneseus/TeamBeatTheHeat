@@ -23,6 +23,7 @@ import java.util.Comparator;
  */
 
 // TODO: Favorites-based sorting
+// TODO: Get stopCode sorting working if no GPS available
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     private Context context;
