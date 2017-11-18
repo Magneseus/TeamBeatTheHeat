@@ -74,7 +74,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final MainViewHolder viewHolder, int position) {
+    public void onBindViewHolder(final MainViewHolder viewHolder, final int position) {
         String stopCode = "" + stops.get(position).getStopCode();
         final String stopName = stops.get(position).getStopName();
 
@@ -95,7 +95,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
                     }
                 });
 
-                OCBus[] currentList = busList.get(viewHolder.getAdapterPosition());
+                OCBus[] currentList = busList.get(position);
 
                 // Set the route number and name
                 final String routeNumber = "" + currentList[0].getRouteNo();

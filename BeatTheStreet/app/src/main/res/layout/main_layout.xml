@@ -29,8 +29,7 @@
                 android:paddingEnd="2dp"
                 android:paddingBottom="6dp"
                 android:textSize="20sp"
-                android:textColor="#000000"
-                android:text="111 Baseline"/>
+                android:textColor="#000000" />
 
             <!-- The stop's name -->
             <TextView
@@ -42,8 +41,7 @@
                 android:paddingEnd="2dp"
                 android:paddingBottom="6dp"
                 android:textSize="20sp"
-                android:textColor="#000000"
-                android:text="Prince of Wales / Dynes"/>
+                android:textColor="#000000" />
 
             <!-- The list of upcoming times -->
             <LinearLayout
