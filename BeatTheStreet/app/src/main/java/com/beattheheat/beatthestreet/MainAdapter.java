@@ -28,6 +28,8 @@ import java.util.HashMap;
  * Adapter to display trips in MainActivity
  */
 
+// TODO: Sort by favorites
+// TODO: Show only favorites if no location available
 class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
     private Context context;
@@ -196,13 +198,15 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         ArrayList<OCStop> outList = new ArrayList<>();
 
         // We only want stops within a certain range
-        for (OCStop stop : inList) {
-            if (stop.getLocation().distanceTo(user) <= 1000)
-                outList.add(stop);
-        }
+        if (user != null) {
+            for (OCStop stop : inList) {
+                if (stop.getLocation().distanceTo(user) <= 1000)
+                    outList.add(stop);
+            }
 
-        // Sort our list of nearby stops
-        Collections.sort(outList, locationSort);
+            // Sort our list of nearby stops
+            Collections.sort(outList, locationSort);
+        }
 
         return outList;
     }
