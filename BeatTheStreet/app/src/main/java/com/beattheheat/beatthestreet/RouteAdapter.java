@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.OC_API.OCRoute;
@@ -24,11 +25,13 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 
     private ArrayList<OCRoute> routes;
     private Context context;
+    private FavoritesStorage faveRoutes;
 
     RouteAdapter(final Context context, ArrayList<OCRoute> routeList) {
         this.context = context;
         this.routes = routeList;
         Collections.sort(routes);
+        faveRoutes = new FavoritesStorage(context);
     }
 
     @Override
@@ -57,6 +60,26 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
                 ((DisplayRoutesActivity)context).onClick(routeDesc);
             }
         });
+
+        // Set whether we start with a fav or unfav icon
+        if (faveRoutes.isFav(routeDesc, FavoritesStorage.FAV_TYPE.ROUTE))
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+        else
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+
+        // Favorite/Unfavorite functionality
+        viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (faveRoutes.toggleFav(routeDesc, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                    // Route was added to favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+                } else {
+                    // Route was removed from favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+                }
+            }
+        });
     }
 
     @Override
@@ -69,11 +92,13 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
     static class RouteViewHolder extends RecyclerView.ViewHolder {
         TextView routeName;
         TextView routeDirection;
+        ImageView favIcon;
 
         public RouteViewHolder(View itemView) {
             super(itemView);
             routeName = (TextView)itemView.findViewById(R.id.route_name);
             routeDirection = (TextView)itemView.findViewById(R.id.route_direction);
+            favIcon  = itemView.findViewById(R.id.stop_fav_button);
         }
     }
 

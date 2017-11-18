@@ -22,4 +22,14 @@
         android:textSize="20sp"
         android:layout_toEndOf="@+id/route_name" />
 
+    <ImageView
+        android:id="@+id/stop_fav_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/route_name"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_unfavorite"
+        android:contentDescription="Favorite Button"/>
+
 </RelativeLayout>

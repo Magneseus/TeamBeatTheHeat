@@ -29,6 +29,8 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
     OCTranspo octAPI;
     ArrayList<OCRoute> routeList;
     StopsForRouteAdapter sfrAdapter;
+    String routeCode;
+    int busNo;
     RecyclerView rv;
 
     @Override
@@ -40,9 +42,11 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
 
         routeList = new ArrayList<>(octAPI.gtfsTable.getRouteList());
 
-        String[] routeInfo = getIntent().getStringExtra("ROUTE").split(" ");
+        routeCode = getIntent().getStringExtra("ROUTE");
 
-        int busNo = Integer.parseInt(routeInfo[0]);
+        String[] routeInfo = routeCode.split(" ");
+
+        busNo = Integer.parseInt(routeInfo[0]);
         String busDir = routeInfo[1];
         String tripId = "";
 
@@ -61,6 +65,7 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
         for (int j = 0; j < stopIds.length; j++){
             stopNames.add(octAPI.gtfsTable.getStop(stopIds[j]));
         }
+
 
         rv = (RecyclerView) findViewById(R.id.rfs_recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
@@ -112,6 +117,7 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);
+        intent.putExtra("ROUTECODE", busNo);
         startActivity(intent);
 
     }
