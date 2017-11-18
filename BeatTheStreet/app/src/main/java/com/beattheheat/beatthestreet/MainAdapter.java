@@ -138,9 +138,9 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
                 // Set whether we start with a fav or unfav icon
                 if (faveRoutes.isFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE))
-                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+                    viewHolder.favIcon.setImageResource(R.drawable.ic_favorite);
                 else
-                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+                    viewHolder.favIcon.setImageResource(R.drawable.ic_unfavorite);
 
                 // Favorite/Unfavorite functionality
                 viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
@@ -148,10 +148,10 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
                     public void onClick(View view) {
                         if (faveRoutes.toggleFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE)) {
                             // Route was added to favorites
-                            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+                            viewHolder.favIcon.setImageResource(R.drawable.ic_favorite);
                         } else {
                             // Route was removed from favorites
-                            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+                            viewHolder.favIcon.setImageResource(R.drawable.ic_unfavorite);
                         }
                     }
                 });
