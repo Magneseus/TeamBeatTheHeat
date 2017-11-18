@@ -13,7 +13,6 @@ import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -23,8 +22,6 @@ import java.util.Comparator;
  * Takes data from OCStop objects and puts it into the RecyclerView layout
  */
 
-// TODO: Favorites-based sorting
-// TODO: Get stopCode sorting working if no GPS available
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     private Context context;
@@ -40,13 +37,9 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
          locationSort = new Comparator<OCStop>() {
              @Override
              public int compare(OCStop o1, OCStop o2) {
-                 // TODO: stopCode sorting if no GPS available
                  Location user = LocationWrapper.getInstance().getLocation();
                  if (user == null) {
-                     // Try to sort by stopCode if GPS isn't available
-                     user = new Location("NO_GPS");
-                     user.setLongitude(-75.696353);
-                     user.setLatitude(45.384906);
+                     // Sort by stopCode if we don't have location permission
                      return o1.getStopCode() - o2.getStopCode();
                  }
 
