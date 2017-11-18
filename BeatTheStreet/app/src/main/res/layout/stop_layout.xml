@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -8,11 +10,8 @@
     android:paddingTop="4dp"
     android:paddingBottom="4dp" >
 
-    <!-- Card layout for a bus stop to be displayed
-        Since we're using a RelativeLayout we can describe locations of items
-        based on where they are relative to other items -->
+    <!-- Card layout for a bus stop to be displayed -->
     <android.support.v7.widget.CardView
-        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/display_stops_card"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
@@ -27,14 +26,12 @@
                 android:layout_alignParentTop="true"
                 android:textSize="20sp"
                 android:textColor="#000000" />
-
             <TextView
                 android:id="@+id/stop_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:layout_below="@id/stop_name" />
-
             <ImageView
                 android:id="@+id/stop_fav_button"
                 android:layout_width="wrap_content"
@@ -43,8 +40,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:src="@drawable/ic_unfavorite"
-                android:contentDescription="Favorite Button"/>
+                tools:ignore="ContentDescription" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
-
 </LinearLayout>

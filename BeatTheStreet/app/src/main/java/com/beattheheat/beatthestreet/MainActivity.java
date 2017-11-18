@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         final Context ctx = this;
-
+/*
         octAPI.LoadGTFS(new SCallable<Boolean>() {
             @Override
             public void call(Boolean arg) {
@@ -101,14 +101,14 @@ public class MainActivity extends AppCompatActivity
                 for(OCStop stop : stopList)
                     stop.setStopName(stop.getStopName().replaceAll("\"", ""));
 
-                /* Set up a RecyclerView so we can display the stops nicely */
+                /* Set up a RecyclerView so we can display the stops nicely
                 rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
                 stopAdapter = new StopAdapter(ctx, stopList);
                 rv.setAdapter(stopAdapter);
             }
-        });
+        });*/
     }
 
     // called when app is opened
@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity
 
 
     @Override
-    public boolean onQueryTextChange(String newText) {
+    public boolean onQueryTextChange(String newText) {/*
         newText = newText.toLowerCase();
 
         // Set up a new list that will contain the search results
@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity
 
         for (OCStop stop : stopList) {
             /* Stop names should all be in uppercase by default but search results were
-               behaving oddly so we're setting everything to lowercase */
+               behaving oddly so we're setting everything to lowercase
             String stopName = stop.getStopName().toLowerCase();
             String stopCode = "" + stop.getStopCode();
 
@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Update the adapter with the newly filtered list
-        stopAdapter.setFilter(newList);
+        stopAdapter.setFilter(newList);*/
         return true;
     }
 

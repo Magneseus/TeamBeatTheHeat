@@ -25,6 +25,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
     String stopName;
+    String stopId;
     int routeName;
     OCTranspo octAPI;
     ArrayList<OCBus[]> busList;
@@ -40,6 +41,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         octAPI = OCTranspo.getInstance();
         stopCode = getIntent().getStringExtra("STOPCODE");
         stopName = getIntent().getStringExtra("STOPNAME");
+        stopId   = getIntent().getStringExtra("STOPID");
         routeName = getIntent().getIntExtra("ROUTECODE", 0);
 
         // Set the activity title
@@ -71,7 +73,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 rv = findViewById(R.id.rfs_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm); // llm makes rv have a linear layout
-                rfsAdapter = new RoutesForStopAdapter(context, busList);
+                rfsAdapter = new RoutesForStopAdapter(context, stopId, busList);
                 rv.setAdapter(rfsAdapter);
             }
         });
@@ -118,6 +120,46 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             public void run() {
                 NotificationUtil.getInstance().notify(ctx, 0, "Timer", "" + (SystemClock.elapsedRealtime()
                         - start)/1000 + "s");
+                handler.postDelayed(runPointer.run, 1000);
+            }
+        };
+
+        // TODO: ONCLICK CODE FROM DISPLAY STOPS ACTIVITY
+        handler.postDelayed(runPointer.run, 1000);*/
+
+        /*class RunnablePointer {
+            public Runnable run;
+            public RunnablePointer(Runnable run) {
+                this.run = run;
+            }
+        }
+
+        class TimeHolder {
+            public long time;
+            public TimeHolder(long t) { this.time = t; }
+        }
+
+        final Context ctx = this;
+
+        final TimeHolder time = new TimeHolder(SystemClock.elapsedRealtime());
+
+        final Handler handler = new Handler();
+        final RunnablePointer runPointer = new RunnablePointer(null);
+        runPointer.run = new Runnable() {
+            @Override
+            public void run() {
+                int minutesInMillis = (int)(0.5*60*1000);
+                float elapsedMillis = (SystemClock.elapsedRealtime() - time.time);
+                int remainingMillis = (int) (minutesInMillis - elapsedMillis);
+
+                NotificationUtil.getInstance().notify(ctx, 0, "Timer", ""
+                        + (int) (remainingMillis / (1000 * 60)) + ":" // minutes
+                        + (int) (remainingMillis % (1000 * 60))/1000); // seconds
+
+                if(remainingMillis < 0) {
+                    time.time = SystemClock.elapsedRealtime();
+                }
+
                 handler.postDelayed(runPointer.run, 1000);
             }
         };

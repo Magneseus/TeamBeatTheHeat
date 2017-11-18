@@ -70,6 +70,7 @@
         <activity
             android:name=".DisplayStopsForRouteActivity"
             android:label="Bus Stops"/>
+        <receiver android:name=".Networking.ActionReceiver"/>
     </application>
 
 </manifest>

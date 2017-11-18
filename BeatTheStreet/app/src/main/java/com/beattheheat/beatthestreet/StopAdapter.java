@@ -22,8 +22,6 @@ import java.util.Comparator;
  * Takes data from OCStop objects and puts it into the RecyclerView layout
  */
 
-// TODO: Favorites-based sorting
-// TODO: Get stopCode sorting working if no GPS available
 class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
     private Context context;
@@ -33,18 +31,15 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
      StopAdapter(final Context context, ArrayList<OCStop> stopList) {
          this.context = context;
-         this.stops = stopList;
+         this.faveStops = new FavoritesStorage(context);
 
+         // Set up a comparator to sort stops by distance from user
          locationSort = new Comparator<OCStop>() {
              @Override
              public int compare(OCStop o1, OCStop o2) {
-                 // TODO: stopCode sorting if no GPS available
                  Location user = LocationWrapper.getInstance().getLocation();
                  if (user == null) {
-                     // Try to sort by stopCode if GPS isn't available
-                     user = new Location("NO_GPS");
-                     user.setLongitude(-75.696353);
-                     user.setLatitude(45.384906);
+                     // Sort by stopCode if we don't have location permission
                      return o1.getStopCode() - o2.getStopCode();
                  }
 
@@ -55,9 +50,8 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
              }
          };
 
-         Collections.sort(stops, locationSort);
-
-         faveStops = new FavoritesStorage(context);
+         // Sort the list
+         this.stops = sortStops(stopList);
     }
 
     @Override
@@ -70,12 +64,14 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     @Override
     public void onBindViewHolder(final StopViewHolder viewHolder , int position) {
         // Set the stop name and code
-        viewHolder.stopName.setText(stops.get(position).getStopName());
+        final String stopNameStr = stops.get(position).getStopName();
+        viewHolder.stopName.setText(stopNameStr);
         final String stopCodeStr = "" + stops.get(position).getStopCode();
         viewHolder.stopCode.setText(stopCodeStr);
+        final String stopIdStr = stops.get(position).getStopId();
 
         // Set whether we start with a fav or unfav icon
-        if (faveStops.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE))
+        if (faveStops.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.STOP))
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
         else
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
@@ -84,7 +80,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (faveStops.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                if (faveStops.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.STOP)) {
                     // Route was added to favorites
                     viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
                 } else {
@@ -98,8 +94,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
             @Override
             public void onClick(View view) {
                 // Get stopCode and pass it back to DisplayStopsActivity
-                ((DisplayStopsActivity)context).onClick(viewHolder.stopCode.getText().toString(),
-                                                        viewHolder.stopName.getText().toString());
+                ((DisplayStopsActivity)context).onClick(stopCodeStr, stopNameStr, stopIdStr);
             }
         });
     }
@@ -123,11 +118,37 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     }
 
     void setFilter(ArrayList<OCStop> newList) {
-        stops = new ArrayList<>(); // Reset our stop list with the new list
+        /*stops = new ArrayList<>(); // Reset our stop list with the new list
         stops.addAll(newList);
 
-        Collections.sort(stops, locationSort); // Resort the list
+        Collections.sort(stops, locationSort); // Resort the list*/
+
+        stops = sortStops(newList);
 
         notifyDataSetChanged(); // Refresh the adapter
+    }
+
+    // Takes care of sorting a list of stops into favorites and not favorites, both
+    // sorted by distance from user
+    private ArrayList<OCStop> sortStops(ArrayList<OCStop> inList) {
+        // Separate stops into favorites and not favorites
+        ArrayList<OCStop> favorites   = new ArrayList<>();
+        ArrayList<OCStop> unFavorites = new ArrayList<>();
+        for (OCStop stop : inList) {
+            if (faveStops.isFav("" + stop.getStopCode(), FavoritesStorage.FAV_TYPE.STOP))
+                favorites.add(stop);
+            else unFavorites.add(stop);
+        }
+
+        // Sort both lists by distance from user
+        Collections.sort(favorites, locationSort);
+        Collections.sort(unFavorites, locationSort);
+
+        // Put the stop list back together
+        ArrayList<OCStop> outList = new ArrayList<>();
+        outList.addAll(favorites);
+        outList.addAll(unFavorites);
+
+        return outList;
     }
 }
