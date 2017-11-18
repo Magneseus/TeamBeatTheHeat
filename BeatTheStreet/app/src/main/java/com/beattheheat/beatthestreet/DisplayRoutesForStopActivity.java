@@ -55,8 +55,11 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             @Override
             public void call(HashMap<Integer, OCBus[]> arg) {
                 busList = new ArrayList<>();
+                System.out.println("ROUTENAME: " + routeName);
                 // Filter out routes that have no upcoming stops
                 for (OCBus[] busArray : arg.values()) {
+                    System.out.println("BUSNO: " + busArray[0].getRouteNo());
+
                     if (busArray != null && busArray.length > 0 && (busArray[0].getRouteNo() == routeName || routeName == 0)){
                         busList.add(busArray);
                     }
