@@ -44,6 +44,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         octAPI = OCTranspo.getInstance();
         final Context context = this;
         // TODO: Catch errors if no connection
+        // TODO: Loading screen?
         octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
             @Override
             public void call(HashMap<Integer, OCBus[]> arg) {
@@ -71,9 +72,9 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         });
     }
 
-    // User has tapped a stop, go to detailed stop page
-    public void onClick(final float minUntilBus) {
-        // TODO: clean up this disgusting mess
+    // User has tapped a route at this stop, go to timetable page
+    public void onClick(int routeNumber) {
+/*        // TODO: clean up this disgusting mess
         class RunnablePointer {
             public int iterations = 0;
             public Runnable run;
@@ -82,7 +83,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             }
         }
         final Context ctx = this;
-/*
+
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
         runPointer.run = new Runnable() {
@@ -103,7 +104,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 }
             }
         };
-*/
+
         final long start = SystemClock.elapsedRealtime();
         final Handler handler = new Handler();
         final RunnablePointer runPointer = new RunnablePointer(null);
@@ -116,6 +117,6 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             }
         };
 
-        handler.postDelayed(runPointer.run, 1000);
+        handler.postDelayed(runPointer.run, 1000);*/
     }
 }

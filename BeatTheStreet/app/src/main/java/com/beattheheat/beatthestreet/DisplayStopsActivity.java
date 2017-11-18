@@ -50,7 +50,7 @@ public class DisplayStopsActivity extends AppCompatActivity
             stop.setStopName(stop.getStopName().replaceAll("\"", ""));
 
         /* Set up a RecyclerView so we can display the stops nicely */
-        rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
+        rv = findViewById(R.id.display_stops_recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
         stopAdapter = new StopAdapter(this, stopList);
@@ -99,7 +99,7 @@ public class DisplayStopsActivity extends AppCompatActivity
     // User has tapped a stop, go to detailed stop page
     public void onClick(String stopCodeStr) {
         //int stopCode = Integer.parseInt(stopCodeStr);
-        class RunnablePointer {
+        /*class RunnablePointer {
             public Runnable run;
             public RunnablePointer(Runnable run) {
                 this.run = run;
@@ -136,7 +136,7 @@ public class DisplayStopsActivity extends AppCompatActivity
             }
         };
 
-        handler.postDelayed(runPointer.run, 1000);
+        handler.postDelayed(runPointer.run, 1000);*/
 
         Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);
