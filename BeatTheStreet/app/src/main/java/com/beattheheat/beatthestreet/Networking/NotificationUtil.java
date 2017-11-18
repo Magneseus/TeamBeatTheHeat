@@ -16,7 +16,7 @@ import android.provider.Settings;
 public class NotificationUtil {
     // Singleton instance
     private static NotificationUtil myObj;
-    final private int defaultIcon = R.drawable.btn_default;
+    final public static int defaultIcon = R.drawable.btn_default;
 
     private NotificationUtil() {
 
@@ -29,6 +29,10 @@ public class NotificationUtil {
 
         return myObj;
     }
+
+    public NotificationManager getManager(Context ctx) {
+        return (NotificationManager)
+            ctx.getSystemService(ctx.NOTIFICATION_SERVICE); }
 
     public void notify(Context ctx, int id, String title)
     {
