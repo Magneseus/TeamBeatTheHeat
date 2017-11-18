@@ -13,6 +13,7 @@ import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -33,8 +34,9 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
 
      StopAdapter(final Context context, ArrayList<OCStop> stopList) {
          this.context = context;
-         this.stops = stopList;
+         this.faveStops = new FavoritesStorage(context);
 
+         // Set up a comparator to sort stops by distance from user
          locationSort = new Comparator<OCStop>() {
              @Override
              public int compare(OCStop o1, OCStop o2) {
@@ -55,9 +57,8 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
              }
          };
 
-         Collections.sort(stops, locationSort);
-
-         faveStops = new FavoritesStorage(context);
+         // Sort the list
+         this.stops = sortStops(stopList);
     }
 
     @Override
@@ -75,7 +76,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         viewHolder.stopCode.setText(stopCodeStr);
 
         // Set whether we start with a fav or unfav icon
-        if (faveStops.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE))
+        if (faveStops.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.STOP))
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
         else
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
@@ -84,7 +85,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (faveStops.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                if (faveStops.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.STOP)) {
                     // Route was added to favorites
                     viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
                 } else {
@@ -123,11 +124,37 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     }
 
     void setFilter(ArrayList<OCStop> newList) {
-        stops = new ArrayList<>(); // Reset our stop list with the new list
+        /*stops = new ArrayList<>(); // Reset our stop list with the new list
         stops.addAll(newList);
 
-        Collections.sort(stops, locationSort); // Resort the list
+        Collections.sort(stops, locationSort); // Resort the list*/
+
+        stops = sortStops(newList);
 
         notifyDataSetChanged(); // Refresh the adapter
+    }
+
+    // Takes care of sorting a list of stops into favorites and not favorites, both
+    // sorted by distance from user
+    private ArrayList<OCStop> sortStops(ArrayList<OCStop> inList) {
+        // Separate stops into favorites and not favorites
+        ArrayList<OCStop> favorites   = new ArrayList<>();
+        ArrayList<OCStop> unFavorites = new ArrayList<>();
+        for (OCStop stop : inList) {
+            if (faveStops.isFav("" + stop.getStopCode(), FavoritesStorage.FAV_TYPE.STOP))
+                favorites.add(stop);
+            else unFavorites.add(stop);
+        }
+
+        // Sort both lists by distance from user
+        Collections.sort(favorites, locationSort);
+        Collections.sort(unFavorites, locationSort);
+
+        // Put the stop list back together
+        ArrayList<OCStop> outList = new ArrayList<>();
+        outList.addAll(favorites);
+        outList.addAll(unFavorites);
+
+        return outList;
     }
 }
