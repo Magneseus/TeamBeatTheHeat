@@ -47,11 +47,10 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
 
-    // Our OCAPI instance, for bus/stop information
-    private OCTranspo octAPI;
+    private OCTranspo octAPI; // Our OCAPI instance, for bus/stop information
     ArrayList<OCStop> stopList;
-    StopAdapter stopAdapter; // Takes OCStop data and puts it into stop_layout.xml
-    RecyclerView rv; // Only shows items on or near the screen, more efficient for long lists
+    MainAdapter mainAdapter;
+    RecyclerView rv;
 
 
     // Initialization function (Constructor)
@@ -92,7 +91,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         final Context ctx = this;
-/*
+
         octAPI.LoadGTFS(new SCallable<Boolean>() {
             @Override
             public void call(Boolean arg) {
@@ -101,14 +100,13 @@ public class MainActivity extends AppCompatActivity
                 for(OCStop stop : stopList)
                     stop.setStopName(stop.getStopName().replaceAll("\"", ""));
 
-                /* Set up a RecyclerView so we can display the stops nicely
                 rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
-                rv.setLayoutManager(llm); // llm makes rv have a linear layout (default is vertical)
-                stopAdapter = new StopAdapter(ctx, stopList);
-                rv.setAdapter(stopAdapter);
+                rv.setLayoutManager(llm);
+                mainAdapter = new MainAdapter(ctx, stopList);
+                rv.setAdapter(mainAdapter);
             }
-        });*/
+        });
     }
 
     // called when app is opened
