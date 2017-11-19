@@ -91,9 +91,18 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
                     for (OCBus[] busArray : tempList) {
                         tripCollection.add(new OCHelper(busArray, stopName, stopCode));
                     }
+
+                    notifyDataSetChanged();
                 }
             });
         }
+
+        // TODO: Remove this dummy data
+        /*tripCollection.add(new OCHelper());
+        tripCollection.add(new OCHelper());
+        tripCollection.add(new OCHelper());
+        tripCollection.add(new OCHelper());
+        tripCollection.add(new OCHelper());*/
     }
 
     @Override
@@ -151,10 +160,10 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
             public void onClick(View view) {
                 if (faveRoutes.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE)) {
                     // Route was added to favorites
-                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+                    viewHolder.favIcon.setImageResource(R.drawable.ic_favorite);
                 } else {
                     // Route was removed from favorites
-                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+                    viewHolder.favIcon.setImageResource(R.drawable.ic_unfavorite);
                 }
             }
         });
@@ -227,6 +236,29 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         String stopName;
         String stopCode;
         String routeNumberName;
+
+        /*OCHelper() {
+            this.stopName = "Test stop";
+            this.stopCode = "1234";
+            this.routeNumberName = "123 Fake Route";
+
+            this.busArray = new OCBus[3];
+            busArray[0] = new OCBus();
+            busArray[0].setRouteNo(123);
+            busArray[0].setRouteHeading("Fake Route");
+            busArray[0].setMinsTilArrival(10);
+            busArray[0].setUpdateAge(10.0f);
+            busArray[1] = new OCBus();
+            busArray[1].setRouteNo(123);
+            busArray[1].setRouteHeading("Fake Route");
+            busArray[1].setMinsTilArrival(15);
+            busArray[1].setUpdateAge(0.0f);
+            busArray[2] = new OCBus();
+            busArray[2].setRouteNo(123);
+            busArray[2].setRouteHeading("Fake Route");
+            busArray[2].setMinsTilArrival(25);
+            busArray[2].setUpdateAge(25.0f);
+        }*/
 
         OCHelper(OCBus[] busArray, String stopName, String stopCode) {
             this.busArray = busArray;
