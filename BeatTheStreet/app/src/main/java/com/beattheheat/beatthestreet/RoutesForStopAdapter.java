@@ -23,12 +23,12 @@ import java.util.ArrayList;
 class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.RoutesForStopViewHolder> {
 
     private Context context;
-    private String stopId;
+    private String stopCode;
     private ArrayList<OCBus[]> busList;
 
-    RoutesForStopAdapter(Context context, String stopId, ArrayList<OCBus[]> busList) {
+    RoutesForStopAdapter(Context context, String stopCode, ArrayList<OCBus[]> busList) {
         this.context = context;
-        this.stopId  = stopId;
+        this.stopCode  = stopCode;
         this.busList = new ArrayList<>(busList);
     }
 

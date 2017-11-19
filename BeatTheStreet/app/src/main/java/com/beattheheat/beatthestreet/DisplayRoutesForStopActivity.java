@@ -25,7 +25,6 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
     String stopName;
-    String stopId;
     int routeName;
     OCTranspo octAPI;
     ArrayList<OCBus[]> busList;
@@ -41,7 +40,6 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         octAPI = OCTranspo.getInstance();
         stopCode = getIntent().getStringExtra("STOPCODE");
         stopName = getIntent().getStringExtra("STOPNAME");
-        stopId   = getIntent().getStringExtra("STOPID");
         routeName = getIntent().getIntExtra("ROUTECODE", 0);
 
         // Set the activity title
@@ -55,14 +53,10 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
             @Override
             public void call(HashMap<Integer, OCBus[]> arg) {
                 busList = new ArrayList<>();
-                System.out.println("ROUTENAME: " + routeName);
                 // Filter out routes that have no upcoming stops
                 for (OCBus[] busArray : arg.values()) {
-                    System.out.println("BUSNO: " + busArray[0].getRouteNo());
-
-                    if (busArray != null && busArray.length > 0 && (busArray[0].getRouteNo() == routeName || routeName == 0)){
+                    if (busArray != null && busArray.length > 0 && (busArray[0].getRouteNo() == routeName || routeName == 0))
                         busList.add(busArray);
-                    }
                 }
 
                 // Sort ArrayList of OCBus arrays by route number
@@ -76,7 +70,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 rv = findViewById(R.id.rfs_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm); // llm makes rv have a linear layout
-                rfsAdapter = new RoutesForStopAdapter(context, stopId, busList);
+                rfsAdapter = new RoutesForStopAdapter(context, stopCode, busList);
                 rv.setAdapter(rfsAdapter);
             }
         });
