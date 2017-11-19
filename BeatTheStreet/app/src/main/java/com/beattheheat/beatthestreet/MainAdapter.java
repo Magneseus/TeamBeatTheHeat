@@ -33,76 +33,13 @@ import java.util.HashMap;
 class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
     private Context context;
-    private Location user;
     private FavoritesStorage faveRoutes;
-    private OCTranspo octAPI;
-    private ArrayList<OCStop> stops;
-    private ArrayList<OCHelper> tripCollection;
-    private Comparator<OCStop> locationSort;
+    private ArrayList<MainAdapterHelper> tripCollection;
 
-    MainAdapter(Context context, ArrayList<OCStop> stopList) {
+    MainAdapter(Context context, ArrayList<MainAdapterHelper> tripCollection) {
         this.context = context;
-        this.user = LocationWrapper.getInstance().getLocation();
         this.faveRoutes = new FavoritesStorage(context);
-        this.octAPI = OCTranspo.getInstance();
-        this.tripCollection = new ArrayList<>();
-
-        // Set up a comparator to sort stops by distance from user
-        locationSort = new Comparator<OCStop>() {
-            @Override
-            public int compare(OCStop o1, OCStop o2) {
-                if (user == null) {
-                    // Sort by stopCode if we don't have location permission
-                    return o1.getStopCode() - o2.getStopCode();
-                }
-
-                float dist1 = o1.getLocation().distanceTo(user);
-                float dist2 = o2.getLocation().distanceTo(user);
-
-                return (int)(dist1 - dist2);
-            }
-        };
-
-        // Sort the list
-        stops = sortStops(stopList);
-
-        // Get the list of buses for each stop
-        for (OCStop stop : stops) {
-            final String stopCode = "" + stop.getStopCode();
-            final String stopName = stop.getStopName();
-            octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
-                @Override
-                public void call(HashMap<Integer, OCBus[]> arg) {
-                    ArrayList<OCBus[]> tempList = new ArrayList<>();
-                    // Filter out routes that have no upcoming stops
-                    for (OCBus[] busArray : arg.values()) {
-                        if (busArray != null && busArray.length > 0)
-                            tempList.add(busArray);
-                    }
-
-                    // Sort ArrayList of OCBus arrays by route number
-                    Collections.sort(tempList, new Comparator<OCBus[]>() {
-                        public int compare(OCBus[] busArray, OCBus[] otherArray) {
-                            return busArray[0].compareTo(otherArray[0]);
-                        }
-                    });
-
-                    // Add the complete set of information to the collection
-                    for (OCBus[] busArray : tempList) {
-                        tripCollection.add(new OCHelper(busArray, stopName, stopCode));
-                    }
-
-                    notifyDataSetChanged();
-                }
-            });
-        }
-
-        // TODO: Remove this dummy data
-        /*tripCollection.add(new OCHelper());
-        tripCollection.add(new OCHelper());
-        tripCollection.add(new OCHelper());
-        tripCollection.add(new OCHelper());
-        tripCollection.add(new OCHelper());*/
+        this.tripCollection = tripCollection;
     }
 
     @Override
@@ -177,6 +114,8 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
                 //((MainActivity)context).onClick(currentList[0].getRouteNo());
             }
         });
+
+        notifyDataSetChanged();
     }
 
     @Override
@@ -209,62 +148,6 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
             cards[1] = itemView.findViewById(R.id.main_card_1);
             cards[2] = itemView.findViewById(R.id.main_card_2);
             favIcon  = itemView.findViewById(R.id.main_fav_button);
-        }
-    }
-
-    private ArrayList<OCStop> sortStops(ArrayList<OCStop> inList) {
-        ArrayList<OCStop> outList = new ArrayList<>();
-
-        // We only want stops within a certain range
-        if (user != null) {
-            for (OCStop stop : inList) {
-                if (stop.getLocation().distanceTo(user) <= 1000)
-                    outList.add(stop);
-            }
-
-            // Sort our list of nearby stops
-            Collections.sort(outList, locationSort);
-        }
-
-        return outList;
-    }
-
-    // Helper class to hold info for each route/stop combo so we can easily pass what we need
-    // to onBindViewHolder
-    private class OCHelper {
-        OCBus[] busArray;
-        String stopName;
-        String stopCode;
-        String routeNumberName;
-
-        /*OCHelper() {
-            this.stopName = "Test stop";
-            this.stopCode = "1234";
-            this.routeNumberName = "123 Fake Route";
-
-            this.busArray = new OCBus[3];
-            busArray[0] = new OCBus();
-            busArray[0].setRouteNo(123);
-            busArray[0].setRouteHeading("Fake Route");
-            busArray[0].setMinsTilArrival(10);
-            busArray[0].setUpdateAge(10.0f);
-            busArray[1] = new OCBus();
-            busArray[1].setRouteNo(123);
-            busArray[1].setRouteHeading("Fake Route");
-            busArray[1].setMinsTilArrival(15);
-            busArray[1].setUpdateAge(0.0f);
-            busArray[2] = new OCBus();
-            busArray[2].setRouteNo(123);
-            busArray[2].setRouteHeading("Fake Route");
-            busArray[2].setMinsTilArrival(25);
-            busArray[2].setUpdateAge(25.0f);
-        }*/
-
-        OCHelper(OCBus[] busArray, String stopName, String stopCode) {
-            this.busArray = busArray;
-            this.stopName = stopName;
-            this.stopCode = stopCode;
-            this.routeNumberName = busArray[0].getRouteNo() + " " + busArray[0].getRouteHeading();
         }
     }
 }

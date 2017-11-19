@@ -36,6 +36,8 @@ import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,6 +53,9 @@ public class MainActivity extends AppCompatActivity
     ArrayList<OCStop> stopList;
     MainAdapter mainAdapter;
     RecyclerView rv;
+    Location user;
+    Comparator<OCStop> locationSort;
+    ArrayList<MainAdapterHelper> tripCollection;
 
 
     // Initialization function (Constructor)
@@ -91,19 +96,66 @@ public class MainActivity extends AppCompatActivity
         }
 
         final Context ctx = this;
+        tripCollection = new ArrayList<>();
+
+        // Set up a comparator to sort stops by distance from user
+        locationSort = new Comparator<OCStop>() {
+            @Override
+            public int compare(OCStop o1, OCStop o2) {
+                if (user == null) {
+                    // Sort by stopCode if we don't have location permission
+                    return o1.getStopCode() - o2.getStopCode();
+                }
+
+                float dist1 = o1.getLocation().distanceTo(user);
+                float dist2 = o2.getLocation().distanceTo(user);
+
+                return (int)(dist1 - dist2);
+            }
+        };
 
         octAPI.LoadGTFS(new SCallable<Boolean>() {
             @Override
             public void call(Boolean arg) {
-                stopList = new ArrayList<>(octAPI.gtfsTable.getStopList());
+                ArrayList<OCStop> tempList = new ArrayList<>(octAPI.gtfsTable.getStopList());
+                stopList = sortStops(tempList);
                 // Trim excess quotes from stopName
                 for(OCStop stop : stopList)
                     stop.setStopName(stop.getStopName().replaceAll("\"", ""));
 
+                /* Set up route & stop information for the adapter */
+                for (OCStop stop : stopList) {
+                    final String stopCode = "" + stop.getStopCode();
+                    final String stopName = stop.getStopName();
+                    octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
+                        @Override
+                        public void call(HashMap<Integer, OCBus[]> arg) {
+                            ArrayList<OCBus[]> tempList = new ArrayList<>();
+                            // Filter out routes that have no upcoming stops
+                            for (OCBus[] busArray : arg.values()) {
+                                if (busArray != null && busArray.length > 0)
+                                    tempList.add(busArray);
+                            }
+
+                            // Sort ArrayList of OCBus arrays by route number
+                            Collections.sort(tempList, new Comparator<OCBus[]>() {
+                                public int compare(OCBus[] busArray, OCBus[] otherArray) {
+                                    return busArray[0].compareTo(otherArray[0]);
+                                }
+                            });
+
+                            // Add the complete set of information to the collection
+                            for (OCBus[] busArray : tempList) {
+                                tripCollection.add(new MainAdapterHelper(busArray, stopName, stopCode));
+                            }
+                        }
+                    });
+                }
+
                 rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm);
-                mainAdapter = new MainAdapter(ctx, stopList);
+                mainAdapter = new MainAdapter(ctx, tripCollection);
                 rv.setAdapter(mainAdapter);
             }
         });
@@ -208,5 +260,22 @@ public class MainActivity extends AppCompatActivity
         if(LocationWrapper.getInstance() != null) {
             LocationWrapper.getInstance().startRequestingUpdates();
         }
+    }
+
+    private ArrayList<OCStop> sortStops(ArrayList<OCStop> inList) {
+        ArrayList<OCStop> outList = new ArrayList<>();
+
+        // We only want stops within a certain range
+        if (user != null) {
+            for (OCStop stop : inList) {
+                if (stop.getLocation().distanceTo(user) <= 1000)
+                    outList.add(stop);
+            }
+
+            // Sort our list of nearby stops
+            Collections.sort(outList, locationSort);
+        }
+
+        return outList;
     }
 }
