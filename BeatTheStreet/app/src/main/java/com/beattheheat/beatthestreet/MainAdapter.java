@@ -33,18 +33,19 @@ import java.util.HashMap;
 class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
     private Context context;
-    private ArrayList<OCStop> stops;
-    private Comparator<OCStop> locationSort;
     private Location user;
     private FavoritesStorage faveRoutes;
     private OCTranspo octAPI;
-    private ArrayList<OCBus[]> busList;
+    private ArrayList<OCStop> stops;
+    private ArrayList<OCHelper> tripCollection;
+    private Comparator<OCStop> locationSort;
 
     MainAdapter(Context context, ArrayList<OCStop> stopList) {
         this.context = context;
         this.user = LocationWrapper.getInstance().getLocation();
         this.faveRoutes = new FavoritesStorage(context);
-        octAPI = OCTranspo.getInstance();
+        this.octAPI = OCTranspo.getInstance();
+        this.tripCollection = new ArrayList<>();
 
         // Set up a comparator to sort stops by distance from user
         locationSort = new Comparator<OCStop>() {
@@ -63,7 +64,36 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         };
 
         // Sort the list
-        this.stops = sortStops(stopList);
+        stops = sortStops(stopList);
+
+        // Get the list of buses for each stop
+        for (OCStop stop : stops) {
+            final String stopCode = "" + stop.getStopCode();
+            final String stopName = stop.getStopName();
+            octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
+                @Override
+                public void call(HashMap<Integer, OCBus[]> arg) {
+                    ArrayList<OCBus[]> tempList = new ArrayList<>();
+                    // Filter out routes that have no upcoming stops
+                    for (OCBus[] busArray : arg.values()) {
+                        if (busArray != null && busArray.length > 0)
+                            tempList.add(busArray);
+                    }
+
+                    // Sort ArrayList of OCBus arrays by route number
+                    Collections.sort(tempList, new Comparator<OCBus[]>() {
+                        public int compare(OCBus[] busArray, OCBus[] otherArray) {
+                            return busArray[0].compareTo(otherArray[0]);
+                        }
+                    });
+
+                    // Add the complete set of information to the collection
+                    for (OCBus[] busArray : tempList) {
+                        tripCollection.add(new OCHelper(busArray, stopName, stopCode));
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -74,95 +104,74 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final MainViewHolder viewHolder, final int position) {
-        String stopCode = "" + stops.get(position).getStopCode();
-        final String stopName = stops.get(position).getStopName();
+    public void onBindViewHolder(final MainViewHolder viewHolder, int position) {
+        // Set the route name, number, and stop name
+        String routeNumberName = tripCollection.get(position).routeNumberName;
+        String stopName = tripCollection.get(position).stopName;
+        viewHolder.routeNumberName.setText(routeNumberName);
+        viewHolder.stopName.setText(stopName);
 
-        octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
+        // Set up each upcoming trip
+        String minsTillArrival;
+        String busTimeIsLive = "GPS";
+        final OCBus[] currentList = tripCollection.get(position).busArray;
+        for (int i = 0; i < currentList.length; i++) {
+            final TextView currentTrip = viewHolder.trips[i];
+            final CardView currentCard = viewHolder.cards[i];
+
+            // Set the time till arrival
+            minsTillArrival = currentList[i].getMinsTilArrival() + " min";
+            currentTrip.setText(minsTillArrival);
+
+            // Set whether time is live
+            if (currentList[i].isTimeLive())
+                viewHolder.gps[i].setText(busTimeIsLive);
+
+            // Set up a click listener so we can set an alarm for this trip
+            // TODO: Implement alarm here
+            currentTrip.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // TODO: Replace this with something better
+                    currentCard.setBackgroundColor(Color.BLACK);
+                }
+            });
+        }
+
+        // Set whether we start with a fav or unfav icon
+        final String stopCodeStr = tripCollection.get(position).stopCode;
+        if (faveRoutes.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE))
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+        else
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+
+        // Favorite/Unfavorite functionality
+        viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void call(HashMap<Integer, OCBus[]> arg) {
-                busList = new ArrayList<>();
-                // Filter out routes that have no upcoming stops
-                for (OCBus[] busArray : arg.values()) {
-                    if (busArray != null && busArray.length > 0)
-                        busList.add(busArray);
+            public void onClick(View view) {
+                if (faveRoutes.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                    // Route was added to favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+                } else {
+                    // Route was removed from favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
                 }
-
-                // Sort ArrayList of OCBus arrays by route number
-                Collections.sort(busList, new Comparator<OCBus[]>() {
-                    public int compare(OCBus[] busArray, OCBus[] otherArray) {
-                        return busArray[0].compareTo(otherArray[0]);
-                    }
-                });
-
-                OCBus[] currentList = busList.get(position);
-
-                // Set the route number and name
-                final String routeNumber = "" + currentList[0].getRouteNo();
-                String routeName = "" + currentList[0].getRouteHeading();
-                String routeNumberName = (routeNumber + " " + routeName);
-                viewHolder.routeNumberName.setText(routeNumberName);
-
-                // Set the stop name
-                viewHolder.stopName.setText(stopName);
-
-                // Set up the trip views
-                String minsTilArrival;
-                String busTimeIsLive = "GPS";
-                for (int i = 0; i < currentList.length; i++) {
-                    final TextView currentTrip = viewHolder.trips[i];
-                    final CardView currentCard = viewHolder.cards[i];
-
-                    // Set time till arrival
-                    minsTilArrival = currentList[i].getMinsTilArrival() + " min";
-                    currentTrip.setText(minsTilArrival);
-
-                    // Set whether time is live
-                    if (currentList[i].isTimeLive())
-                        viewHolder.gps[i].setText(busTimeIsLive);
-
-                    // Set up a click listener so we can set an alarm for this trip
-                    // TODO: Implement alarm here
-                    currentTrip.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // TODO: Replace this with something better
-                            currentCard.setBackgroundColor(Color.BLACK);
-                        }
-                    });
-
-                }
-
-                // Click listener to go to timetable for chosen route at current stop
-                // TODO: Set up call to an onClick method in MainActivity
-
-                // Set whether we start with a fav or unfav icon
-                if (faveRoutes.isFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE))
-                    viewHolder.favIcon.setImageResource(R.drawable.ic_favorite);
-                else
-                    viewHolder.favIcon.setImageResource(R.drawable.ic_unfavorite);
-
-                // Favorite/Unfavorite functionality
-                viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (faveRoutes.toggleFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE)) {
-                            // Route was added to favorites
-                            viewHolder.favIcon.setImageResource(R.drawable.ic_favorite);
-                        } else {
-                            // Route was removed from favorites
-                            viewHolder.favIcon.setImageResource(R.drawable.ic_unfavorite);
-                        }
-                    }
-                });
             }
         });
 
-
+        // TODO: this
+        // Click listener to go to timetable for chosen route at current stop
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Get route number and pass it back to MainActivity
+                //((MainActivity)context).onClick(currentList[0].getRouteNo());
+            }
+        });
     }
 
     @Override
-    public int getItemCount() { return stops.size(); }
+    public int getItemCount() { return tripCollection.size(); }
 
     /* Helper class to assign route and stop info to the appropriate parts of the layout */
     static class MainViewHolder extends RecyclerView.ViewHolder {
@@ -209,5 +218,21 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         }
 
         return outList;
+    }
+
+    // Helper class to hold info for each route/stop combo so we can easily pass what we need
+    // to onBindViewHolder
+    private class OCHelper {
+        OCBus[] busArray;
+        String stopName;
+        String stopCode;
+        String routeNumberName;
+
+        OCHelper(OCBus[] busArray, String stopName, String stopCode) {
+            this.busArray = busArray;
+            this.stopName = stopName;
+            this.stopCode = stopCode;
+            this.routeNumberName = busArray[0].getRouteNo() + " " + busArray[0].getRouteHeading();
+        }
     }
 }
