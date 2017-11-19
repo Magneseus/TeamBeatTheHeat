@@ -33,13 +33,39 @@ import java.util.HashMap;
 class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
     private Context context;
+    private OCTranspo octAPI;
     private FavoritesStorage faveRoutes;
     private ArrayList<MainAdapterHelper> tripCollection;
+    private Location user;
+    private Comparator<OCStop> locationSort;
 
-    MainAdapter(Context context, ArrayList<MainAdapterHelper> tripCollection) {
+    MainAdapter(Context context) {
         this.context = context;
+        this.octAPI = OCTranspo.getInstance();
         this.faveRoutes = new FavoritesStorage(context);
-        this.tripCollection = tripCollection;
+        this.tripCollection = new ArrayList<>();
+        // TODO: REMOVE
+        //tripCollection.add(new MainAdapterHelper());
+        this.user = LocationWrapper.getInstance().getLocation();
+
+        // Set up a comparator to sort stops by distance from user
+        locationSort = new Comparator<OCStop>() {
+            @Override
+            public int compare(OCStop o1, OCStop o2) {
+                if (user == null) {
+                    // Sort by stopCode if we don't have location permission
+                    return o1.getStopCode() - o2.getStopCode();
+                }
+
+                float dist1 = o1.getLocation().distanceTo(user);
+                float dist2 = o2.getLocation().distanceTo(user);
+
+                return (int)(dist1 - dist2);
+            }
+        };
+
+        // Being preparing data for the adapter
+        prepareList();
     }
 
     @Override
@@ -85,8 +111,8 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         }
 
         // Set whether we start with a fav or unfav icon
-        final String stopCodeStr = tripCollection.get(position).stopCode;
-        if (faveRoutes.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE))
+        final String routeNumber = tripCollection.get(position).routeNumber;
+        if (faveRoutes.isFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE))
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
         else
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
@@ -95,7 +121,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (faveRoutes.toggleFav(stopCodeStr, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                if (faveRoutes.toggleFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE)) {
                     // Route was added to favorites
                     viewHolder.favIcon.setImageResource(R.drawable.ic_favorite);
                 } else {
@@ -111,15 +137,85 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
             @Override
             public void onClick(View view) {
                 // Get route number and pass it back to MainActivity
-                //((MainActivity)context).onClick(currentList[0].getRouteNo());
+                ((MainActivity)context).onClick("" + currentList[0].getRouteNo());
             }
         });
-
-        notifyDataSetChanged();
     }
 
     @Override
     public int getItemCount() { return tripCollection.size(); }
+
+    // Update the adapter with a new list of data
+    private void updateCollection(ArrayList<MainAdapterHelper> newList) {
+        tripCollection.addAll(newList);
+        notifyDataSetChanged();
+    }
+
+    // Take in a list of stops and return a location-sorted list of stops within a given range
+    private ArrayList<OCStop> sortStops(ArrayList<OCStop> inList) {
+        ArrayList<OCStop> outList = new ArrayList<>();
+
+        // We only want stops within a certain range
+        if (user != null) {
+            for (OCStop stop : inList) {
+                if (stop.getLocation().distanceTo(user) <= 1000)
+                    outList.add(stop);
+            }
+
+            // Sort our list of nearby stops
+            Collections.sort(outList, locationSort);
+        }
+
+        return outList;
+    }
+
+    // Initial setup method
+    private void prepareList() {
+        /* Get the list of all nearby stops */
+        // Get the list of all stops
+        ArrayList<OCStop> stopList = new ArrayList<>(octAPI.gtfsTable.getStopList());
+        // Sort the list and only keep nearby stops
+        stopList = sortStops(stopList);
+        // Trim excess quotes from stopName
+        for(OCStop stop : stopList)
+            stop.setStopName(stop.getStopName().replaceAll("\"", ""));
+
+        /* Get the list of all routes that service nearby stops */
+        for (OCStop stop : stopList) {
+            // Get the stop name
+            final String stopName = stop.getStopName();
+            String stopCode = "" + stop.getStopCode(); // Needed for the API call
+
+            // Get every route that services the current stop
+            octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
+                @Override
+                public void call(HashMap<Integer, OCBus[]> arg) {
+                    ArrayList<MainAdapterHelper> currentCollection = new ArrayList<>();
+                    ArrayList<OCBus[]> routeList = new ArrayList<>();
+                    // Filter out routes that have no upcoming stops
+                    for (OCBus[] busArray : arg.values()) {
+                        if (busArray != null && busArray.length > 0)
+                            routeList.add(busArray);
+                    }
+
+                    // Sort ArrayList of OCBus arrays by route number
+                    Collections.sort(routeList, new Comparator<OCBus[]>() {
+                        public int compare(OCBus[] busArray, OCBus[] otherArray) {
+                            return busArray[0].compareTo(otherArray[0]);
+                        }
+                    });
+
+                    // Add the complete set of information on stop and route to the collection
+                    for (OCBus[] busArray : routeList) {
+                        currentCollection.add(new MainAdapterHelper(busArray, stopName));
+                    }
+
+                    /* Done collecting data for this API call, refresh the adapter */
+                    updateCollection(currentCollection);
+                }
+            });
+        }
+    }
 
     /* Helper class to assign route and stop info to the appropriate parts of the layout */
     static class MainViewHolder extends RecyclerView.ViewHolder {
@@ -148,6 +244,44 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
             cards[1] = itemView.findViewById(R.id.main_card_1);
             cards[2] = itemView.findViewById(R.id.main_card_2);
             favIcon  = itemView.findViewById(R.id.main_fav_button);
+        }
+    }
+
+    /* Helper class so we can easily pass information to onBindViewHolder */
+    private class MainAdapterHelper {
+        OCBus[] busArray;
+        String stopName;
+        String routeNumber;
+        String routeNumberName;
+
+/*        MainAdapterHelper() {
+            this.stopName = "Test stop";
+            this.routeNumber = "123";
+            this.routeNumberName = "123 Fake Route";
+
+            this.busArray = new OCBus[3];
+            busArray[0] = new OCBus();
+            busArray[0].setRouteNo(123);
+            busArray[0].setRouteHeading("Fake Route");
+            busArray[0].setMinsTilArrival(10);
+            busArray[0].setUpdateAge(10.0f);
+            busArray[1] = new OCBus();
+            busArray[1].setRouteNo(123);
+            busArray[1].setRouteHeading("Fake Route");
+            busArray[1].setMinsTilArrival(15);
+            busArray[1].setUpdateAge(0.0f);
+            busArray[2] = new OCBus();
+            busArray[2].setRouteNo(123);
+            busArray[2].setRouteHeading("Fake Route");
+            busArray[2].setMinsTilArrival(25);
+            busArray[2].setUpdateAge(25.0f);
+        }
+*/
+        MainAdapterHelper(OCBus[] busArray, String stopName) {
+            this.busArray = busArray;
+            this.stopName = stopName;
+            this.routeNumber = "" + busArray[0].getRouteNo();
+            this.routeNumberName = routeNumber + " " + busArray[0].getRouteHeading();
         }
     }
 }
