@@ -149,6 +149,67 @@ public class OCTranspo {
         });
     }
 
+    public void GetNextTripsForStopAndRoute(final String stopNo, final String routeNo, final SCallable<OCBus[]> callback) {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("appID", appID);
+        params.put("apiKey", apiKey);
+        params.put("stopNo", stopNo);
+        params.put("routeNo", routeNo);
+        params.put("format", "json");
+
+        MakeVolleyPOST(OC_TYPE.TIMES_FOR_STOP_ROUTE, params, new SCallable<String>() {
+            @Override
+            public void call(String arg) {
+                try {
+                    OCBus[] busList = null;
+
+                    JSONObject json = new JSONObject(arg);
+                    JSONObject route = json.getJSONObject("GetNextTripsForStopResult").getJSONObject("Route").getJSONObject("RouteDirection");
+
+                    if (route.has("Trips")) {
+                        JSONArray tripList = null;
+
+                        // Check if Trips is an array or object
+                        Object tripsObj = route.get("Trips");
+                        if (tripsObj instanceof JSONArray) {
+                            tripList = route.getJSONArray("Trips");
+                        } else if (tripsObj instanceof JSONObject) {
+                            JSONObject tripsJSONObj = route.getJSONObject("Trips");
+
+                            if (tripsJSONObj.has("Trip")) {
+                                Object tripObj = tripsJSONObj.get("Trip");
+
+                                // Check if route is an array or object
+                                if (tripObj instanceof JSONArray) {
+                                    tripList = tripsJSONObj.getJSONArray("Trip");
+                                } else if (tripObj instanceof JSONObject) {
+                                    tripList = new JSONArray();
+                                    tripList.put(tripsJSONObj.getJSONObject("Trip"));
+                                }
+                            }
+                        }
+
+                        // Iterate through the trips list
+                        if (tripList != null) {
+                            busList = new OCBus[tripList.length()];
+                            for (int j = 0; j < tripList.length(); j++) {
+                                JSONObject trip = tripList.getJSONObject(j);
+                                busList[j] = new OCBus(trip, route.getInt("RouteNo"), route.getString("RouteLabel"));
+                            }
+                        }
+                    }
+
+                    // Callback
+                    callback.call(busList);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    Log.e("OC_ERR", "Failed to parse json for next trip (single route) summary of stop no: " + stopNo + " and route no: " + routeNo);
+                }
+            }
+        });
+    }
+
     // Retrieves next three trips for all routes for a given stop number.
     public void GetNextTripsForStopAllRoutes(final String stopNo, final SCallable<HashMap<Integer, OCBus[]>> callback) {
         HashMap<String, String> params = new HashMap<String, String>();
