@@ -5,22 +5,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
-import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
@@ -30,9 +27,8 @@ import com.beattheheat.beatthestreet.Networking.SCallable;
  */
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
-    private OCTranspo octAPI; // Our OCAPI instance, for bus/stop information
     MainAdapter mainAdapter;
     RecyclerView rv;
 
@@ -43,20 +39,20 @@ public class MainActivity extends AppCompatActivity
         LocationWrapper.create(this);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         // OCTranspo API caller
-        octAPI = OCTranspo.getInstance();
+        OCTranspo octAPI = OCTranspo.getInstance();
         octAPI.setup(this.getApplicationContext());
 
         // TODO: handle location being turned off.
@@ -78,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         octAPI.LoadGTFS(new SCallable<Boolean>() {
             @Override
             public void call(Boolean arg) {
-                rv = (RecyclerView) findViewById(R.id.display_stops_recycler_view);
+                rv = findViewById(R.id.display_stops_recycler_view);
                 LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
                 rv.setLayoutManager(llm);
                 mainAdapter = new MainAdapter(ctx);
@@ -104,50 +100,12 @@ public class MainActivity extends AppCompatActivity
     // Closes navigation drawer if open, does default action if not.
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_items, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
-        searchView.setOnQueryTextListener(this);
-        return true;
-    }
-
-    // Do nothing, we update search results live so we don't need this method
-    @Override
-    public boolean onQueryTextSubmit(String query) { return false; }
-
-
-    @Override
-    public boolean onQueryTextChange(String newText) {/*
-        newText = newText.toLowerCase();
-
-        // Set up a new list that will contain the search results
-        ArrayList<OCStop> newList = new ArrayList<>();
-
-        for (OCStop stop : stopList) {
-            /* Stop names should all be in uppercase by default but search results were
-               behaving oddly so we're setting everything to lowercase
-            String stopName = stop.getStopName().toLowerCase();
-            String stopCode = "" + stop.getStopCode();
-
-            // We search by stop name and by stop code so check both
-            if (stopName.contains(newText) || stopCode.contains(newText)) {
-                newList.add(stop);
-            }
-        }
-
-        // Update the adapter with the newly filtered list
-        stopAdapter.setFilter(newList);*/
-        return true;
     }
 
     // TODO: this
@@ -159,7 +117,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -169,21 +127,22 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         } else if (id == R.id.nav_view_routes) {
             // View all routes
-            /* Starts a new activity that will display all routes saved from GTFS
-               From there you can search for a route and then go to a detailed route view */
             Intent intent = new Intent(this, DisplayRoutesActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_notify) {
-            NotificationUtil.getInstance().notify(this, 1, "New Notification", "yo you pressed the button", -1, true);
+        } else if (id == R.id.nav_settings) {
+            // TODO: Settings activity
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+            return true;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(LocationWrapper.getInstance() != null) {
             LocationWrapper.getInstance().startRequestingUpdates();
         }
