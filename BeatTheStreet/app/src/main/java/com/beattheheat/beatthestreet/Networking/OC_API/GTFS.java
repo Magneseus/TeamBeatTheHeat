@@ -120,6 +120,10 @@ public class GTFS {
         return tripTable.tripDAO().loadAllTripTimesWithStopID(getRoute(routeNo).getTrips(), stopID);
     }
 
+    public String getTripIDForStartTime(int routeNo, int start_hour, int start_min, int start_sec) {
+        return tripTable.tripDAO().getTripIDForStartTime(getRoute(routeNo).getTrips(), start_hour, start_min, start_sec)[0];
+    }
+
     // Starts the asynchronous load of the GTFS files
     // Callback will be alerted with a T/F when files have been loaded
     public final void LoadGTFS(SCallable<Boolean> sCallable) {

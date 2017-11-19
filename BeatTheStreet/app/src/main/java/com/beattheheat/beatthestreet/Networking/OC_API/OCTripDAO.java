@@ -25,6 +25,9 @@ public interface OCTripDAO {
     @Query("SELECT * FROM octrips WHERE trip_id IN (:searchTripID) AND stop_id = :searchStopID")
     public OCTrips[] loadAllTripTimesWithStopID(List<String> searchTripID, String searchStopID);
 
+    @Query("SELECT trip_id FROM octrips WHERE arrival_hour = :start_hour AND arrival_minute = :start_min AND arrival_second = :start_sec AND stop_sequence = 0 AND trip_id in (:tripIDs)")
+    public String[] getTripIDForStartTime(List<String> tripIDs, int start_hour, int start_min, int start_sec);
+
 
     @Insert
     public void insertTrip(OCTrips tripToInsert);
