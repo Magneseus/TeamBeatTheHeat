@@ -271,7 +271,7 @@ public class GTFS {
 
             // Setup the Room database
             Log.d("GTFS", "Preparing Room db...");
-            tripTable = Room.databaseBuilder(appCtx, OCTripDatabase.class, "octrips.db").build();
+            tripTable = Room.databaseBuilder(appCtx, OCTripDatabase.class, "octrips.db").allowMainThreadQueries().build();
 
             isLoading = false;
             isLoaded = true;

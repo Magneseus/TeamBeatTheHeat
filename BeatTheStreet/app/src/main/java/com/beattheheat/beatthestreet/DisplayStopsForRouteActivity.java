@@ -66,7 +66,6 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
             stopNames.add(octAPI.gtfsTable.getStop(stopIds[j]));
         }
 
-
         rv = (RecyclerView) findViewById(R.id.rfs_recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm);
@@ -75,7 +74,7 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
         }
 
     // User has tapped a stop, go to detailed stop page
-    public void onClick(String stopCodeStr, String stopNameStr, String stopIdStr) {
+    public void onClick(String stopCodeStr, String stopNameStr) {
         class RunnablePointer {
             public Runnable run;
             public RunnablePointer(Runnable run) {
@@ -118,7 +117,6 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
         Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
         intent.putExtra("STOPCODE", stopCodeStr);
         intent.putExtra("STOPNAME", stopNameStr);
-        intent.putExtra("STOPID",   stopIdStr);
         intent.putExtra("ROUTECODE", busNo);
         startActivity(intent);
 

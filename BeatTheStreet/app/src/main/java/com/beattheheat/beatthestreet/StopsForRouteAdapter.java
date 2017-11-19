@@ -37,7 +37,6 @@ public class StopsForRouteAdapter extends RecyclerView.Adapter<com.beattheheat.b
         // Set the route number view
         final String stopNameStr = stopList.get(position).getStopName();
         final String stopCodeStr = "" + stopList.get(position).getStopCode();
-        final String stopIdStr = stopList.get(position).getStopId();
         
         viewHolder.stopName.setText(stopNameStr.replace("\"", ""));
         viewHolder.stopCode.setText(stopCodeStr);
@@ -46,7 +45,7 @@ public class StopsForRouteAdapter extends RecyclerView.Adapter<com.beattheheat.b
             @Override
             public void onClick(View view) {
                 // Get stopCode and pass it back to DisplayStopsForRouteActivity
-                ((DisplayStopsForRouteActivity)context).onClick(stopCodeStr, stopNameStr, stopIdStr);
+                ((DisplayStopsForRouteActivity)context).onClick(stopCodeStr, stopNameStr);
             }
         });
     }
