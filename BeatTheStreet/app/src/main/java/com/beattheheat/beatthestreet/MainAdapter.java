@@ -28,7 +28,6 @@ import java.util.HashMap;
  * Adapter to display trips in MainActivity
  */
 
-// TODO: Sort by favorites
 // TODO: Show only favorites if no location available
 class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
@@ -44,8 +43,6 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         this.octAPI = OCTranspo.getInstance();
         this.faveRoutes = new FavoritesStorage(context);
         this.tripCollection = new ArrayList<>();
-        // TODO: REMOVE
-        //tripCollection.add(new MainAdapterHelper());
         this.user = LocationWrapper.getInstance().getLocation();
 
         // Set up a comparator to sort stops by distance from user
@@ -64,8 +61,9 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
             }
         };
 
-        // Being preparing data for the adapter
+        // Prepare data for the adapter
         prepareList();
+        sortFavorites(tripCollection);
     }
 
     @Override
@@ -148,6 +146,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
     // Update the adapter with a new list of data
     private void updateCollection(ArrayList<MainAdapterHelper> newList) {
         tripCollection.addAll(newList);
+        tripCollection = sortFavorites(tripCollection);
         notifyDataSetChanged();
     }
 
@@ -165,6 +164,24 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
             // Sort our list of nearby stops
             Collections.sort(outList, locationSort);
         }
+
+        return outList;
+    }
+
+    private ArrayList<MainAdapterHelper> sortFavorites(ArrayList<MainAdapterHelper> inList) {
+        // Separate list into favorites and not favorites
+        ArrayList<MainAdapterHelper> favorites = new ArrayList<>();
+        ArrayList<MainAdapterHelper> unFavorites = new ArrayList<>();
+        for (MainAdapterHelper currentTrip : inList) {
+            if (faveRoutes.isFav(currentTrip.routeNumber, FavoritesStorage.FAV_TYPE.ROUTE))
+                favorites.add(currentTrip);
+            else unFavorites.add(currentTrip);
+        }
+
+        // Put the lists back together with favorites being first
+        ArrayList<MainAdapterHelper> outList = new ArrayList<>();
+        outList.addAll(favorites);
+        outList.addAll(unFavorites);
 
         return outList;
     }
@@ -254,29 +271,6 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         String routeNumber;
         String routeNumberName;
 
-/*        MainAdapterHelper() {
-            this.stopName = "Test stop";
-            this.routeNumber = "123";
-            this.routeNumberName = "123 Fake Route";
-
-            this.busArray = new OCBus[3];
-            busArray[0] = new OCBus();
-            busArray[0].setRouteNo(123);
-            busArray[0].setRouteHeading("Fake Route");
-            busArray[0].setMinsTilArrival(10);
-            busArray[0].setUpdateAge(10.0f);
-            busArray[1] = new OCBus();
-            busArray[1].setRouteNo(123);
-            busArray[1].setRouteHeading("Fake Route");
-            busArray[1].setMinsTilArrival(15);
-            busArray[1].setUpdateAge(0.0f);
-            busArray[2] = new OCBus();
-            busArray[2].setRouteNo(123);
-            busArray[2].setRouteHeading("Fake Route");
-            busArray[2].setMinsTilArrival(25);
-            busArray[2].setUpdateAge(25.0f);
-        }
-*/
         MainAdapterHelper(OCBus[] busArray, String stopName) {
             this.busArray = busArray;
             this.stopName = stopName;
