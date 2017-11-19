@@ -68,7 +68,6 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         viewHolder.stopName.setText(stopNameStr);
         final String stopCodeStr = "" + stops.get(position).getStopCode();
         viewHolder.stopCode.setText(stopCodeStr);
-        final String stopIdStr = stops.get(position).getStopId();
 
         // Set whether we start with a fav or unfav icon
         if (faveStops.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.STOP))
@@ -94,7 +93,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
             @Override
             public void onClick(View view) {
                 // Get stopCode and pass it back to DisplayStopsActivity
-                ((DisplayStopsActivity)context).onClick(stopCodeStr, stopNameStr, stopIdStr);
+                ((DisplayStopsActivity)context).onClick(stopCodeStr, stopNameStr);
             }
         });
     }
