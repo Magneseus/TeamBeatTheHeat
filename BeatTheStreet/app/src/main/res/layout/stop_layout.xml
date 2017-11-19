@@ -39,7 +39,6 @@
                 android:layout_below="@+id/stop_name"
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/ic_unfavorite"
                 tools:ignore="ContentDescription" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
