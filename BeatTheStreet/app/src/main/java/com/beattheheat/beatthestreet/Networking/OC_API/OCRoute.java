@@ -42,7 +42,12 @@ public class OCRoute implements Comparable {
         if (entries.length < 5)
             return;
 
-        int routeNo = Integer.parseInt(entries[0].split("-")[0]);
+        int routeNo;
+        try {
+            routeNo = Integer.parseInt(entries[0].split("-")[0]);
+        } catch (NumberFormatException e) {
+            routeNo = -1;
+        }
 
         String tripId = entries[2];
         String routeName = entries[3];
