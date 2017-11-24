@@ -44,7 +44,7 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
 
         routeCode = getIntent().getStringExtra("ROUTE");
 
-        String[] routeInfo = routeCode.split(" ");
+        String[] routeInfo = routeCode.split("~");
 
         busNo = Integer.parseInt(routeInfo[0]);
         String busDir = routeInfo[1];
@@ -54,7 +54,7 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
 
         //TODO: catch errors if trip not found
         int i = 0;
-        while (!thisRoute.getRouteNames().get(i).equals(busDir)){
+        while (!thisRoute.getRouteNames().get(i).equals(busDir) && i < thisRoute.getRouteNames().size()){
             i++;
         }
         tripId = thisRoute.getTrips().get(i);
