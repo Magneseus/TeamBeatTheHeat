@@ -145,6 +145,15 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
     // Update the adapter with a new list of data
     private void updateCollection(ArrayList<MainAdapterHelper> newList) {
+        // Remove entries from newList that are already in the tripCollection
+        for (MainAdapterHelper newRoute : newList) {
+            for (MainAdapterHelper oldRoute : tripCollection) {
+                if (newRoute.routeNumberName.equals(oldRoute.routeNumberName)) {
+                    newList.remove(newRoute);
+                }
+            }
+        }
+
         tripCollection.addAll(newList);
         tripCollection = sortFavorites(tripCollection);
         notifyDataSetChanged();
