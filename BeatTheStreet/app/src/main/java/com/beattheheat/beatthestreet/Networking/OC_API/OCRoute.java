@@ -42,7 +42,15 @@ public class OCRoute implements Comparable {
         if (entries.length < 5)
             return;
 
-        int routeNo = Integer.parseInt(entries[0].split("-")[0]);
+        int routeNo;
+        try {
+            routeNo = Integer.parseInt(entries[0].split("-")[0]);
+        } catch (NumberFormatException e) {
+            /* Replace return; with routeNo = -1; to see the bugged entry
+             * Appears to be a route 7 Carleton that gets messed up somehow.
+             * A proper entry for the 7 still appears in the Routes activity though. */
+            return;
+        }
 
         String tripId = entries[2];
         String routeName = entries[3];
