@@ -11,8 +11,6 @@ import android.widget.TextView;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCRoute;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Collections;
 
 /**
@@ -28,10 +26,9 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
     private FavoritesStorage faveRoutes;
 
     RouteAdapter(final Context context, ArrayList<OCRoute> routeList) {
-        this.context = context;
-        this.routes = routeList;
-        Collections.sort(routes);
         faveRoutes = new FavoritesStorage(context);
+        this.context = context;
+        this.routes = sortRoutes(routeList);
     }
 
     @Override
@@ -43,14 +40,10 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 
     @Override
     public void onBindViewHolder(final RouteViewHolder viewHolder , final int position) {
-
         // Set the route name and direction
         String direction = routes.get(position).getRouteNames().get(0).replaceAll("\"", "");
-
         viewHolder.routeName.setText(String.valueOf(routes.get(position).getRouteNo()));
-
         viewHolder.routeDirection.setText(direction);
-
         final String routeDesc = routes.get(position).getRouteNo() + " " + routes.get(position).getRouteNames().get(0);
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -107,5 +100,22 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
         routes = new ArrayList<OCRoute>();
         routes.addAll(newList);
         notifyDataSetChanged(); // Refresh the adapter
+    }
+
+    private ArrayList<OCRoute> sortRoutes(ArrayList<OCRoute> routeList){
+        ArrayList<OCRoute> faves   = new ArrayList<>();
+        ArrayList<OCRoute> nonFaves = new ArrayList<>();
+        for (OCRoute route : routeList) {
+            if (faveRoutes.isFav("" + route.getRouteNo() + " " + route.getRouteNames().get(0), FavoritesStorage.FAV_TYPE.ROUTE))
+                faves.add(route);
+            else nonFaves.add(route);
+        }
+        ArrayList<OCRoute> returnList   = new ArrayList<>();
+        Collections.sort(faves);
+        Collections.sort(nonFaves);
+        returnList.addAll(faves);
+        returnList.addAll(nonFaves);
+
+        return returnList;
     }
 }
