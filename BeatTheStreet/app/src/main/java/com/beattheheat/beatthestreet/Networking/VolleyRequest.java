@@ -6,7 +6,25 @@ import android.content.Context;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.Volley;
+import com.beattheheat.beatthestreet.R;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 
 /**
@@ -31,15 +49,62 @@ public class VolleyRequest {
                                               DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 
     // Initialization, requires a context from an android activity
-    private VolleyRequest(Context context) {
+    private VolleyRequest(Context context) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException {
         mCtx = context;
         mRequestQueue = getRequestQueue();
+
+        // Load our CA Certificate
+        InputStream in = context.getResources().openRawResource(R.raw.globalsign_dv);
+        Certificate ca;
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        ca = cf.generateCertificate(in);
+
+        // Create a KeyStore containing our trusted CAs
+        String keyStoreType = KeyStore.getDefaultType();
+        KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+        keyStore.load(null, null);
+        keyStore.setCertificateEntry("ca", ca);
+
+        // Create a TrustManager that trusts the CAs in our KeyStore
+        String tmfAlgorithm = TrustManagerFactory.getDefaultAlgorithm();
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(tmfAlgorithm);
+        tmf.init(keyStore);
+
+        // Create an SSLContext that uses our TrustManager
+        final SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, tmf.getTrustManagers(), null);
+
+        HurlStack hurlStack = new HurlStack() {
+            @Override
+            protected HttpURLConnection createConnection(URL url) throws IOException {
+                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) super.createConnection(url);
+                try {
+                    httpsURLConnection.setSSLSocketFactory(sslContext.getSocketFactory());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return httpsURLConnection;
+            }
+        };
     }
 
     // Returns the singleton instance (or creates a new one if non-existent)
     public static synchronized VolleyRequest getInstance(Context context) {
         if (mInstance == null) {
-            mInstance = new VolleyRequest(context);
+            try {
+                mInstance = new VolleyRequest(context);
+            } catch (KeyManagementException e) {
+                e.printStackTrace();
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CertificateException e) {
+                e.printStackTrace();
+            }
         }
         return mInstance;
     }

@@ -325,7 +325,7 @@ public class GTFS {
                             new LoadGTFSFromDisk().execute(gtfsPointer);
 
                         } catch (Exception e) {
-                            Log.e("OC_ERR", "Error with callback response: " + e.toString());
+                            Log.e("OC_GTFS_ERR", "Error with callback response: " + e.toString());
                         }
                     }
                 },
