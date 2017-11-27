@@ -130,10 +130,11 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, DisplayRoutesActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_settings) {
-            // TODO: Settings activity
-            DrawerLayout drawer = findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
+            // TODO: Remove testing code
+            Intent intent = new Intent(this, TimetableActivity.class);
+            intent.putExtra("ROUTENUMBER", 135);
+            intent.putExtra("STOPCODE", 1581);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

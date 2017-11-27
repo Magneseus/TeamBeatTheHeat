@@ -1,6 +1,7 @@
 package com.beattheheat.beatthestreet;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -76,89 +77,9 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     // User has tapped a route at this stop, go to timetable page
     public void onClick(int routeNumber) {
-/*        // TODO: clean up this disgusting mess
-        class RunnablePointer {
-            public int iterations = 0;
-            public Runnable run;
-            public RunnablePointer(Runnable run) {
-                this.run = run;
-            }
-        }
-        final Context ctx = this;
-
-        final Handler handler = new Handler();
-        final RunnablePointer runPointer = new RunnablePointer(null);
-        runPointer.run = new Runnable() {
-            @Override
-            public void run() {
-                // difference in milliseconds
-                float millisUntilBus = minUntilBus*60000 - runPointer.iterations*1000;
-
-                // TODO: give a little bus icon to this notification
-                // TODO: ping the servers to update bus time ever so often
-                // TODO: color notif red if bus is more than X minutes off (7?)
-                NotificationUtil.getInstance().notify(ctx, 0, "Bus", "Bus will arrive in " +
-                        (millisUntilBus/60000) + " minutes.");
-
-                if (millisUntilBus >= 0) {
-                    runPointer.iterations++;
-                    handler.postDelayed(runPointer.run, 1000);
-                }
-            }
-        };
-
-        final long start = SystemClock.elapsedRealtime();
-        final Handler handler = new Handler();
-        final RunnablePointer runPointer = new RunnablePointer(null);
-        runPointer.run = new Runnable() {
-            @Override
-            public void run() {
-                NotificationUtil.getInstance().notify(ctx, 0, "Timer", "" + (SystemClock.elapsedRealtime()
-                        - start)/1000 + "s");
-                handler.postDelayed(runPointer.run, 1000);
-            }
-        };
-
-        // TODO: ONCLICK CODE FROM DISPLAY STOPS ACTIVITY
-        handler.postDelayed(runPointer.run, 1000);*/
-
-        /*class RunnablePointer {
-            public Runnable run;
-            public RunnablePointer(Runnable run) {
-                this.run = run;
-            }
-        }
-
-        class TimeHolder {
-            public long time;
-            public TimeHolder(long t) { this.time = t; }
-        }
-
-        final Context ctx = this;
-
-        final TimeHolder time = new TimeHolder(SystemClock.elapsedRealtime());
-
-        final Handler handler = new Handler();
-        final RunnablePointer runPointer = new RunnablePointer(null);
-        runPointer.run = new Runnable() {
-            @Override
-            public void run() {
-                int minutesInMillis = (int)(0.5*60*1000);
-                float elapsedMillis = (SystemClock.elapsedRealtime() - time.time);
-                int remainingMillis = (int) (minutesInMillis - elapsedMillis);
-
-                NotificationUtil.getInstance().notify(ctx, 0, "Timer", ""
-                        + (int) (remainingMillis / (1000 * 60)) + ":" // minutes
-                        + (int) (remainingMillis % (1000 * 60))/1000); // seconds
-
-                if(remainingMillis < 0) {
-                    time.time = SystemClock.elapsedRealtime();
-                }
-
-                handler.postDelayed(runPointer.run, 1000);
-            }
-        };
-
-        handler.postDelayed(runPointer.run, 1000);*/
+        Intent intent = new Intent(this, TimetableActivity.class);
+        intent.putExtra("ROUTENUMBER", routeNumber);
+        intent.putExtra("STOPCODE", Integer.parseInt(this.stopCode));
+        startActivity(intent);
     }
 }
