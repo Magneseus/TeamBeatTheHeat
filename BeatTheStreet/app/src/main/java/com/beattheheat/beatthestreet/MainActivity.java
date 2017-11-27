@@ -131,12 +131,6 @@ public class MainActivity extends AppCompatActivity
             // View all routes
             Intent intent = new Intent(this, DisplayRoutesActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_settings) {
-            // TODO: Remove testing code
-            Intent intent = new Intent(this, TimetableActivity.class);
-            intent.putExtra("ROUTENUMBER", 135);
-            intent.putExtra("STOPCODE", 1581);
-            startActivity(intent);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
