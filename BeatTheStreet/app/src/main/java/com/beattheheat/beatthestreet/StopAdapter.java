@@ -69,6 +69,18 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         final String stopCodeStr = "" + stops.get(position).getStopCode();
         viewHolder.stopCode.setText(stopCodeStr);
 
+        // Set the alarm icon
+        viewHolder.alarmIcon.setBackgroundResource(R.drawable.ic_set_alarm);
+
+        // Click listener for alarm icon
+        viewHolder.alarmIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: Proximity alarm goes here
+
+            }
+        });
+
         // Set whether we start with a fav or unfav icon
         if (faveStops.isFav(stopCodeStr, FavoritesStorage.FAV_TYPE.STOP))
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
@@ -106,13 +118,16 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     static class StopViewHolder extends RecyclerView.ViewHolder {
         TextView  stopName;
         TextView  stopCode;
+        ImageView alarmIcon;
         ImageView favIcon;
 
         StopViewHolder(View itemView) {
             super(itemView);
-            stopName = itemView.findViewById(R.id.stop_name);
-            stopCode = itemView.findViewById(R.id.stop_code);
-            favIcon  = itemView.findViewById(R.id.stop_fav_button);
+            stopName  = itemView.findViewById(R.id.stop_name);
+            stopCode  = itemView.findViewById(R.id.stop_code);
+            alarmIcon = itemView.findViewById(R.id.stop_alarm_button);
+            favIcon   = itemView.findViewById(R.id.stop_fav_button);
+
         }
     }
 

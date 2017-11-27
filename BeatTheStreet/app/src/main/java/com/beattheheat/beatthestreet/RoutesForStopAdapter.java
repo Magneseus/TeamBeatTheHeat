@@ -66,15 +66,10 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
 
 
             // Set up a click listener so we can set an alarm for this trip
-            // TODO: Implement alarm here
-            // Set up a click listener so we can set an alarm for this trip
-            // TODO: Implement alarm here
             final int index = i;
             currentTrip.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View view) {
-                   // TODO: Replace this with something better
-                   currentCard.setBackgroundColor(Color.BLACK);
                    Intent intent = new Intent();
                    intent.putExtra("action", "start");
                    intent.putExtra("route_num", currentList[index].getRouteNo());
