@@ -1,7 +1,9 @@
 package com.beattheheat.beatthestreet;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.beattheheat.beatthestreet.Networking.ActionReceiver;
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
@@ -79,6 +82,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         String routeNumberName = tripCollection.get(position).routeNumberName;
         String stopName = tripCollection.get(position).stopName;
         viewHolder.routeNumberName.setText(routeNumberName);
+        viewHolder.routeNumberName.setTypeface(null, Typeface.BOLD);
         viewHolder.stopName.setText(stopName);
 
         // Set up each upcoming trip
@@ -98,14 +102,21 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
                 viewHolder.gps[i].setText(busTimeIsLive);
 
             // Set up a click listener so we can set an alarm for this trip
-            // TODO: Implement alarm here
+            /*final int index = i;
             currentTrip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    // TODO: Replace this with something better
-                    currentCard.setBackgroundColor(Color.BLACK);
+                    Intent intent = new Intent();
+                    intent.putExtra("action", "start");
+                    intent.putExtra("route_num", currentList[index].getRouteNo());
+                    intent.putExtra("stop_code", stopCode);
+                    intent.putExtra("start_time", currentList[index].getTripStart());
+                    intent.putExtra("mins_until_bus", currentList[index].getMinsTilArrival());
+                    intent.putExtra("last_available", index==2);
+
+                    ActionReceiver.makeNotification(context, intent);
                 }
-            });
+            });*/
         }
 
         // Set whether we start with a fav or unfav icon
