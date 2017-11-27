@@ -375,59 +375,5 @@ public class GTFS {
         }
 
         return false;
-
-        // TODO: Figure out why this crashes matt & laura's devices, cert errors n stuff
-        /*
-        final HashMap<String, String> params = new HashMap<String, String>();
-        params.put("appID", OCTranspo.appID);
-        params.put("apiKey", OCTranspo.apiKey);
-        params.put("table", "calendar");
-        params.put("format", "json");
-
-        // Make a request to the OC API
-        StringRequest jReq = new StringRequest(
-                Request.Method.POST,
-                OCTranspo.apiURLs[OCTranspo.OC_TYPE.GTFS.ordinal()],
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            // Parse returned text into a json
-                            JSONObject calendarJSON = new JSONObject(response);
-
-                            // Get the end_date of the current schedule
-                            String start_date = calendarJSON.getJSONArray("Gtfs").getJSONObject(0).getString("start_date");
-
-                            // Call the callback and give it a return value based on whether we've validated
-                            Integer returnCode = oldStartDate.equals(start_date) ? 1 : 0;
-                            callback.call(returnCode);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-
-                            // Give the callback the error code
-                            Integer returnCode = -1;
-                            callback.call(returnCode);
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e("OC_ERR", "Error with OC_API POST request: " + error.toString());
-                    }
-                }
-        ) {
-            /**
-             * Passing some request parameters
-
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                return params;
-            }
-        };
-
-        req.add(jReq);
-        */
     }
 }
