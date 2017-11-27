@@ -2,7 +2,6 @@ package com.beattheheat.beatthestreet;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Location;
 import android.support.v7.widget.CardView;
@@ -81,6 +80,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         // Set the route name, number, and stop name
         String routeNumberName = tripCollection.get(position).routeNumberName;
         String stopName = tripCollection.get(position).stopName;
+        final String stopCode = tripCollection.get(position).stopCode;
         viewHolder.routeNumberName.setText(routeNumberName);
         viewHolder.routeNumberName.setTypeface(null, Typeface.BOLD);
         viewHolder.stopName.setText(stopName);
@@ -102,7 +102,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
                 viewHolder.gps[i].setText(busTimeIsLive);
 
             // Set up a click listener so we can set an alarm for this trip
-            /*final int index = i;
+            final int index = i;
             currentTrip.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -116,7 +116,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
                     ActionReceiver.makeNotification(context, intent);
                 }
-            });*/
+            });
         }
 
         // Set whether we start with a fav or unfav icon
@@ -221,7 +221,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         for (OCStop stop : stopList) {
             // Get the stop name
             final String stopName = stop.getStopName();
-            String stopCode = "" + stop.getStopCode(); // Needed for the API call
+            final String stopCode = "" + stop.getStopCode(); // Needed for the API call
 
             // Get every route that services the current stop
             octAPI.GetNextTripsForStopAllRoutes(stopCode, new SCallable<HashMap<Integer, OCBus[]>>() {
@@ -244,7 +244,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
                     // Add the complete set of information on stop and route to the collection
                     for (OCBus[] busArray : routeList) {
-                        currentCollection.add(new MainAdapterHelper(busArray, stopName));
+                        currentCollection.add(new MainAdapterHelper(busArray, stopName, stopCode));
                     }
 
                     /* Done collecting data for this API call, refresh the adapter */
@@ -288,12 +288,14 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
     private class MainAdapterHelper {
         OCBus[] busArray;
         String stopName;
+        String stopCode;
         String routeNumber;
         String routeNumberName;
 
-        MainAdapterHelper(OCBus[] busArray, String stopName) {
+        MainAdapterHelper(OCBus[] busArray, String stopName, String stopCode) {
             this.busArray = busArray;
             this.stopName = stopName;
+            this.stopCode = stopCode;
             this.routeNumber = "" + busArray[0].getRouteNo();
             this.routeNumberName = routeNumber + " " + busArray[0].getRouteHeading();
         }
