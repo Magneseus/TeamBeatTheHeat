@@ -140,13 +140,12 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
             }
         });
 
-        // TODO: this
         // Click listener to go to timetable for chosen route at current stop
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Get route number and pass it back to MainActivity
-                ((MainActivity)context).onClick("" + currentList[0].getRouteNo());
+                ((MainActivity)context).onClick("" + currentList[0].getRouteNo(), stopCode);
             }
         });
     }

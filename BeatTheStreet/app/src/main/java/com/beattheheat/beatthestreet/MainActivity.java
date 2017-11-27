@@ -108,12 +108,14 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    // TODO: this
     // User has tapped a stop, go to timetable page
-    public void onClick(String stopCodeStr) {
-        Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
-        intent.putExtra("STOPCODE", stopCodeStr);
-        //startActivity(intent);
+    public void onClick(String routeNoStr, String stopCodeStr) {
+        int routeNo = Integer.parseInt(routeNoStr);
+        int stopCode = Integer.parseInt(stopCodeStr);
+        Intent intent = new Intent(this, TimetableActivity.class);
+        intent.putExtra("ROUTENUMBER", routeNo);
+        intent.putExtra("STOPCODE", stopCode);
+        startActivity(intent);
     }
 
     @Override
