@@ -1,0 +1,5 @@
+4hrs - Packing and unpacking zipped sqlite database with the main APK
+2hrs - Creating convenience functions for database access in GTFS class
+1hr  - Implementing the favorites functionality
+
+3hrs - Attempting fixes for strange SSL errors
