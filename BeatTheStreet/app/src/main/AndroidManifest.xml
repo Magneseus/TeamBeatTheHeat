@@ -68,9 +68,12 @@
         </activity>
         <activity
             android:name=".DisplayRoutesActivity"
-            android:label="Bus Routes" />
+            android:label="Bus Routes"/>
+        <activity
+            android:name=".DisplayStopsForRouteActivity"
+            android:label="Bus Stops"/>
 
-        <receiver android:name=".Networking.ActionReceiver" />
+        <receiver android:name=".Networking.ActionReceiver"/>
 
         <activity android:name=".TimetableActivity"></activity>
     </application>

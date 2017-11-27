@@ -26,6 +26,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
 
     String stopCode; // stopCode of the stop we want to display
     String stopName;
+    int routeName;
     OCTranspo octAPI;
     ArrayList<OCBus[]> busList;
     RoutesForStopAdapter rfsAdapter; //Places route data into the RecyclerView's layout
@@ -40,6 +41,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
         octAPI = OCTranspo.getInstance();
         stopCode = getIntent().getStringExtra("STOPCODE");
         stopName = getIntent().getStringExtra("STOPNAME");
+        routeName = getIntent().getIntExtra("ROUTECODE", 0);
 
         // Set the activity title
         if (getSupportActionBar() != null)
@@ -54,7 +56,7 @@ public class DisplayRoutesForStopActivity extends AppCompatActivity {
                 busList = new ArrayList<>();
                 // Filter out routes that have no upcoming stops
                 for (OCBus[] busArray : arg.values()) {
-                    if (busArray != null && busArray.length > 0)
+                    if (busArray != null && busArray.length > 0 && (busArray[0].getRouteNo() == routeName || routeName == 0))
                         busList.add(busArray);
                 }
 

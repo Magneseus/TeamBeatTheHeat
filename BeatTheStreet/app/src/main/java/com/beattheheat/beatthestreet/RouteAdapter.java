@@ -5,13 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.OC_API.OCRoute;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Collections;
 
 /**
@@ -24,11 +23,12 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 
     private ArrayList<OCRoute> routes;
     private Context context;
+    private FavoritesStorage faveRoutes;
 
-    RouteAdapter(Context context, ArrayList<OCRoute> routeList) {
+    RouteAdapter(final Context context, ArrayList<OCRoute> routeList) {
+        faveRoutes = new FavoritesStorage(context);
         this.context = context;
-        this.routes = routeList;
-        Collections.sort(routes);
+        this.routes = sortRoutes(routeList);
     }
 
     @Override
@@ -39,32 +39,40 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final RouteViewHolder viewHolder , int position) {
-
+    public void onBindViewHolder(final RouteViewHolder viewHolder , final int position) {
         // Set the route name and direction
+        String direction = routes.get(position).getRouteNames().get(0).replaceAll("\"", "");
         viewHolder.routeName.setText(String.valueOf(routes.get(position).getRouteNo()));
+        viewHolder.routeDirection.setText(direction);
+        final String routeDesc = routes.get(position).getRouteNo() + "~" + routes.get(position).getRouteNames().get(0);
 
-        String dir1 = routes.get(position).getRouteNames().get(0);
-        String dir2 = "";
-        for(int i = 0; i <routes.get(position).getRouteNames().size(); i++){
-            if (!routes.get(position).getRouteNames().get(i).equals(dir1)){
-                dir2 = routes.get(position).getRouteNames().get(i);
-                break;
-            }
-        }
-
-        String directions = dir1 + " / " + dir2;
-        directions = directions.replaceAll("\"", "");
-
-        viewHolder.routeDirection.setText(directions);
-
-        // TODO: On click, go to detailed routes page
-        // Implement setOnClickListener event
-       /*viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Get stopCode and pass it back to DisplayRoutes
+                ((DisplayRoutesActivity)context).onClick(routeDesc);
             }
-        });*/
+        });
+
+        // Set whether we start with a fav or unfav icon
+        if (faveRoutes.isFav(routeDesc, FavoritesStorage.FAV_TYPE.ROUTE))
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+        else
+            viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+
+        // Favorite/Unfavorite functionality
+        viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (faveRoutes.toggleFav(routeDesc, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                    // Route was added to favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
+                } else {
+                    // Route was removed from favorites
+                    viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
+                }
+            }
+        });
     }
 
     @Override
@@ -77,11 +85,13 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
     static class RouteViewHolder extends RecyclerView.ViewHolder {
         TextView routeName;
         TextView routeDirection;
+        ImageView favIcon;
 
         public RouteViewHolder(View itemView) {
             super(itemView);
             routeName = (TextView)itemView.findViewById(R.id.route_name);
             routeDirection = (TextView)itemView.findViewById(R.id.route_direction);
+            favIcon  = itemView.findViewById(R.id.stop_fav_button);
         }
     }
 
@@ -90,5 +100,22 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
         routes = new ArrayList<OCRoute>();
         routes.addAll(newList);
         notifyDataSetChanged(); // Refresh the adapter
+    }
+
+    private ArrayList<OCRoute> sortRoutes(ArrayList<OCRoute> routeList){
+        ArrayList<OCRoute> faves   = new ArrayList<>();
+        ArrayList<OCRoute> nonFaves = new ArrayList<>();
+        for (OCRoute route : routeList) {
+            if (faveRoutes.isFav("" + route.getRouteNo() + "~" + route.getRouteNames().get(0), FavoritesStorage.FAV_TYPE.ROUTE))
+                faves.add(route);
+            else nonFaves.add(route);
+        }
+        ArrayList<OCRoute> returnList   = new ArrayList<>();
+        Collections.sort(faves);
+        Collections.sort(nonFaves);
+        returnList.addAll(faves);
+        returnList.addAll(nonFaves);
+
+        return returnList;
     }
 }

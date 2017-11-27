@@ -44,6 +44,8 @@ public class LocationWrapper
 
     // callbacks to excecute when new locations are received
     private Collection<SCallable> subscribers;
+    private Collection<SCallable> un_subs;
+    private Collection<SCallable> new_subs;
 
     // Constructor for Singleton class.
     // Takes the context, which is needed for creation of the GoogleApiClient.
@@ -56,6 +58,9 @@ public class LocationWrapper
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        un_subs = new ArrayList<SCallable>();
+        new_subs = new ArrayList<SCallable>();
 
         // creates a request for frequent location updates
         //  TODO: Consider different location update rates
@@ -111,12 +116,11 @@ public class LocationWrapper
     }
 
     public void subscribe(SCallable sub) {
-        // TODO: should we check for uniqueness?
-        subscribers.add(sub);
+        new_subs.add(sub);
     }
 
     public void unsubscribe(SCallable sub) {
-        subscribers.remove(sub);
+        un_subs.add(sub);
     }
 
     // Callback for when the googleApiClient connects
@@ -148,6 +152,22 @@ public class LocationWrapper
 
         for(SCallable sub : subscribers) {
             sub.call(null);
+        }
+
+        if(un_subs.size() > 0)
+        {
+            for(SCallable sub : un_subs)
+            {
+                subscribers.remove(sub);
+            }
+        }
+
+        if(new_subs.size() > 0)
+        {
+            for(SCallable sub : new_subs)
+            {
+                subscribers.add(sub);
+            }
         }
     }
 

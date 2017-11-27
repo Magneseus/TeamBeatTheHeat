@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 
 import android.R;
+import android.graphics.Color;
 import android.net.Uri;
 import android.provider.Settings;
+import android.support.v4.app.NotificationCompat;
 
 /**
  * Created by kylec on 2017-10-25.
@@ -68,13 +70,17 @@ public class NotificationUtil {
             sound = Settings.System.DEFAULT_NOTIFICATION_URI;
         }
 
-        Notification n = new Notification.Builder(ctx)
+        Notification n = new NotificationCompat.Builder(ctx)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setOngoing(persistent)
                 .setSmallIcon(icon)
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
+                .setColorized(true)
+        .setStyle(new NotificationCompat.BigTextStyle()
+                .bigText(text))
+                .setColor(Color.argb(255, 180, 18, 0))
                 .setSound(sound)
                 .build();
 
