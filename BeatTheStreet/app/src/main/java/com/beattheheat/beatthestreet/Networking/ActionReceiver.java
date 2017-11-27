@@ -129,6 +129,8 @@ public class ActionReceiver extends BroadcastReceiver {
 
                     boolean outdated = (remainingMins < 45) &&
                             ((remainingMins > 15 && millis_since_check > 4 * 60 * 1000)
+                                    || (remainingMins <= 15 && millis_since_check > 2 * 60 * 1000)
+                                    || (remainingMins < 7 && millis_since_check > 45 * 1000));
 
                     // if we are outdated, we want to attempt to update the arrival with GPS time
                     if (outdated) {
