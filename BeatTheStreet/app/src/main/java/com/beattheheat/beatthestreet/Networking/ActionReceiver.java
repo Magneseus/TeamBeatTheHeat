@@ -1,6 +1,7 @@
 package com.beattheheat.beatthestreet.Networking;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -34,7 +35,7 @@ public class ActionReceiver extends BroadcastReceiver {
         } else if (action.equals("next_bus")) {     // clicked the "next bus" button
             nextBus(context, intent);
         } else if (action.equals("cancel")) {       // swiped away the notification
-            cancelTimer();
+            cancelTimer(context);
         }
     }
 
@@ -219,7 +220,7 @@ public class ActionReceiver extends BroadcastReceiver {
         if(route_num == null || start_time == null || stop_code == null)
             return;
 
-        cancelTimer();
+        cancelTimer(context);
 
         NotificationUtil.getInstance().notify(context, 0, "Acquiring information for the next bus...");
 
@@ -253,7 +254,8 @@ public class ActionReceiver extends BroadcastReceiver {
                 });
     }
 
-    public void cancelTimer() {
+    public void cancelTimer(Context ctx) {
         shouldNotify = false;
+        NotificationUtil.getInstance().getManager(ctx).cancel(0);
     }
 }
