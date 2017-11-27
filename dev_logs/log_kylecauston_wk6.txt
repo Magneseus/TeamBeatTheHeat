@@ -1,0 +1,2 @@
+8h: Research and work on Bus ETA Timer (PoC)
+1h: Locational stop sort
