@@ -1,6 +1,7 @@
 package com.beattheheat.beatthestreet;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.beattheheat.beatthestreet.Networking.ActionReceiver;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCBus;
 
 import java.util.ArrayList;
@@ -61,15 +63,28 @@ class RoutesForStopAdapter extends RecyclerView.Adapter<RoutesForStopAdapter.Rou
             if (currentList[i].isTimeLive())
                 viewHolder.gps[i].setText(busTimeIsLive);
 
+
+
             // Set up a click listener so we can set an alarm for this trip
             // TODO: Implement alarm here
+            // Set up a click listener so we can set an alarm for this trip
+            // TODO: Implement alarm here
+            final int index = i;
             currentTrip.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // TODO: Replace this with something better
-                    currentCard.setBackgroundColor(Color.BLACK);
-                }
-            });
+               @Override
+               public void onClick(View view) {
+                   // TODO: Replace this with something better
+                   currentCard.setBackgroundColor(Color.BLACK);
+                   Intent intent = new Intent();
+                   intent.putExtra("action", "start");
+                   intent.putExtra("route_num", currentList[index].getRouteNo());
+                   intent.putExtra("stop_code", stopCode);
+                   intent.putExtra("start_time", currentList[index].getTripStart());
+                   intent.putExtra("mins_until_bus", currentList[index].getMinsTilArrival());
+                   intent.putExtra("last_available", index==2);
+
+                   ActionReceiver.makeNotification(context, intent);
+               }});
 
         }
 

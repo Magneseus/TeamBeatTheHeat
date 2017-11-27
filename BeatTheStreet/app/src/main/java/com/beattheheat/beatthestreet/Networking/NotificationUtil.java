@@ -16,7 +16,7 @@ import android.provider.Settings;
 public class NotificationUtil {
     // Singleton instance
     private static NotificationUtil myObj;
-    final public static int defaultIcon = R.drawable.btn_default;
+    final public static int defaultIcon = com.beattheheat.beatthestreet.R.drawable.ic_bus;
 
     private NotificationUtil() {
 
