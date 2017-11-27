@@ -1,0 +1,2 @@
+1hr  - Adding more queries to DAO/GTFS database
+6hrs - D3 Document work

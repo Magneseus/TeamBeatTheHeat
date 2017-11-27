@@ -1,0 +1,5 @@
+4hrs - Merging two activities into the Main activity (Stops sorted)
+3hrs - Bug fixes
+
+10hrs - Research into SQLite and Room databases, planning data structures
+ 3hrs - implementing the DAO and Database classes
