@@ -1,7 +1,10 @@
 package com.beattheheat.beatthestreet;
 
+import android.app.Notification;
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Location;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +13,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.beattheheat.beatthestreet.Networking.LocationWrapper;
+import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
+import com.beattheheat.beatthestreet.Networking.SCallable;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -62,7 +68,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(final StopViewHolder viewHolder , int position) {
+    public void onBindViewHolder(final StopViewHolder viewHolder , final int position) {
         // Set the stop name and code
         final String stopNameStr = stops.get(position).getStopName();
         viewHolder.stopName.setText(stopNameStr);
@@ -76,8 +82,56 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
         viewHolder.alarmIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: Proximity alarm goes here
+                // how many meters away we want to notify the user
+                final double distance_threshold = 100;
 
+
+                final Location stopLocation = stops.get(position).getLocation();
+                /*
+                Location tempUser = LocationWrapper.getInstance().getLocation();
+                float[] tempDist = new float[1];
+                Location.distanceBetween(tempUser.getLatitude(),
+                        tempUser.getLongitude(),
+                        stopLocation.getLatitude(),
+                        stopLocation.getLongitude(),
+                        tempDist);
+
+                final float startDistance = tempDist[0];*/
+
+                NotificationUtil.getInstance().notify(context, 0, "Stop Alarm", "You will be " +
+                        "notified when you are within " + distance_threshold + "m of stop "
+                        + stopNameStr + ".");
+
+                LocationWrapper.getInstance().subscribe(new SCallable() {
+                    @Override
+                    public void call(Object arg) {
+                        Location user = LocationWrapper.getInstance().getLocation();
+                        if (user == null) return;
+
+                        float[] distance = new float[1];
+                        Location.distanceBetween(user.getLatitude(),
+                                user.getLongitude(),
+                                stopLocation.getLatitude(),
+                                stopLocation.getLongitude(), distance);
+
+                        if (distance[0] < distance_threshold) {
+                            NotificationUtil.getInstance().notify(context, 0,
+                                    "You are close to your stop!");
+
+                            LocationWrapper.getInstance().unsubscribe(this);
+                        } /*else {
+                            Notification n = new NotificationCompat.Builder(context)
+                                    .setContentTitle("Stop Distance")
+                                    .setSmallIcon(R.drawable.ic_bus)
+                                    .setContentText(stopNameStr + ": " + df.format(distance[0]/1000)
+                                        + "km.")
+                                    .setColorized(true)
+                                    .setColor(Color.argb(255, 180, 18, 0))
+                                    .setOngoing(true)
+                                    .build();
+                        }*/
+                    }
+                });
             }
         });
 
