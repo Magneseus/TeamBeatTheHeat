@@ -160,6 +160,8 @@ public class LocationWrapper
             {
                 subscribers.remove(sub);
             }
+
+            un_subs = new ArrayList<SCallable>();
         }
 
         if(new_subs.size() > 0)
@@ -168,6 +170,8 @@ public class LocationWrapper
             {
                 subscribers.add(sub);
             }
+
+            new_subs = new ArrayList<SCallable>();
         }
     }
 

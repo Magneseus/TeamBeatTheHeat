@@ -83,7 +83,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
             @Override
             public void onClick(View view) {
                 // how many meters away we want to notify the user
-                final double distance_threshold = 100;
+                final double distance_threshold = 200;
 
 
                 final Location stopLocation = stops.get(position).getLocation();
@@ -99,7 +99,7 @@ class StopAdapter extends RecyclerView.Adapter<StopAdapter.StopViewHolder> {
                 final float startDistance = tempDist[0];*/
 
                 NotificationUtil.getInstance().notify(context, 0, "Stop Alarm", "You will be " +
-                        "notified when you are within " + distance_threshold + "m of stop "
+                        "notified when you are within " + (int)distance_threshold + "m of stop "
                         + stopNameStr + ".");
 
                 LocationWrapper.getInstance().subscribe(new SCallable() {
