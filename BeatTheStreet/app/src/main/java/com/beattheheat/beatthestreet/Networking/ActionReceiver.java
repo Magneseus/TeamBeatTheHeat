@@ -78,14 +78,18 @@ public class ActionReceiver extends BroadcastReceiver {
         Intent cancel = new Intent(context, ActionReceiver.class);
         cancel.putExtra("action", "cancel");
 
-        PendingIntent pi_next = PendingIntent.getBroadcast(ctx, 1, buttons,
+        PendingIntent pi_next = PendingIntent.getBroadcast(ctx, 2, buttons,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        final PendingIntent pi_cancel = PendingIntent.getBroadcast(ctx, 2, cancel,
+        final PendingIntent pi_cancel = PendingIntent.getBroadcast(ctx, 1, cancel,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        final NotificationCompat.Action action = new NotificationCompat.Action
+        final NotificationCompat.Action next_action = new NotificationCompat.Action
                 .Builder(NotificationUtil.defaultIcon, "Next Bus", pi_next)
+                .build();
+
+        final NotificationCompat.Action cancel_action = new NotificationCompat.Action
+                .Builder(NotificationUtil.defaultIcon, "Cancel", pi_cancel)
                 .build();
 
         runPointer.run = new Runnable() {
@@ -177,7 +181,7 @@ public class ActionReceiver extends BroadcastReceiver {
                     DecimalFormat df = new DecimalFormat("00");
 
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx)
-                            .setContentTitle("Bus")
+                            .setContentTitle("Bus ETA")
                             .setSmallIcon(R.drawable.ic_bus)
                             .setContentText("Bus " + route_num + " at " + stop_code
                                     + " will arrive in "
@@ -186,10 +190,12 @@ public class ActionReceiver extends BroadcastReceiver {
                                     + df.format((remainingMillis % 60000) / 1000) + ".")
                             .setColorized(true)
                             .setColor(Color.argb(255, 180, 18, 0))
-                            .setDeleteIntent(pi_cancel);
+                            .setOngoing(true)
+                            .addAction(cancel_action);
+                            //.setDeleteIntent(pi_cancel);
 
                     if (!runPointer.last_bus)
-                        builder.addAction(action);
+                        builder.addAction(next_action);
 
                     Notification n = builder.build();
 
@@ -215,15 +221,7 @@ public class ActionReceiver extends BroadcastReceiver {
 
         cancelTimer();
 
-        Notification n = new NotificationCompat.Builder(context)
-                .setContentTitle("Acquiring information for the next bus...")
-                .setSmallIcon(R.drawable.ic_bus)
-                .setColorized(true)
-                .setColor(Color.argb(255, 180, 18, 0))
-                .build();
-
-
-        NotificationUtil.getInstance().notify(context, 0, n);
+        NotificationUtil.getInstance().notify(context, 0, "Acquiring information for the next bus...");
 
         OCTranspo.getInstance().GetNextTripsForStopAndRoute(stop_code, route_num.toString(),
                 new SCallable<OCBus[]>() {
