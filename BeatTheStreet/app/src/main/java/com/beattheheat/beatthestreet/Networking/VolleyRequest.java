@@ -51,7 +51,6 @@ public class VolleyRequest {
     // Initialization, requires a context from an android activity
     private VolleyRequest(Context context) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, IOException, CertificateException {
         mCtx = context;
-        mRequestQueue = getRequestQueue();
 
         // Load our CA Certificate
         InputStream in = context.getResources().openRawResource(R.raw.globalsign_dv);
@@ -87,6 +86,8 @@ public class VolleyRequest {
                 return httpsURLConnection;
             }
         };
+
+        mRequestQueue = getRequestQueue(hurlStack);
     }
 
     // Returns the singleton instance (or creates a new one if non-existent)
@@ -109,12 +110,16 @@ public class VolleyRequest {
         return mInstance;
     }
 
-    // Returns the current request queue, so you can add requests to it
     public RequestQueue getRequestQueue() {
+        return getRequestQueue(null);
+    }
+
+    // Returns the current request queue, so you can add requests to it
+    public RequestQueue getRequestQueue(HurlStack hurlStack) {
         if (mRequestQueue == null) {
             // getApplicationContext() is key, it keeps you from leaking the
             // Activity or BroadcastReceiver if someone passes one in.
-            mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
+            mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext(), hurlStack);
         }
         return mRequestQueue;
     }
