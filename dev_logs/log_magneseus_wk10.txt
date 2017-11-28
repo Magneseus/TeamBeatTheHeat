@@ -1,0 +1,3 @@
+1hr  - More work on fixing strange SSL error
+1hr  - Minor changes to overall Manifest
+8hrs - Work on D4 doc/video/demo
