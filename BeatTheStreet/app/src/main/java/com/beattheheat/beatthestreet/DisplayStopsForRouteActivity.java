@@ -75,51 +75,11 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
         rv.setAdapter(sfrAdapter);
         }
 
-    // User has tapped a stop, go to detailed stop page
-    public void onClick(String stopCodeStr, String stopNameStr) {
-        class RunnablePointer {
-            public Runnable run;
-            public RunnablePointer(Runnable run) {
-                this.run = run;
-            }
-        }
-
-        class TimeHolder {
-            public long time;
-            public TimeHolder(long t) { this.time = t; }
-        }
-
-        final Context ctx = this;
-
-        final TimeHolder time = new TimeHolder(SystemClock.elapsedRealtime());
-
-        final Handler handler = new Handler();
-        final RunnablePointer runPointer = new RunnablePointer(null);
-        runPointer.run = new Runnable() {
-            @Override
-            public void run() {
-                int minutesInMillis = (int)(0.5*60*1000);
-                float elapsedMillis = (SystemClock.elapsedRealtime() - time.time);
-                int remainingMillis = (int) (minutesInMillis - elapsedMillis);
-
-                NotificationUtil.getInstance().notify(ctx, 0, "Timer", ""
-                        + (int) (remainingMillis / (1000 * 60)) + ":" // minutes
-                        + (int) (remainingMillis % (1000 * 60))/1000); // seconds
-
-                if(remainingMillis < 0) {
-                    time.time = SystemClock.elapsedRealtime();
-                }
-
-                handler.postDelayed(runPointer.run, 1000);
-            }
-        };
-
-        handler.postDelayed(runPointer.run, 1000);
-
-        Intent intent = new Intent(this, DisplayRoutesForStopActivity.class);
-        intent.putExtra("STOPCODE", stopCodeStr);
-        intent.putExtra("STOPNAME", stopNameStr);
-        intent.putExtra("ROUTECODE", busNo);
+    // User has tapped a stop, go to timetable page
+    public void onClick(int stopCode) {
+        Intent intent = new Intent(this, TimetableActivity.class);
+        intent.putExtra("ROUTENUMBER", busNo);
+        intent.putExtra("STOPCODE", stopCode);
         startActivity(intent);
 
     }
