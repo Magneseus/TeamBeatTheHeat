@@ -120,8 +120,8 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         }
 
         // Set whether we start with a fav or unfav icon
-        final String routeNumber = tripCollection.get(position).routeNumber;
-        if (faveRoutes.isFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE))
+        final String faveRoute = tripCollection.get(position).routeFaveStr;
+        if (faveRoutes.isFav(faveRoute, FavoritesStorage.FAV_TYPE.ROUTE))
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_favorite);
         else
             viewHolder.favIcon.setBackgroundResource(R.drawable.ic_unfavorite);
@@ -130,7 +130,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         viewHolder.favIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (faveRoutes.toggleFav(routeNumber, FavoritesStorage.FAV_TYPE.ROUTE)) {
+                if (faveRoutes.toggleFav(faveRoute, FavoritesStorage.FAV_TYPE.ROUTE)) {
                     // Route was added to favorites
                     viewHolder.favIcon.setImageResource(R.drawable.ic_favorite);
                 } else {
@@ -192,7 +192,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         ArrayList<MainAdapterHelper> favorites = new ArrayList<>();
         ArrayList<MainAdapterHelper> unFavorites = new ArrayList<>();
         for (MainAdapterHelper currentTrip : inList) {
-            if (faveRoutes.isFav(currentTrip.routeNumber, FavoritesStorage.FAV_TYPE.ROUTE))
+            if (faveRoutes.isFav(currentTrip.routeFaveStr, FavoritesStorage.FAV_TYPE.ROUTE))
                 favorites.add(currentTrip);
             else unFavorites.add(currentTrip);
         }
@@ -289,14 +289,18 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
         String stopName;
         String stopCode;
         String routeNumber;
+        String routeName;
         String routeNumberName;
+        String routeFaveStr;
 
         MainAdapterHelper(OCBus[] busArray, String stopName, String stopCode) {
             this.busArray = busArray;
             this.stopName = stopName;
             this.stopCode = stopCode;
             this.routeNumber = "" + busArray[0].getRouteNo();
-            this.routeNumberName = routeNumber + " " + busArray[0].getRouteHeading();
+            this.routeName = "" + busArray[0].getRouteHeading();
+            this.routeNumberName = routeNumber + " " + routeName;
+            this.routeFaveStr = routeNumber + "~" + routeName;
         }
     }
 }

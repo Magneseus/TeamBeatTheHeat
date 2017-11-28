@@ -44,7 +44,7 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
         String direction = routes.get(position).getRouteNames().get(0).replaceAll("\"", "");
         viewHolder.routeName.setText(String.valueOf(routes.get(position).getRouteNo()));
         viewHolder.routeDirection.setText(direction);
-        final String routeDesc = routes.get(position).getRouteNo() + "~" + routes.get(position).getRouteNames().get(0);
+        final String routeDesc = routes.get(position).getRouteNo() + "~" + routes.get(position).getRouteNames().get(0).replaceAll("\"", "");
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +106,7 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
         ArrayList<OCRoute> faves   = new ArrayList<>();
         ArrayList<OCRoute> nonFaves = new ArrayList<>();
         for (OCRoute route : routeList) {
-            if (faveRoutes.isFav("" + route.getRouteNo() + "~" + route.getRouteNames().get(0), FavoritesStorage.FAV_TYPE.ROUTE))
+            if (faveRoutes.isFav("" + route.getRouteNo() + "~" + route.getRouteNames().get(0).replaceAll("\"", ""), FavoritesStorage.FAV_TYPE.ROUTE))
                 faves.add(route);
             else nonFaves.add(route);
         }
