@@ -1,0 +1,3 @@
+3h - reserach Android development /review Java
+2h - research OCTranspo API
+1h - Android Studio set-up
