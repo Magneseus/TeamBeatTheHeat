@@ -103,7 +103,7 @@ class MainAdapter extends RecyclerView.Adapter<MainAdapter.MainViewHolder> {
 
             // Set up a click listener so we can set an alarm for this trip
             final int index = i;
-            currentTrip.setOnClickListener(new View.OnClickListener() {
+            currentCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent intent = new Intent();
