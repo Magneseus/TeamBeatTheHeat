@@ -347,7 +347,7 @@ public class GTFS {
 
         bReq.setRetryPolicy(VolleyRequest.longerWaitPolicy);
 
-        req.add(bReq);
+        VolleyRequest.getInstance(appCtx).getNonSSLRequestQueue().add(bReq);
     }
 
     /// Checks if the GTFS needs to be updated

@@ -41,6 +41,7 @@ public class VolleyRequest {
     @SuppressLint("StaticFieldLeak")
     private static Context mCtx;
     private RequestQueue mRequestQueue;
+    private RequestQueue mNonSSLRequestQueue;
 
     // A Longer wait policy for requests
     public static DefaultRetryPolicy longerWaitPolicy = new DefaultRetryPolicy(
@@ -88,6 +89,7 @@ public class VolleyRequest {
         };
 
         mRequestQueue = getRequestQueue(hurlStack);
+        mNonSSLRequestQueue = getNonSSLRequestQueue();
     }
 
     // Returns the singleton instance (or creates a new one if non-existent)
@@ -115,13 +117,22 @@ public class VolleyRequest {
     }
 
     // Returns the current request queue, so you can add requests to it
-    public RequestQueue getRequestQueue(HurlStack hurlStack) {
+    private RequestQueue getRequestQueue(HurlStack hurlStack) {
         if (mRequestQueue == null) {
             // getApplicationContext() is key, it keeps you from leaking the
             // Activity or BroadcastReceiver if someone passes one in.
             mRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext(), hurlStack);
         }
         return mRequestQueue;
+    }
+
+    public RequestQueue getNonSSLRequestQueue() {
+        if (mNonSSLRequestQueue == null) {
+            // getApplicationContext() is key, it keeps you from leaking the
+            // Activity or BroadcastReceiver if someone passes one in.
+            mNonSSLRequestQueue = Volley.newRequestQueue(mCtx.getApplicationContext());
+        }
+        return mNonSSLRequestQueue;
     }
 
     // Allows requests to be added directly, instead of getting the request queue and adding to it
