@@ -1,0 +1,4 @@
+10h:
+->Finish implementations for DisplayStopsActivity and DisplayRoutesForStopActivity
+->Begin improving UI with CardViews and icons
+->Begin adding favorites functionality to DisplayStopsActivity

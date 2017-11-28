@@ -1,0 +1,8 @@
+2h:
+->Work on D4 submission
+->Work on D4 demo
+5h:
+->Finish work in MainActivity
+->Create TimetableActivity
+->Final round of cleanup and UI adjustments, lots of bug fixes
+->Review of all UI elements to ensure consistent look and behaviour across whole app

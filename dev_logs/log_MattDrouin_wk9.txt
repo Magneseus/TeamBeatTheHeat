@@ -1,0 +1,4 @@
+2h: Oral exam prep
+6h:
+->Begin implementing MainActivity's final functionality
+->Begin/complete UI work in MainActivity

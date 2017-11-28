@@ -1,0 +1,2 @@
+2h: Work on D2
+3h: Bug fixes and code cleanup

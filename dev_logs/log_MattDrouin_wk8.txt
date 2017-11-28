@@ -1,0 +1,2 @@
+5h: Work on D3 submission
+2h: Bug fixes, code cleanup, UI adjustments

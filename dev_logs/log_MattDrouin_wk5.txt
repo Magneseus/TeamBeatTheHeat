@@ -1,0 +1,6 @@
+Reading week
+50h (yes, fifty):
+->Finish implementing DisplayStopsActivity
+->Begin implementing DisplayRoutesForStopActivity
+->Research into Android RecyclerView
+->Begin implementing RecyclerView in both activities
