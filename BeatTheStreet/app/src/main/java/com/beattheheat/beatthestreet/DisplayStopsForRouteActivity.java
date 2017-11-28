@@ -51,10 +51,12 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
         String tripId = "";
 
         OCRoute thisRoute = octAPI.gtfsTable.getRoute(busNo);
+        System.out.println("BUSDIR:" + busDir);
 
         //TODO: catch errors if trip not found
         int i = 0;
-        while (!thisRoute.getRouteNames().get(i).equals(busDir) && i < thisRoute.getRouteNames().size() - 1){
+        while (!thisRoute.getRouteNames().get(i).replace("\"", "").equals(busDir) && i < thisRoute.getRouteNames().size()){
+            System.out.println("ROUTE: " + thisRoute.getRouteNames().get(i));
             i++;
         }
         tripId = thisRoute.getTrips().get(i);

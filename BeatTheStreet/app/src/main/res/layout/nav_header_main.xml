@@ -14,14 +14,14 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="63dp"
+        android:layout_height="69dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        app:srcCompat="@android:drawable/sym_def_app_icon" />
+        android:src="@drawable/bus_icon" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="19dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="Beat The Heat"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
@@ -29,7 +29,7 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="beattheheat@heat.ca" />
+        android:layout_height="34dp"
+        android:text="github.com/Magneseus/TeamBeatTheHeat" />
 
 </LinearLayout>
