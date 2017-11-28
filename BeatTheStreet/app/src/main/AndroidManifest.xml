@@ -44,9 +44,6 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps" />
-        <activity
             android:name=".DisplayStopsActivity"
             android:label="Bus Stops"
             android:parentActivityName=".MainActivity"
@@ -68,14 +65,29 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DisplayStopsActivity" />
         </activity>
+
         <activity
             android:name=".DisplayRoutesActivity"
             android:label="Bus Routes"
-            android:screenOrientation="portrait"/>
+            android:parentActivityName=".MainActivity"
+            android:screenOrientation="portrait" >
+
+        <!-- meta-data tag to support older APIs -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity" />
+        </activity>
         <activity
             android:name=".DisplayStopsForRouteActivity"
             android:label="Bus Stops"
-            android:screenOrientation="portrait"/>
+            android:parentActivityName=".DisplayRoutesActivity"
+            android:screenOrientation="portrait" >
+
+        <!-- meta-data tag to support older APIs -->
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".DisplayRoutesActivity" />
+        </activity>
 
         <receiver android:name=".Networking.ActionReceiver"/>
 

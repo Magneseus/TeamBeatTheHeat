@@ -2,13 +2,11 @@ package com.beattheheat.beatthestreet;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
-import android.view.MenuItem;
 
 import com.beattheheat.beatthestreet.Networking.OC_API.OCRoute;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCTranspo;
@@ -33,7 +31,7 @@ public class DisplayRoutesActivity extends AppCompatActivity
 
         ArrayList<OCRoute> newRouteList = organizeRoutes(routeList);
 
-        rv = (RecyclerView) findViewById(R.id.recycler_view);
+        rv = findViewById(R.id.recycler_view);
         LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
         rv.setLayoutManager(llm);
         routeAdapter = new RouteAdapter(this, newRouteList);
@@ -55,8 +53,8 @@ public class DisplayRoutesActivity extends AppCompatActivity
                 }
             }
 
-            ArrayList<String> routeNames1 = new ArrayList<String>();
-            ArrayList<String> routeNames2 = new ArrayList<String>();
+            ArrayList<String> routeNames1 = new ArrayList<>();
+            ArrayList<String> routeNames2 = new ArrayList<>();
             routeNames1.add(dir1);
             routeNames2.add(dir2);
 
@@ -68,7 +66,6 @@ public class DisplayRoutesActivity extends AppCompatActivity
 
         }
 
-
         return returnList;
     }
 
@@ -76,35 +73,37 @@ public class DisplayRoutesActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_items, menu);
-        MenuItem menuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
+        SearchView searchView = (SearchView)menu.findItem(R.id.action_search).getActionView();
         searchView.setOnQueryTextListener(this);
         return true;
     }
 
-    //search for route number
+    // Do nothing, we update search results live so we don't need this method
     @Override
-    public boolean onQueryTextSubmit(String searchText) {
-        ArrayList<OCRoute> newList = new ArrayList<OCRoute>();
+    public boolean onQueryTextSubmit(String searchText) { return false; }
+
+    @Override
+    public boolean onQueryTextChange(String searchText) {
+        searchText = searchText.toLowerCase();
+
+        // Set up a list that will contain the search results
+        ArrayList<OCRoute> newList = new ArrayList<>();
 
         for (OCRoute route : routeList) {
-            int routeName = route.getRouteNo();
+            String routeNumber = "" + route.getRouteNo();
+            String routeName   = route.getRouteNames().get(0).toLowerCase().replaceAll("\"", "");
 
-            if (routeName == Integer.parseInt(searchText)) {
+            // We search by route name and number so check both
+            if (routeNumber.contains(searchText) || routeName.contains(searchText)) {
                 newList.add(route);
             }
         }
+
+        // Update the adapter with the newly filtered list
         routeAdapter.setFilter(newList);
         return true;
     }
 
-    //wait until user has submitted route to search
-    //@Override
-    public boolean onQueryTextChange(String searchText) {
-        return false;
-    }
-
-    //@Override
     public void onClick(String route) {
         Intent intent = new Intent(this, DisplayStopsForRouteActivity.class);
         intent.putExtra("ROUTE", route);

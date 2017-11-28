@@ -54,7 +54,7 @@ public class DisplayStopsForRouteActivity extends AppCompatActivity {
 
         //TODO: catch errors if trip not found
         int i = 0;
-        while (!thisRoute.getRouteNames().get(i).equals(busDir) && i < thisRoute.getRouteNames().size()){
+        while (!thisRoute.getRouteNames().get(i).equals(busDir) && i < thisRoute.getRouteNames().size() - 1){
             i++;
         }
         tripId = thisRoute.getTrips().get(i);

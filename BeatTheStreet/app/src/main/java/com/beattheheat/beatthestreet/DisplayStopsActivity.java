@@ -61,7 +61,6 @@ public class DisplayStopsActivity extends AppCompatActivity
     @Override
     public boolean onQueryTextSubmit(String query) { return false; }
 
-
     @Override
     public boolean onQueryTextChange(String newText) {
         newText = newText.toLowerCase();

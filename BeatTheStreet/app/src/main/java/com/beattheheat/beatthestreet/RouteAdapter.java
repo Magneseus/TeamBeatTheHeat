@@ -97,8 +97,9 @@ class RouteAdapter extends RecyclerView.Adapter<RouteAdapter.RouteViewHolder> {
 
     // Replaces the current list of stops with the routes that match the searchp
     public void setFilter(ArrayList<OCRoute> newList) {
-        routes = new ArrayList<OCRoute>();
-        routes.addAll(newList);
+        //routes = new ArrayList<OCRoute>();
+        //routes.addAll(newList);
+        routes = sortRoutes(newList);
         notifyDataSetChanged(); // Refresh the adapter
     }
 

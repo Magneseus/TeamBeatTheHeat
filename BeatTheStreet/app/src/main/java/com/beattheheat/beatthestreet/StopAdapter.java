@@ -1,10 +1,7 @@
 package com.beattheheat.beatthestreet;
 
-import android.app.Notification;
 import android.content.Context;
-import android.graphics.Color;
 import android.location.Location;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +14,6 @@ import com.beattheheat.beatthestreet.Networking.NotificationUtil;
 import com.beattheheat.beatthestreet.Networking.OC_API.OCStop;
 import com.beattheheat.beatthestreet.Networking.SCallable;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
